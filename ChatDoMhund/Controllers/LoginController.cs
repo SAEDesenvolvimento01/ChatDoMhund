@@ -70,7 +70,7 @@ namespace ChatDoMhund.Controllers
                             codigoDoAluno: ca,
                             tipoDeRelacao: tr))
                         {
-                            return this.RedirectToAction("Index", "Home");
+                            return this.RedirectToAction("Index", "Chat");
                         }
                     }
                     else
@@ -86,27 +86,6 @@ namespace ChatDoMhund.Controllers
 
             return this.RedirectToAction("HandleError", "Error", new { @error = "not allowed", @code = 403 });
         }
-        //public IActionResult Auth2(int e, int c, string t, string h, int ca = 0, string tr = "")
-        //{
-        //    string hash = this._saeCriptography.GerarCriptografia($"{e}{c}{t}{ca}{tr}");
-        //    if (this._saeCriptography.Comparar(hash, h))
-        //    {
-        //        if (this._appCfgRepository.EscolaUsaChat()) 
-        //        {
-        //            if (this._usuarioLogado.SetUsuarioLogado(
-        //                codigoDaEscola: e,
-        //                codigoDoUsuario: c,
-        //                tipoDoUsuario: t,
-        //                codigoDoAluno: ca,
-        //                tipoDeRelacao: tr))
-        //            {
-        //                return this.RedirectToAction("Index", "Home");
-        //            }
-        //        }
-        //    }
-
-        //    return this.RedirectToAction("HandleError", "Error", new { @error = "not allowed", @code = 403 });
-        //}
 
         public IActionResult Sair()
         {

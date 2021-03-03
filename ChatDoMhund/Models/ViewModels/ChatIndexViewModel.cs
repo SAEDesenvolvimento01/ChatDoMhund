@@ -2,8 +2,7 @@
 
 namespace ChatDoMhund.Models.ViewModels
 {
-    public class HomeViewModel : BaseViewModelIndex
+    public class ChatIndexViewModel : BaseViewModelIndex
     {
-
     }
 }

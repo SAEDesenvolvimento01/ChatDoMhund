@@ -4,16 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ChatDoMhund.Controllers
 {
-    public class HomeController : AbsController
+    public class ChatController : AbsController
     {
-        public HomeController()
-        {
-            
-        }
-
         public IActionResult Index()
         {
-            return this.View("Index", new HomeViewModel());
+            return this.View("Index", new ChatIndexViewModel());
         }
     }
 }

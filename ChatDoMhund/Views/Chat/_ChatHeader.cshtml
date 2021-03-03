@@ -1,0 +1,22 @@
+﻿@model ChatDoMhund.Models.ViewModels.ChatIndexViewModel
+@{
+    this.Layout = null;
+}
+<div class="chat-header">
+    <div class="row valign-wrapper">
+        <div class="col media-image online pr-0">
+            <img src="@this.Model.Routes.Helper/materialize/images/user/7.jpg" alt="" class="circle z-depth-2 responsive-img">
+        </div>
+        <div class="col">
+            <p class="m-0 blue-grey-text text-darken-4 font-weight-700">Alice Hawker</p>
+            <p class="m-0 chat-text truncate">Apple pie bonbon cheesecake tiramisu</p>
+        </div>
+    </div>
+    <span class="option-icon">
+        <span class="favorite">
+            <i class="material-icons">star_outline</i>
+        </span>
+        <i class="material-icons">delete</i>
+        <i class="material-icons">more_vert</i>
+    </span>
+</div>

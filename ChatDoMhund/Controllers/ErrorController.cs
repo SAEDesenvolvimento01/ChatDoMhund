@@ -16,7 +16,6 @@ namespace ChatDoMhund.Controllers
             this._httpContextAccessor = httpContextAccessor;
         }
 
-        //[Route("/Home/HandleError/{code:int}")]
         public IActionResult HandleError(int code = 500, string error = "", string message = "")
         {
             ErrorViewModel viewModel = new ErrorViewModel(code, error, message, this._httpContextAccessor);
