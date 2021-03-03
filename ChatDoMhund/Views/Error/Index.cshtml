@@ -1,0 +1,67 @@
+﻿@model ChatDoMhund.Models.ViewModels.ErrorViewModel
+@{
+    this.Layout = null;
+}
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr">
+<head>
+    <title>@Html.Raw(this.Model.Title)</title>
+    <link rel="apple-touch-icon" href="~/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/themes/horizontal-menu-template/materialize.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/themes/horizontal-menu-template/style.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/layouts/style-horizontal.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/pages/dashboard.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/vendors.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/animate-css/animate.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/sweetalert/sweetalert.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/custom/custom.css" />
+    <link rel="stylesheet" type="text/css" href="@this.Model.Routes.Helper/materialize/css/pages/page-@(this.Model.StatusCode).css">
+
+    <script src="@this.Model.Routes.Helper/materialize/js/vendors.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/sweetalert/sweetalert.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/plugins.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/custom/custom-script.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/loading.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/materialize-loading.js"></script>
+
+    <style>
+        .section-400, .section-404, .section-500 {
+            height: auto;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="horizontal-layout page-header-light horizontal-menu preload-transitions 1-column  bg-full-screen-image  blank-page blank-page" data-open="click" data-menu="horizontal-menu" data-col="1-column">
+    <div class="row">
+        <div class="col s12">
+            <div class="container">
+                <div class="section section-@this.Model.StatusCode p-0 m-0">
+                    <div class="row">
+                        <div class="col s12 center-align white">
+                            <img src="@this.Model.Routes.Helper/image/error/error-2.png"
+                                 class="bg-image-@this.Model.StatusCode" 
+                                 alt="">
+                            <h1 class="error-code m-0">
+                                @this.Model.StatusCode
+                            </h1>
+                            <h6 class="mb-1">
+                                @Html.Raw(this.Model.GetTitulo())
+                            </h6>
+                            <div class="left-align p-0 m-0">
+                                @Html.Raw(this.Model.GetMensagem())
+                            </div>
+                            <a class="btn waves-effect waves-light gradient-45deg-deep-purple-blue gradient-shadow mb-4 hoverable"
+                               href="/Home">
+                                Voltar para a Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content-overlay"></div>
+        </div>
+    </div>
+</body>
+</html>

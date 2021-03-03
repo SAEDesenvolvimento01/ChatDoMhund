@@ -1,0 +1,51 @@
+﻿@model ChatDoMhund.Models.ViewModels.Base.BaseViewModelIndex
+@{
+    this.Layout = null;
+}
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <title>@Html.Raw(this.Model.Title)</title>
+    <link rel="apple-touch-icon" href="~/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/themes/horizontal-menu-template/materialize.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/themes/horizontal-menu-template/style.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/layouts/style-horizontal.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/pages/dashboard.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/vendors.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/animate-css/animate.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/sweetalert/sweetalert.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/data-tables/extensions/responsive/css/responsive.dataTables.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/data-tables/css/dataTables.material.min.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/css/custom/custom.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/summernote/summernoteCss.css" />
+    <link rel="stylesheet" href="@this.Model.Routes.Helper/materialize/vendors/dropify/css/dropify.min.css" />
+    <link asp-append-version="true" href="~/css/layout.css" rel="stylesheet" />
+
+    <script src="@this.Model.Routes.Helper/materialize/js/vendors.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/jquery-validation/jquery.validate.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/sweetalert/sweetalert.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/plugins.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/custom/custom-script.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/loading.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/materialize-loading.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/table.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/toast.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/js/infra/datepicker.js"></script>
+    <script src="@this.Model.Routes.Helper/Js/material/SaeMaterialModal.js"></script>
+    <script src="@this.Model.Routes.Helper/Js/SaeAjax.js"></script>
+    <script src="@this.Model.Routes.Helper/Js/SaeResponse.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/formatter/jquery.formatter.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/data-tables/js/jquery.dataTables.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/data-tables/extensions/responsive/js/dataTables.responsive.min.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/summernote/summernote.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/summernote/SummernoteCreator.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/summernote/SummernoteValidator.js"></script>
+    <script src="@this.Model.Routes.Helper/materialize/vendors/dropify/js/dropify.min.js"></script>
+</head>

@@ -1,0 +1,35 @@
+﻿@model ChatDoMhund.Models.ViewModels.Base.BaseViewModelIndex
+@{
+    this.Layout = null;
+}
+<nav class="navbar-main navbar-color nav-collapsible sideNav-lock navbar-dark @this.Model.CorPrimaria gradient-shadow">
+    <div class="nav-wrapper">
+        <ul class="left">
+            <li>
+                <h1 class="logo-wrapper">
+                    <a asp-action="Index" asp-controller="Home" class="brand-logo darken-1 animated bounceInLeft">
+                        <span class="logo material-icons">home</span>
+                        <span class="logo-text hide-on-med-and-down">Chat</span>
+                    </a>
+                </h1>
+            </li>
+        </ul>
+        <ul class="navbar-list right">
+            <li>
+                <a class="waves-effect waves-block waves-light profile-button dropdown-trigger"
+                   href="javascript:void(0);"
+                   data-target="profile-dropdown">
+                    <span class="avatar-status avatar-online">
+                        <img src="~/image/no-user-image.gif" alt="avatar"><i></i>
+                    </span>
+                </a>
+                <ul class="dropdown-content" id="profile-dropdown" tabindex="0" style="">
+                    <li tabindex="0"><a class="grey-text text-darken-1" asp-controller="Login" asp-action="Sair"><i class="material-icons">keyboard_tab</i> Sair</a></li>
+                </ul>
+            </li>
+            <li class="hide-on-small-only">
+                <a class="waves-effect waves-block waves-light toggle-fullscreen" href="javascript:void(0);"><i class="material-icons">settings_overscan</i></a>
+            </li>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Devart.Data" Version="5.0.2584" />
+    <PackageReference Include="Devart.Data.PostgreSql" Version="7.20.1792" />
+    <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql" Version="5.0.1.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChatDoMhundStandard\ChatDoMhundStandard.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HelperMhundCore31">
+      <HintPath>..\..\HelperMhund\HelperMhundCore31\bin\Release\netcoreapp3.1\HelperMhundCore31.dll</HintPath>
+    </Reference>
+    <Reference Include="HelperSaeCore31">
+      <HintPath>..\..\HelperMhund\HelperSaeCore31\bin\Release\netcoreapp3.1\HelperSaeCore31.dll</HintPath>
+    </Reference>
+    <Reference Include="HelperSaeStandard11">
+      <HintPath>..\..\HelperMhund\HelperSaeStandard11\bin\Release\netstandard1.1\HelperSaeStandard11.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\image\demo\" />
+  </ItemGroup>
+
+</Project>

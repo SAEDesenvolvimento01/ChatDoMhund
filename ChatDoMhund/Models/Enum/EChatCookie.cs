@@ -1,0 +1,7 @@
+﻿namespace ChatDoMhund.Models.Enum
+{
+    public enum EChatCookie
+    {
+        OrigemDeChat
+    }
+}

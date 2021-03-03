@@ -1,0 +1,46 @@
+﻿@using ChatDoMhund.Models.Infra.Cookie
+@{
+    Layout = null;
+    CookieConsent consent = new CookieConsent(this.Context);
+}
+
+@if (consent.NeedShowBanner())
+{
+    <div id="modal-cookie-consent" class="modal modal-fixed-footer bottom-sheet" style="overflow: hidden !important;">
+        <div class="modal-content gradient-45deg-blue-indigo medium-small white-text">
+            <h5 class="white-text">Hora dos Cookies! ;)</h5>
+            <p>Ao entrar, você concorda que eu preciso usar cookies para que você tenha uma melhor experiência.</p>
+            <p>Eu preciso deles também para diferenciar os usuários que me acessam.</p>
+        </div>
+        <div class="modal-footer indigo medium-small">
+            <a href='#'
+               id="btn-accept-cookies"
+               data-cookie-string="@consent.GetConsentCookie()"
+               class='btn waves-effect waves-light gradient-45deg-purple-deep-purple gradient-shadow white-text'>
+                Ok, eu aceito os cookies!
+            </a>
+        </div>
+    </div>
+    <script>
+        $(() => {
+            const $inputsLogin = $("form#form-login-voce-sabia input");
+
+            $inputsLogin.attr("disabled", "disabled");
+
+            const saeModal = new SaeModal({
+                id: "modal-cookie-consent"
+            });
+
+            saeModal.Open();
+
+            const $btnAcceptCookies = $("a#btn-accept-cookies");
+            $btnAcceptCookies.on("click", (e) => {
+                document.cookie = $btnAcceptCookies.attr("data-cookie-string");
+                $inputsLogin.removeAttr("disabled");
+                const $modal = $("div#modal-cookie-consent");
+                $modal.addClass("scale-transition scale-out");
+                setTimeout(() => { saeModal.Close() }, 500);
+            });
+        });
+    </script>
+}

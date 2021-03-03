@@ -1,0 +1,60 @@
+﻿@using ChatDoMhund.Models.Infra
+@model ChatDoMhund.Models.ViewModels.Base.BaseViewModelIndex
+@{
+    this.Layout = null;
+    const string cor = "#64b5f6 blue lighten-2";
+    const string esconderEmTabletECelular = "hide-on-med-and-down";
+}
+
+<!DOCTYPE html>
+<html class="loading" lang="pt-BR" data-textdirection="ltr">
+<partial name="_Head" model="this.Model" />
+<body class="horizontal-layout page-header-light horizontal-menu 2-columns" data-open="click" data-menu="horizontal-menu" data-col="2-columns">
+    <!-- EGIN: Header-->
+    <header id="header">
+        <div class="navbar navbar-fixed navbar-chat">
+            <partial name="_MenuSuperior" model="this.Model" />
+@*            <partial name="_MenuPrincipal" model="this.Model" />*@
+        </div>
+    </header>
+  @*  <partial name="_MenuLateral" model="this.Model" />*@
+    <!-- END: Header-->
+    <!-- BEGIN: Page Main-->
+    <div id="main">
+        <div id="loading"></div>
+        <div class="row">
+            <div class="col s12">
+                <div class="container">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END: Page Main-->
+    <!-- BEGIN: Footer-->
+    @*<footer class="page-footer footer footer-static footer-dark @cor @esconderEmTabletECelular gradient-shadow navbar-border navbar-shadow">
+        <div class="footer-copyright">
+            <div class="container">
+                <span>
+                    &copy; @DateTime.Today.Year -
+                    <a href="http://vocesabia.mhund.com.br/" target="_blank">Você Sabia? - Mhund</a> - Todos os direitos reservados.
+                </span>
+                <span class="right">
+                    Desenvolvido por <a href="https://www.saeinfo.net.br/" target="_blank">SAE+C</a>
+                </span>
+            </div>
+        </div>
+    </footer>*@
+    <!-- END: Footer-->
+    @if (Util.EhDebug())
+    {
+        <script>
+            $(() => {
+                window.onerror = function (event) {
+                    alert(`Erro: ${event}`);
+                };
+            });
+        </script>
+    }
+</body>
+</html>

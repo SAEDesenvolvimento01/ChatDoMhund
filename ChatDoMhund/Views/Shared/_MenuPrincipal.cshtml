@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Http
+@using ChatDoMhund.Models.Infra
+@using ChatDoMhund.Models.Poco
+@model ChatDoMhund.Models.ViewModels.Base.BaseViewModelIndex
+@inject IHttpContextAccessor _httpContextAcessor
+@inject UsuarioLogado _usuarioLogado
+@{
+    this.Layout = null;
+    this.Model.SetItensDoMenuPrincipal(this._httpContextAcessor.HttpContext, this._usuarioLogado.GetUsuarioLogado());
+}
+<nav class="white hide-on-med-and-down" id="horizontal-nav">
+    <div class="nav-wrapper">
+        <ul class="left hide-on-med-and-down" id="ul-horizontal-nav" data-menu="menu-navigation">
+            @if (Util.EhDebug())
+            {
+                <li>
+                    <a href="https://pixinvent.com/materialize-material-design-admin-template/html/ltr/horizontal-menu-template/"
+                       target="_blank">
+                        <i class="material-icons">dvr</i><span>Template</span>
+                    </a>
+                </li>
+            }
+
+            @foreach (var item in this.Model.ItensDoMenuPrincipal
+            .Where(item => item.PossuiPermissaoParaAcessar)
+            .Select((item, i) => new { menu = item, index = i }))
+            {
+                if (!item.menu.SubItens.Any())
+                {
+                    <li class="@item.menu.GetClasseActive()">
+                        <a asp-controller="@item.menu.Controller" asp-action="@item.menu.Action">
+                            <i class="material-icons">@item.menu.Icone</i><span>@item.menu.Texto</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    string idSubmenu = $"sub-menu-{item.index}";
+                    <li>
+                        <a class="dropdown-menu @item.menu.GetClasseActive()"
+                           href="Javascript:void(0)"
+                           data-target="@idSubmenu">
+                            <i class="material-icons">@item.menu.Icone</i><span>@item.menu.Texto</span>
+                        </a>
+                        <ul class="dropdown-content dropdown-horizontal-list"
+                            id="@idSubmenu" tabindex="0">
+                            @foreach (PkSubItemMenuPrincipal subItem in item.menu.SubItens
+                                .Where(subItem => subItem.PossuiPermissaoParaAcessar))
+                            {
+                                <li data-menu="" tabindex="0" class="@subItem.GetClasseActive()">
+                                    <a asp-controller="@subItem.Controller" asp-action="@subItem.Action">
+                                        <span>@subItem.Texto</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</nav>

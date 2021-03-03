@@ -1,0 +1,64 @@
+﻿@using ChatDoMhund.Models.Infra
+@using ChatDoMhund.Models.Poco
+@model ChatDoMhund.Models.ViewModels.Base.BaseViewModelIndex
+@{
+    this.Layout = null;
+}
+<aside class="sidenav-main nav-expanded nav-lock nav-collapsible sidenav-fixed hide-on-large-only">
+    <div class="brand-sidebar sidenav-light"></div>
+    <ul class="sidenav sidenav-collapsible leftside-navigation collapsible sidenav-fixed hide-on-large-only menu-shadow ps"
+        id="slide-out"
+        data-menu="menu-navigation"
+        data-collapsible="menu-accordion"
+        style="transform: translateX(-105%);">
+        @if (Util.EhDebug())
+        {
+            <li>
+                <a href="https://pixinvent.com/materialize-material-design-admin-template/html/ltr/horizontal-menu-template/"
+                   target="_blank">
+                    <i class="material-icons">dvr</i><span>Template</span>
+                </a>
+            </li>
+        }
+        @foreach (var item in this.Model.ItensDoMenuPrincipal
+            .Where(item => item.PossuiPermissaoParaAcessar)
+            .Select((item, i) => new { menu = item, index = i }))
+        {
+            if (!item.menu.SubItens.Any())
+            {
+                <li class="@item.menu.GetClasseActive()">
+                    <a asp-controller="@item.menu.Controller" asp-action="@item.menu.Action">
+                        <i class="material-icons">@item.menu.Icone</i><span>@item.menu.Texto</span>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a class="collapsible-header waves-effect waves-cyan @item.menu.GetClasseActive()"
+                       href="Javascript:void(0)">
+                        <i class="material-icons">@item.menu.Icone</i><span>@item.menu.Texto</span>
+                    </a>
+                    <div class="collapsible-body">
+                        <ul class="collapsible collapsible-sub" data-collapsible="accordion" tabindex="0">
+                            @foreach (PkSubItemMenuPrincipal subItem in item.menu.SubItens
+                                .Where(subItem => subItem.PossuiPermissaoParaAcessar))
+                            {
+                                string classActive = subItem.GetClasseActive();
+                                <li data-menu="" tabindex="0" class="@classActive">
+                                    <a asp-controller="@subItem.Controller" asp-action="@subItem.Action" class="@classActive">
+                                        <span>@subItem.Texto</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </li>
+            }
+        }
+    </ul>
+    <div class="navigation-background"></div>
+    <a class="sidenav-trigger btn-floating btn-medium waves-effect waves-light hide-on-large-only animated bounceInLeft" href="#" data-target="slide-out">
+        <i class="material-icons">menu</i>
+    </a>
+</aside>
