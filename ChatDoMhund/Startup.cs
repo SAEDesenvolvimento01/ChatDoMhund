@@ -1,4 +1,5 @@
 using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Hubs;
 using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Infra.Filter;
 using HelperMhundCore31;
@@ -57,6 +58,8 @@ namespace ChatDoMhund
             .AddTransient<CadforpsRepository>()
             .AddTransient<PessoasRepository>()
             ;
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,6 +81,7 @@ namespace ChatDoMhund
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Chat}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }

@@ -2,6 +2,7 @@
 {
     public enum EChatCookie
     {
-        OrigemDeChat
+        OrigemDeChat,
+        SRID
     }
 }
