@@ -9,8 +9,7 @@
     margin-bottom: 0;
 }
 
-
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     .chat-application .app-chat .sidenav-trigger {
         top: 35px !important;
     }
@@ -33,4 +32,8 @@
 
 .sidenav {
     padding-bottom: 0 !important;
+}
+
+.message {
+    padding-top: 10px;
 }

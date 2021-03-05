@@ -28,5 +28,17 @@ namespace ChatDoMhund.Data.Repository
 
             return new SaeResponseRepository<PkUsuarioLogado>(usuario != null, usuario);
         }
+
+        public SaeResponseRepository<byte[]> GetFoto(int codigo)
+        {
+            byte[] foto = this
+                ._db
+                .Cadforps
+                .Select(x => new { x.Codigo, x.Foto })
+                .FirstOrDefault(x => x.Codigo == codigo)
+                ?.Foto;
+
+            return new SaeResponseRepository<byte[]>(foto != null, foto);
+        }
     }
 }

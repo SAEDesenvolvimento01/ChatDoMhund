@@ -3,6 +3,7 @@ using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using ChatDoMhund.Models.Tratamento;
 
 namespace ChatDoMhund.Hubs
 {
@@ -10,33 +11,34 @@ namespace ChatDoMhund.Hubs
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISaeHelperCookie _saeHelperCookie;
+        private readonly GroupBuilder _groupBuilder;
 
         public ChatHub(IHttpContextAccessor httpContextAccessor,
-            ISaeHelperCookie saeHelperCookie)
+            ISaeHelperCookie saeHelperCookie,
+            GroupBuilder  groupBuilder)
         {
             this._httpContextAccessor = httpContextAccessor;
             this._saeHelperCookie = saeHelperCookie;
+            this._groupBuilder = groupBuilder;
         }
 
         public async Task AddToGroup()
         {
-            string codigoDoCliente = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente);
-            string tipoDeUsuario = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
-            string codigoDoUsuario = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario);
-            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, $"{codigoDoCliente}{tipoDeUsuario}{codigoDoUsuario}");
+            await this.Groups.AddToGroupAsync(this.Context.ConnectionId, this._groupBuilder.GetGroupName());
         }
 
-        public async Task RemoveFromGroup(string groupName)
+        public async Task RemoveFromGroup()
         {
-            string codigoDoCliente = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente);
-            string tipoDeUsuario = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
-            string codigoDoUsuario = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario);
-            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, $"{codigoDoCliente}{tipoDeUsuario}{codigoDoUsuario}");
+            await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, this._groupBuilder.GetGroupName());
         }
 
-        public async Task SendMessage(string groupName, string message)
+        public async Task SendMessage(string groupNameDestino, string message)
         {
-            await this.Clients.OthersInGroup(groupName).SendAsync("ReceiveMessage", message);
+	        string groupNameOrigem = this._groupBuilder.GetGroupName();
+            await this
+	            .Clients
+	            .Groups(groupNameOrigem, groupNameDestino)
+	            .SendAsync("ReceiveMessage", groupNameOrigem, groupNameDestino, message);
         }
     }
 }

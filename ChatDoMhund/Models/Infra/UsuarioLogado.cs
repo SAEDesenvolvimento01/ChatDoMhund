@@ -5,16 +5,13 @@ using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperSaeCore31.Extensions;
 using HelperSaeCore31.Models.Enum;
-using HelperSaeCore31.Models.Infra.Cookie;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeCore31.Models.Infra.Criptography;
-using HelperSaeCore31.Models.Infra.Session;
 using HelperSaeCore31.Models.Infra.Session.Interface;
 using HelperSaeStandard11.Handlers;
 using HelperSaeStandard11.Models;
 using HelperSaeStandard11.Models.Infra;
 using HelperSaeStandard11.Models.Tratamento;
-using Microsoft.AspNetCore.Http;
 
 namespace ChatDoMhund.Models.Infra
 {
@@ -23,7 +20,6 @@ namespace ChatDoMhund.Models.Infra
         private readonly ISaeHelperSession _saeHelperSession;
         private readonly ISaeHelperCookie _saeHelperCookie;
         private readonly SaeCriptography _saeCriptography;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AlunosRepository _alunosRepository;
         private readonly AppCfgRepository _appCfgRepository;
         private readonly CadforpsRepository _cadforpsRepository;
@@ -32,7 +28,6 @@ namespace ChatDoMhund.Models.Infra
         public UsuarioLogado(ISaeHelperSession saeHelperSession,
             ISaeHelperCookie saeHelperCookie,
             SaeCriptography saeCriptography,
-            IHttpContextAccessor httpContextAccessor,
             AlunosRepository alunosRepository,
             AppCfgRepository appCfgRepository,
             CadforpsRepository cadforpsRepository,
@@ -41,7 +36,6 @@ namespace ChatDoMhund.Models.Infra
             this._saeHelperSession = saeHelperSession;
             this._saeHelperCookie = saeHelperCookie;
             this._saeCriptography = saeCriptography;
-            this._httpContextAccessor = httpContextAccessor;
             this._alunosRepository = alunosRepository;
             this._appCfgRepository = appCfgRepository;
             this._cadforpsRepository = cadforpsRepository;
@@ -54,6 +48,10 @@ namespace ChatDoMhund.Models.Infra
             {
                 this.Codigo = usuarioLogado.Codigo;
                 this.Nome = usuarioLogado.Nome;
+                this.OrigemDeChat = usuarioLogado.OrigemDeChat;
+                this.TipoDeUsuario = usuarioLogado.TipoDeUsuario;
+                this.RelacaoComAluno = usuarioLogado.RelacaoComAluno;
+                this.Permissoes = usuarioLogado.Permissoes;
             }
 
             return this;
@@ -134,9 +132,9 @@ namespace ChatDoMhund.Models.Infra
             int codigoDaEscola = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
             int codigoDoUsuario = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario).ConvertToInt32();
             string tipoDoUsuario = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
-            int codigoDoAluno = this._saeHelperCookie.GetCookie(ECookie.CodigoDoAlunoSelecionado).ConvertToInt32();
+            int codigoDoAluno = this._saeHelperCookie.GetCookie(EChatCookie.CodigoDoAlunoSelecionado.ToString()).ConvertToInt32();
             string origemDeChat = this._saeHelperCookie.GetCookie(EChatCookie.OrigemDeChat.ToString());
-            string tipoDeRelacao = this._saeHelperCookie.GetCookie(ECookie.TipoDeRelacaoComAluno);
+            string tipoDeRelacao = this._saeHelperCookie.GetCookie(EChatCookie.TipoDeRelacaoComAluno.ToString());
             bool ehResponsavel = tipoDeRelacao == TipoDeUsuarioTrata.Responsavel;
             bool relacaoComAlunoEstaPreenchida = codigoDoAluno > 0 && !string.IsNullOrEmpty(tipoDeRelacao);
             if (codigoDaEscola > 0 &&
@@ -177,7 +175,7 @@ namespace ChatDoMhund.Models.Infra
             }
         }
 
-        private string GetHashUsuarioLogado(int codigoDaEscola, int codigoDoUsuario, string tipoDoUsuario,
+        public string GetHashUsuarioLogado(int codigoDaEscola, int codigoDoUsuario, string tipoDoUsuario,
             string origemDeChat, int codigoDoAluno, string tipoDeRelacao)
         {
             if (tipoDoUsuario == TipoDeUsuarioTrata.Responsavel)
@@ -217,13 +215,13 @@ namespace ChatDoMhund.Models.Infra
                 serverOnly: true);
 
             this._saeHelperCookie.SetCookie(
-                cookie: ECookie.CodigoDoAlunoSelecionado,
+                cookie: EChatCookie.CodigoDoAlunoSelecionado.ToString(),
                 valor: codigoDoAlunoSelecionado.ToString(),
                 duracaoEmMinutos: Tempo.SeteDiasEmMinutos,
                 serverOnly: true);
 
             this._saeHelperCookie.SetCookie(
-                cookie: ECookie.TipoDeRelacaoComAluno,
+                cookie: EChatCookie.TipoDeRelacaoComAluno.ToString(),
                 valor: tipoDeRelacaoComAluno,
                 duracaoEmMinutos: Tempo.SeteDiasEmMinutos,
                 serverOnly: true);

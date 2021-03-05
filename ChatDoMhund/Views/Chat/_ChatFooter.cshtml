@@ -7,7 +7,7 @@
         <div class="row valign-wrapper">
             <div class="input-field col s10">
                 <label for="mensagem">Escreva a sua mensagem</label>
-                <textarea type="text" class="message mb-0 hoverable" name="mensagem" id="mensagem"></textarea>
+                <textarea type="text" class="message mb-0 hoverable" name="mensagem" id="mensagem" disabled="disabled"></textarea>
             </div>
             @*<i class="material-icons mr-2">face</i>
                 <i class="material-icons mr-2">attachment</i>*@
@@ -21,40 +21,3 @@
         </div>
     </form>
 </div>
-
-<script>
-    $(() => {
-        var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
-
-        //Disable send button until connection is established
-        document.getElementById("sendButton").disabled = true;
-
-        connection.on("ReceiveMessage", (message) => {
-            const msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const html = '<div class="chat-text">' + "<p>" + msg + "</p>" + "</div>";
-            $(".chat:last-child .chat-body").append(html);
-            $(".message").val("");
-            $(".chat-area").scrollTop($(".chat-area > .chats").height());
-        });
-
-        connection.start().then(async () => {
-            document.getElementById("sendButton").disabled = false;
-        }).catch(function (err) {
-            return console.error(err.toString());
-        });
-
-        $("#sendButton").on("click", function (event) {
-            event.preventDefault();
-            const message = $(".message").val();
-            if (message != "") {
-                const html = '<div class="chat-text">' + "<p>" + message + "</p>" + "</div>";
-                $(".chat:last-child .chat-body").append(html);
-                $(".message").val("");
-                $(".chat-area").scrollTop($(".chat-area > .chats").height());
-                connection.invoke("SendMessage", message).catch((err) => {
-                    return console.error(err.toString());
-                });
-            }
-        });
-    });
-</script>

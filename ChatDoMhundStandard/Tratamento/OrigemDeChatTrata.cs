@@ -3,7 +3,7 @@
     public class OrigemDeChatTrata
     {
         public const string OrigemMhund = "MH";
-        public const string ProfessusMais = "MM";
-        public const string ProfessusPro = "MP";
+        public const string ProfessusMais = "PM";
+        public const string ProfessusPro = "PP";
     }
 }
