@@ -1,10 +1,10 @@
 ﻿using ChatDoMhund.Data.Repository.Abstract;
 using ChatDoMhund.Models.Poco;
+using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperMhundCore31.Data.Entity.Partials;
 using HelperSaeStandard11.Models;
 using System.Linq;
-using ChatDoMhundStandard.Tratamento;
 
 namespace ChatDoMhund.Data.Repository
 {
@@ -28,6 +28,18 @@ namespace ChatDoMhund.Data.Repository
                 .FirstOrDefault(x => x.Codigo == codigoDoUsuario);
 
             return new SaeResponseRepository<PkUsuarioLogado>(usuario != null, usuario);
+        }
+
+        public SaeResponseRepository<byte[]> GetFoto(int codigo)
+        {
+            byte[] foto = this
+                ._db
+                .Alunos
+                .Select(x => new { x.Codigo, x.Foto })
+                .FirstOrDefault(x => x.Codigo == codigo)
+                ?.Foto;
+
+            return new SaeResponseRepository<byte[]>(foto != null, foto);
         }
     }
 }

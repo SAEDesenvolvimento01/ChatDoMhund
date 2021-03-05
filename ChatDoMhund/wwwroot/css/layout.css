@@ -1,3 +1,39 @@
-﻿.navbar.navbar-fixed.navbar-chat {
+﻿
+/*Com navbar de apenas uma linha*/
+/*.navbar.navbar-fixed.navbar-chat {
     margin-bottom: 0;
+}*/
+
+/*Sem navbar*/
+.navbar.navbar-fixed.navbar-chat {
+    margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+    .chat-application .app-chat .sidenav-trigger {
+        top: 35px !important;
+    }
+
+    .sidebar .sidebar-content #chat-sidenav.sidenav {
+        top: 0 !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .chat-application #chat-sidenav.sidenav.app-sidebar {
+        /*width: 400px;*/
+    }
+}
+
+.chat-application .app-chat .chat-content .chat-content-area .chat-area,
+.chat-application .app-chat .chat-content .sidebar .sidebar-chat {
+    height: calc( 100vh - 250px);
+}
+
+.sidenav {
+    padding-bottom: 0 !important;
+}
+
+.message {
+    padding-top: 10px;
 }

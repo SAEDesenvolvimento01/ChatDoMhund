@@ -2,8 +2,8 @@
 @model ChatDoMhund.Models.ViewModels.Base.BaseViewModelIndex
 @{
     this.Layout = null;
-    const string cor = "#64b5f6 blue lighten-2";
-    const string esconderEmTabletECelular = "hide-on-med-and-down";
+    //const string cor = "#64b5f6 blue lighten-2";
+    //const string esconderEmTabletECelular = "hide-on-med-and-down";
 }
 
 <!DOCTYPE html>
@@ -11,12 +11,12 @@
 <partial name="_Head" model="this.Model" />
 <body class="horizontal-layout page-header-light horizontal-menu 2-columns" data-open="click" data-menu="horizontal-menu" data-col="2-columns">
     <!-- EGIN: Header-->
-    <header id="header">
+    @*<header id="header">
         <div class="navbar navbar-fixed navbar-chat">
             <partial name="_MenuSuperior" model="this.Model" />
-@*            <partial name="_MenuPrincipal" model="this.Model" />*@
+            <partial name="_MenuPrincipal" model="this.Model" />
         </div>
-    </header>
+    </header>*@
   @*  <partial name="_MenuLateral" model="this.Model" />*@
     <!-- END: Header-->
     <!-- BEGIN: Page Main-->

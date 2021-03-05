@@ -1,6 +1,8 @@
 using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Hubs;
 using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Infra.Filter;
+using ChatDoMhund.Models.Tratamento;
 using HelperMhundCore31;
 using HelperMhundCore31.Data.Entity.Partials;
 using HelperSaeCore31.Models.Infra.ControllerComponents;
@@ -18,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatDoMhund
 {
-    public class Startup
+	public class Startup
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -56,7 +58,10 @@ namespace ChatDoMhund
             .AddTransient<AppCfgRepository>()
             .AddTransient<CadforpsRepository>()
             .AddTransient<PessoasRepository>()
+            .AddTransient<GroupBuilder>()
             ;
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,8 +69,12 @@ namespace ChatDoMhund
         {
             //app.UseExceptionHandler("/Error/HandleError?code=500");
             app.UseExceptionHandler("/Error/HandleError");
-            app.UseStatusCodePagesWithRedirects("/Error/HandleError?code={0}");
-
+            if(!Util.EhDebug())
+            {
+                //todo: ver um jeito de pegar qual recurso deu 404
+                //todo: desabilitei em debug para facilitar minha vida enquanto não corrige
+	            app.UseStatusCodePagesWithRedirects("/Error/HandleError?code={0}");
+            }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -77,7 +86,8 @@ namespace ChatDoMhund
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Chat}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }
