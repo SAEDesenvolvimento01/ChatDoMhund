@@ -1,39 +1,29 @@
 ﻿using ChatDoMhund.Controllers.Abstract;
-using ChatDoMhund.Data.Repository;
 using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Poco;
-using ChatDoMhund.Models.Tratamento;
 using ChatDoMhund.Models.ViewModels;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperSaeCore31.Models.Enum;
-using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
 using HelperSaeStandard11.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
+using ChatDoMhund.Models.Domain;
 
 namespace ChatDoMhund.Controllers
 {
 	public class ChatController : AbsController
 	{
-		private readonly ISaeHelperCookie _saeHelperCookie;
-		private readonly AlunosRepository _alunosRepository;
 		private UsuarioLogado _usuarioLogado;
-		private readonly CadforpsRepository _cadforpsRepository;
-		private readonly GroupBuilder _groupBuilder;
+		private readonly ChatDomain _chatDomain;
 
-		public ChatController(ISaeHelperCookie saeHelperCookie,
-			AlunosRepository alunosRepository,
-			UsuarioLogado usuarioLogado,
-			CadforpsRepository cadforpsRepository,
-			GroupBuilder groupBuilder)
+		public ChatController(UsuarioLogado usuarioLogado,
+			ChatDomain chatDomain)
 		{
-			this._saeHelperCookie = saeHelperCookie;
-			this._alunosRepository = alunosRepository;
 			this._usuarioLogado = usuarioLogado;
-			this._cadforpsRepository = cadforpsRepository;
-			this._groupBuilder = groupBuilder;
+			this._chatDomain = chatDomain;
 		}
 
 		public IActionResult Index()
@@ -47,47 +37,15 @@ namespace ChatDoMhund.Controllers
 
 		public JsonResult GetConversas()
 		{
-			var lista = new List<PkConversa>();
+			this._usuarioLogado.GetUsuarioLogado();
+			List<PkConversa> lista = new List<PkConversa>(this._chatDomain.GetMensagensDoUsuario(this._usuarioLogado.Codigo, this._usuarioLogado.TipoDeUsuario));
 
-			string codigoDaEscola = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente);
-			this._usuarioLogado = this._usuarioLogado.GetUsuarioLogado();
-			if (this._usuarioLogado.TipoDeUsuario == TipoDeUsuarioTrata.Aluno)
-			{
-				Cadforps cadforps1 = this._cadforpsRepository.GetById(1143).Content;
-				Cadforps cadforps2 = this._cadforpsRepository.GetById(6).Content;
-				foreach (Cadforps cadforps in new List<Cadforps> { cadforps1, cadforps2 })
-				{
-					lista.Add(new PkConversa
-					{
-						Nome = cadforps.Nome,
-						Foto = FotoTrata.ToBase64String(cadforps.Foto),
-						Status = TipoDeUsuarioTrata.TipoExtenso(TipoDeUsuarioTrata.Professor),
-						Codigo = cadforps.Codigo,
-						Tipo = TipoDeUsuarioTrata.Professor,
-						CodigoDaEscola = codigoDaEscola.ConvertToInt32(),
-						GroupName = this._groupBuilder.GetGroupName(codigoDaEscola, TipoDeUsuarioTrata.Professor, cadforps.Codigo.ToString())
-					});
-				}
-			}
-			else if (this._usuarioLogado.TipoDeUsuario == TipoDeUsuarioTrata.Professor)
-			{
-				Alunos alunos1 = this._alunosRepository.GetById(750).Content;
-				Alunos alunos2 = this._alunosRepository.GetById(861).Content;
+			//lista.AddRange(lista);
+			//lista.AddRange(lista);
+			//lista.AddRange(lista);
+			//lista.AddRange(lista);
+			//lista.AddRange(lista);
 
-				foreach (Alunos alunos in new List<Alunos> { alunos1, alunos2 })
-				{
-					lista.Add(new PkConversa
-					{
-						Nome = alunos.Nome,
-						Foto = FotoTrata.ToBase64String(alunos.Foto),
-						Status = TipoDeUsuarioTrata.TipoExtenso(TipoDeUsuarioTrata.Aluno),
-						Codigo = alunos.Codigo,
-						Tipo = TipoDeUsuarioTrata.Aluno,
-						CodigoDaEscola = codigoDaEscola.ConvertToInt32(),
-						GroupName = this._groupBuilder.GetGroupName(codigoDaEscola, TipoDeUsuarioTrata.Aluno, alunos.Codigo.ToString())
-					});
-				}
-			}
 			SaeResponse response = new SaeResponse
 			{
 				Status = true,

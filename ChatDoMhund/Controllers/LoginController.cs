@@ -2,15 +2,12 @@
 using ChatDoMhund.Data.Repository;
 using ChatDoMhund.Models.Infra;
 using HelperMhundCore31;
+using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeCore31.Models.Infra.Criptography;
+using HelperSaeStandard11.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.ComponentModel.DataAnnotations;
-using HelperSaeCore31.Models.Enum;
-using HelperSaeCore31.Models.Infra.Cookie.Interface;
-using HelperSaeStandard11.Handlers;
-using Microsoft.AspNetCore.Http;
 
 namespace ChatDoMhund.Controllers
 {

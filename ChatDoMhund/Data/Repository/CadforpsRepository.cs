@@ -1,9 +1,11 @@
-﻿using ChatDoMhund.Data.Repository.Abstract;
+﻿using System.Collections.Generic;
+using ChatDoMhund.Data.Repository.Abstract;
 using ChatDoMhund.Models.Poco;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperMhundCore31.Data.Entity.Partials;
 using HelperSaeStandard11.Models;
 using System.Linq;
+using ChatDoMhundStandard.Tratamento;
 
 namespace ChatDoMhund.Data.Repository
 {
@@ -39,6 +41,25 @@ namespace ChatDoMhund.Data.Repository
                 ?.Foto;
 
             return new SaeResponseRepository<byte[]>(foto != null, foto);
+        }
+
+        public SaeResponseRepository<List<PkUsuarioConversa>> GetProfessoresECoordenadoresDasConversas(
+	        List<int> codigosDosCoordenadores, List<int> codigosDosProfessores)
+        {
+	        List<PkUsuarioConversa> professoresECoordenadores = this._db
+		        .Cadforps
+		        .Where(x => x.Tipo == TipoDeUsuarioTrata.Professor &&
+		                    (codigosDosCoordenadores.Contains(x.Codigo) || codigosDosProfessores.Contains(x.Codigo)))
+		        .Select(cadforps => new PkUsuarioConversa
+		        {
+			        Nome = cadforps.Nome,
+			        Foto = cadforps.Foto,
+			        Status = cadforps.Tipo,
+			        Codigo = cadforps.Codigo,
+			        Tipo = cadforps.Tipo
+		        }).ToList();
+
+	        return new SaeResponseRepository<List<PkUsuarioConversa>>(true, professoresECoordenadores);
         }
     }
 }
