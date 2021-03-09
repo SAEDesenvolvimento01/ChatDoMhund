@@ -27,7 +27,9 @@
 
 .chat-application .app-chat .chat-content .chat-content-area .chat-area,
 .chat-application .app-chat .chat-content .sidebar .sidebar-chat {
-    height: calc( 100vh - 250px);
+	height: calc( 100vh - 250px) !important;
+    /*    max-height: calc( 100vh - 250px) !important;
+	height: auto !important;*/
 }
 
 .sidenav {

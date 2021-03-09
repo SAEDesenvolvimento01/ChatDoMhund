@@ -24,5 +24,10 @@ namespace ChatDoMhund.Models.Tratamento
 		{
 			return $"{codigoDoCliente}-{tipoDeUsuario}-{codigoDoUsuario}";
 		}
+
+		public string GetGroupName(int codigoDoCliente, string tipoDeUsuario, int codigoDoUsuario)
+		{
+			return $"{codigoDoCliente}-{tipoDeUsuario}-{codigoDoUsuario}";
+		}
 	}
 }

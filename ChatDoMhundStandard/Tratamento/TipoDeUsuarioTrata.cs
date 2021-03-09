@@ -1,4 +1,6 @@
-﻿namespace ChatDoMhundStandard.Tratamento
+﻿using System.Collections.Generic;
+
+namespace ChatDoMhundStandard.Tratamento
 {
     public class TipoDeUsuarioTrata
     {
@@ -30,6 +32,17 @@
             }
 
             return string.Empty;
+        }
+
+        public static List<string> GetTipos()
+        {
+	        return new List<string>
+	        {
+		        Aluno,
+		        Professor,
+		        Coordenador,
+		        Responsavel
+	        };
         }
     }
 }

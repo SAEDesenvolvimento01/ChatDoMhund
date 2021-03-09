@@ -1,5 +1,6 @@
 using ChatDoMhund.Data.Repository;
 using ChatDoMhund.Hubs;
+using ChatDoMhund.Models.Domain;
 using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Infra.Filter;
 using ChatDoMhund.Models.Tratamento;
@@ -58,7 +59,10 @@ namespace ChatDoMhund
             .AddTransient<AppCfgRepository>()
             .AddTransient<CadforpsRepository>()
             .AddTransient<PessoasRepository>()
+            .AddTransient<ChatProfessRepository>()
             .AddTransient<GroupBuilder>()
+            //Domínios
+            .AddTransient<ChatDomain>()
             ;
 
             services.AddSignalR();

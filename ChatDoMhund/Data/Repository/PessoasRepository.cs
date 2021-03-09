@@ -1,4 +1,5 @@
-﻿using ChatDoMhund.Data.Repository.Abstract;
+﻿using System.Collections.Generic;
+using ChatDoMhund.Data.Repository.Abstract;
 using ChatDoMhund.Models.Poco;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
@@ -40,6 +41,23 @@ namespace ChatDoMhund.Data.Repository
                 ?.Foto;
 
             return new SaeResponseRepository<byte[]>(foto != null, foto);
+        }
+
+        public SaeResponseRepository<List<PkUsuarioConversa>> GetResponsaveisDasConversas(List<int> codigosDosResponsaveis)
+        {
+	        List<PkUsuarioConversa> responsaveis = this._db
+		        .Pessoas
+		        .Where(x => codigosDosResponsaveis.Contains(x.Codigo))
+		        .Select(aluno => new PkUsuarioConversa
+		        {
+			        Nome = aluno.Nome,
+			        Foto = aluno.Foto,
+			        Status = TipoDeUsuarioTrata.Responsavel,
+			        Codigo = aluno.Codigo,
+			        Tipo = TipoDeUsuarioTrata.Responsavel
+		        }).ToList();
+
+	        return new SaeResponseRepository<List<PkUsuarioConversa>>(true, responsaveis);
         }
     }
 }
