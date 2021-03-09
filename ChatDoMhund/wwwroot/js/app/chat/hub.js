@@ -7,20 +7,26 @@
 		this._conversas = new Conversas();
 	}
 
-	Inicializar() {
-		this.Start();
+	Inicializar(estaReconectando = false) {
+		this.Start(estaReconectando);
 
 		return this;
 	}
 
-	async Start() {
+	async Start(estaReconectando) {
 		await this._connection
 			.start()
 			.then(async () => {
 				await this.AddToGroup();
 				this.ConfigurarReceiveMessage();
+				this.ConfigurarOnDisconnected();
+				await ConexaoEstabelecida(estaReconectando);
 			})
 			.catch((err) => {
+				if (estaReconectando) {
+					new MaterialToast({ html: "Falha ao tentar reconectar." }).Show();
+					setTimeout(() => { ConexaoInterrompida(); }, 10000);
+				}
 				console.error(err);
 			});
 
@@ -39,6 +45,16 @@
 			try {
 				this._conversas.AddMensagem(groupNameOrigem, groupNameDestino, message);
 				AtualizarConversa();
+			} catch (e) {
+				console.error(e);
+			}
+		});
+	}
+
+	ConfigurarOnDisconnected() {
+		this._connection.onclose(async () => {
+			try {
+				await ConexaoInterrompida();
 			} catch (e) {
 				console.error(e);
 			}

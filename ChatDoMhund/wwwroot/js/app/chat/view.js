@@ -8,7 +8,7 @@ var observe = (element, event, handler) => {
 	}
 };
 
-const hub = new Hub().Inicializar();
+let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
 
@@ -42,6 +42,7 @@ function AtualizarConversa() {
 		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
 		$mensagensNovas.attr("novas-mensagens", mensagensNovas);
 		$mensagensNovas.html(mensagensNovas);
+		PlaySound("new-message");
 	}
 }
 
@@ -86,6 +87,10 @@ function InserirMensagensNoChat(conversa) {
 			}
 		});
 
+	AtualizaScrollDaConversa();
+}
+
+function AtualizaScrollDaConversa() {
 	$(".chat-area").scrollTop($(".chat-area > .chats").height());
 }
 
@@ -144,20 +149,22 @@ $(".chat-list")
 					$(".sidenav-trigger[data-target=\"chat-sidenav\"]").click();
 				}
 
+				InserirMensagensNoChat(conversa);
+
 				if ($chatContentArea.is(":hidden")) {
 					$chatContentArea.show(300);
 					await sleep(400);
 				}
 
-				if ($mensagem.attr("disabled")) {
-					$mensagem.removeAttr("disabled");
-				}
+				//if ($mensagem.attr("disabled")) {
+				//	$mensagem.removeAttr("disabled");
+				//}
 
-				if (!isMobile.any()) {
+				AtualizaScrollDaConversa();
+
+				if (!isMobile.any() && !$mensagem.is("[disabled]")) {
 					$mensagem.focus();
 				}
-
-				InserirMensagensNoChat(conversa);
 			}
 		});
 
@@ -192,7 +199,7 @@ async function AtualizarListaDeConversas() {
 				tipo="${conversa.tipo}"
 				codigo-da-escola="${conversa.codigoDaEscola}"
 				group-name="${conversa.groupName}"
-				class="chat-user animate fadeUp delay-1">
+				class="chat-user animate fadeUp hoverable delay-1">
 	                <div class="user-section">
 	                    <div class="row valign-wrapper">
 	                        <div class="col s2 media-image online pr-0">
@@ -254,4 +261,39 @@ function InicializarInputMensagem() {
 		element.select();
 	}
 	resize();
+}
+
+async function ConexaoInterrompida() {
+	const $mensagem = $("#mensagem");
+	const $sendButton = $("#sendButton");
+	$mensagem.attr("disabled", "disabled");
+	$sendButton.attr("disabled", "disabled");
+	new MaterialToast({ html: "Reconectando..." }).Show();
+	await sleep(1000);
+	const estaReconectando = true;
+	hub = new Hub().Inicializar(estaReconectando);
+}
+
+function ConexaoEstabelecida(estaReconectando) {
+	const $mensagem = $("#mensagem");
+	const $sendButton = $("#sendButton");
+	$mensagem.removeAttr("disabled");
+	if ($mensagem.is(":visible")) {
+		$mensagem.focus();
+	}
+	$sendButton.removeAttr("disabled");
+	if (estaReconectando) {
+		new MaterialToast({ html: "Conexão estabelecida novamente." }).Show();
+	}
+}
+
+function PlaySound(soundObj) {
+	try {
+		const element = document.getElementById(soundObj);
+		//element.muted = true;
+
+		element.play();
+	} catch (e) {
+		console.error(e);
+	}
 }
