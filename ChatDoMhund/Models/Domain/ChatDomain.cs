@@ -93,6 +93,11 @@ namespace ChatDoMhund.Models.Domain
 					.Add(this.GetOrigensDoTipo(mensagens, tipo), tipo);
 			});
 
+			codigosETipos.CodigosDosAlunos = codigosETipos.CodigosDosAlunos.Distinct().ToList();
+			codigosETipos.CodigosDosCoordenadores = codigosETipos.CodigosDosCoordenadores.Distinct().ToList();
+			codigosETipos.CodigosDosProfessores = codigosETipos.CodigosDosProfessores.Distinct().ToList();
+			codigosETipos.CodigosDosResponsaveis = codigosETipos.CodigosDosResponsaveis.Distinct().ToList();
+
 			return codigosETipos;
 		}
 
@@ -102,7 +107,6 @@ namespace ChatDoMhund.Models.Domain
 				.Select(x => new { x.TipoDestino, x.IdDestino })
 				.Where(x => x.TipoDestino == tipo)
 				.Select(x => x.IdDestino.ConvertToInt32())
-				.Distinct()
 				.ToList();
 
 			return destinatarios;
@@ -114,7 +118,6 @@ namespace ChatDoMhund.Models.Domain
 				.Select(x => new { x.TipoOrigem, x.IdOrigem })
 				.Where(x => x.TipoOrigem == tipo)
 				.Select(x => x.IdOrigem.ConvertToInt32())
-				.Distinct()
 				.ToList();
 
 			return destinatarios;

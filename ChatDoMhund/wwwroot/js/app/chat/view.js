@@ -8,7 +8,7 @@ var observe = (element, event, handler) => {
 	}
 };
 
-const hub = new Hub().Inicializar();
+let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
 
@@ -42,51 +42,8 @@ function AtualizarConversa() {
 		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
 		$mensagensNovas.attr("novas-mensagens", mensagensNovas);
 		$mensagensNovas.html(mensagensNovas);
+		PlaySound("new-message");
 	}
-}
-
-function InserirMensagensNoChat(conversa) {
-	const $chats = $(".chats").html("");
-	$(conversa.mensagens)
-		.each((i, mensagem) => {
-			let foto;
-			const origemEhUsuarioLogado = groupNameUsuarioLogado === mensagem.groupNameOrigem;
-			if (origemEhUsuarioLogado) {
-				foto = sessionStorage.getItem("foto");
-			} else {
-				foto = conversa.foto;
-			}
-			const $ultimaPessoaQueEnviou = $chats.find(".chat").last();
-			if ($ultimaPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
-				$ultimaPessoaQueEnviou.find(".chat-body")
-					.append(`
-            <div class="chat-text">
-                <p>${mensagem.texto}</p>
-            </div>
-`);
-			} else {
-				let classes = "chat";
-				if (origemEhUsuarioLogado) {
-					classes += " chat-right";
-				}
-				$chats.append(`
-            <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
-                <div class="chat-avatar">
-                    <a class="avatar">
-                        <img src="${foto}" class="circle" alt="avatar">
-                    </a>
-                </div>
-                <div class="chat-body">
-                    <div class="chat-text">
-                        <p>${mensagem.texto}</p>
-                    </div>
-                </div>
-            </div>
-`);
-			}
-		});
-
-	$(".chat-area").scrollTop($(".chat-area > .chats").height());
 }
 
 async function SendMessage() {
@@ -144,22 +101,72 @@ $(".chat-list")
 					$(".sidenav-trigger[data-target=\"chat-sidenav\"]").click();
 				}
 
+				InserirMensagensNoChat(conversa);
+
 				if ($chatContentArea.is(":hidden")) {
 					$chatContentArea.show(300);
 					await sleep(400);
 				}
 
-				if ($mensagem.attr("disabled")) {
-					$mensagem.removeAttr("disabled");
-				}
+				//if ($mensagem.attr("disabled")) {
+				//	$mensagem.removeAttr("disabled");
+				//}
 
-				if (!isMobile.any()) {
+				AtualizaScrollDaConversa();
+
+				if (!isMobile.any() && !$mensagem.is("[disabled]")) {
 					$mensagem.focus();
 				}
-
-				InserirMensagensNoChat(conversa);
 			}
 		});
+
+function InserirMensagensNoChat(conversa) {
+	const $chats = $(".chats").html("");
+	$(conversa.mensagens)
+		.each((i, mensagem) => {
+			let foto;
+			const origemEhUsuarioLogado = groupNameUsuarioLogado === mensagem.groupNameOrigem;
+			if (origemEhUsuarioLogado) {
+				foto = sessionStorage.getItem("foto");
+			} else {
+				foto = conversa.foto;
+			}
+			const $ultimaPessoaQueEnviou = $chats.find(".chat").last();
+			if ($ultimaPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
+				$ultimaPessoaQueEnviou.find(".chat-body")
+					.append(`
+            <div class="chat-text">
+                <p>${mensagem.texto}</p>
+            </div>
+`);
+			} else {
+				let classes = "chat";
+				if (origemEhUsuarioLogado) {
+					classes += " chat-right";
+				}
+				$chats.append(`
+            <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
+                <div class="chat-avatar">
+                    <a class="avatar">
+                        <img src="${foto}" class="circle" alt="avatar">
+                    </a>
+                </div>
+                <div class="chat-body">
+                    <div class="chat-text">
+                        <p>${mensagem.texto}</p>
+                    </div>
+                </div>
+            </div>
+`);
+			}
+		});
+
+	AtualizaScrollDaConversa();
+}
+
+function AtualizaScrollDaConversa() {
+	$(".chat-area").scrollTop($(".chat-area > .chats").height());
+}
 
 async function CarregarConversas() {
 	const listaDeConversas = new Array();
@@ -192,7 +199,7 @@ async function AtualizarListaDeConversas() {
 				tipo="${conversa.tipo}"
 				codigo-da-escola="${conversa.codigoDaEscola}"
 				group-name="${conversa.groupName}"
-				class="chat-user animate fadeUp delay-1">
+				class="chat-user animate fadeUp hoverable delay-1">
 	                <div class="user-section">
 	                    <div class="row valign-wrapper">
 	                        <div class="col s2 media-image online pr-0">
@@ -207,10 +214,10 @@ async function AtualizarListaDeConversas() {
 	                <div class="info-section">
 	                    <div class="star-timing">
 	                        <div class="time">
-	                            <span>2.38 pm</span>
+	                            <span>${conversa.dataDaUltimaMensagem}</span>
 	                        </div>
 	                    </div>
-	                    <span novas-mensagens="${0}" class="badge badge pill red"></span>
+	                    <span novas-mensagens="${1}" class="badge badge pill red"></span>
 	                </div>
 	        </div>`);
 	});
@@ -254,4 +261,39 @@ function InicializarInputMensagem() {
 		element.select();
 	}
 	resize();
+}
+
+async function ConexaoInterrompida() {
+	const $mensagem = $("#mensagem");
+	const $sendButton = $("#sendButton");
+	$mensagem.attr("disabled", "disabled");
+	$sendButton.attr("disabled", "disabled");
+	new MaterialToast({ html: "Reconectando..." }).Show();
+	await sleep(1000);
+	const estaReconectando = true;
+	hub = new Hub().Inicializar(estaReconectando);
+}
+
+function ConexaoEstabelecida(estaReconectando) {
+	const $mensagem = $("#mensagem");
+	const $sendButton = $("#sendButton");
+	$mensagem.removeAttr("disabled");
+	if ($mensagem.is(":visible")) {
+		$mensagem.focus();
+	}
+	$sendButton.removeAttr("disabled");
+	if (estaReconectando) {
+		new MaterialToast({ html: "Conexão estabelecida novamente." }).Show();
+	}
+}
+
+function PlaySound(soundObj) {
+	try {
+		const element = document.getElementById(soundObj);
+		//element.muted = true;
+
+		element.play();
+	} catch (e) {
+		console.error(e);
+	}
 }
