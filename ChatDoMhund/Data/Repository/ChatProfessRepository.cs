@@ -20,6 +20,7 @@ namespace ChatDoMhund.Data.Repository
 				.Where(x =>
 					(x.IdDestino == codigoDoUsuario && x.TipoDestino == tipoDoUsuario) ||
 					(x.IdOrigem == codigoDoUsuario && x.TipoOrigem == tipoDoUsuario))
+				.OrderBy(x=>x.DtMensagem)
 				.ToList();
 			return mensagens;
 		}

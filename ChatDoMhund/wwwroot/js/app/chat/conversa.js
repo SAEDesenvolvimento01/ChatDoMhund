@@ -6,5 +6,6 @@
 	tipo = "";
 	codigoDaEscola = 0;
 	groupName = "";
+	dataDaUltimaMensagem = "";
 	mensagens = new Array()
 }

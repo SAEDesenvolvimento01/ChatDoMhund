@@ -46,54 +46,6 @@ function AtualizarConversa() {
 	}
 }
 
-function InserirMensagensNoChat(conversa) {
-	const $chats = $(".chats").html("");
-	$(conversa.mensagens)
-		.each((i, mensagem) => {
-			let foto;
-			const origemEhUsuarioLogado = groupNameUsuarioLogado === mensagem.groupNameOrigem;
-			if (origemEhUsuarioLogado) {
-				foto = sessionStorage.getItem("foto");
-			} else {
-				foto = conversa.foto;
-			}
-			const $ultimaPessoaQueEnviou = $chats.find(".chat").last();
-			if ($ultimaPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
-				$ultimaPessoaQueEnviou.find(".chat-body")
-					.append(`
-            <div class="chat-text">
-                <p>${mensagem.texto}</p>
-            </div>
-`);
-			} else {
-				let classes = "chat";
-				if (origemEhUsuarioLogado) {
-					classes += " chat-right";
-				}
-				$chats.append(`
-            <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
-                <div class="chat-avatar">
-                    <a class="avatar">
-                        <img src="${foto}" class="circle" alt="avatar">
-                    </a>
-                </div>
-                <div class="chat-body">
-                    <div class="chat-text">
-                        <p>${mensagem.texto}</p>
-                    </div>
-                </div>
-            </div>
-`);
-			}
-		});
-
-	AtualizaScrollDaConversa();
-}
-
-function AtualizaScrollDaConversa() {
-	$(".chat-area").scrollTop($(".chat-area > .chats").height());
-}
-
 async function SendMessage() {
 	const $message = $(".message");
 	const message = $message.val();
@@ -168,6 +120,54 @@ $(".chat-list")
 			}
 		});
 
+function InserirMensagensNoChat(conversa) {
+	const $chats = $(".chats").html("");
+	$(conversa.mensagens)
+		.each((i, mensagem) => {
+			let foto;
+			const origemEhUsuarioLogado = groupNameUsuarioLogado === mensagem.groupNameOrigem;
+			if (origemEhUsuarioLogado) {
+				foto = sessionStorage.getItem("foto");
+			} else {
+				foto = conversa.foto;
+			}
+			const $ultimaPessoaQueEnviou = $chats.find(".chat").last();
+			if ($ultimaPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
+				$ultimaPessoaQueEnviou.find(".chat-body")
+					.append(`
+            <div class="chat-text">
+                <p>${mensagem.texto}</p>
+            </div>
+`);
+			} else {
+				let classes = "chat";
+				if (origemEhUsuarioLogado) {
+					classes += " chat-right";
+				}
+				$chats.append(`
+            <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
+                <div class="chat-avatar">
+                    <a class="avatar">
+                        <img src="${foto}" class="circle" alt="avatar">
+                    </a>
+                </div>
+                <div class="chat-body">
+                    <div class="chat-text">
+                        <p>${mensagem.texto}</p>
+                    </div>
+                </div>
+            </div>
+`);
+			}
+		});
+
+	AtualizaScrollDaConversa();
+}
+
+function AtualizaScrollDaConversa() {
+	$(".chat-area").scrollTop($(".chat-area > .chats").height());
+}
+
 async function CarregarConversas() {
 	const listaDeConversas = new Array();
 	const response = await chatController.GetConversas();
@@ -214,10 +214,10 @@ async function AtualizarListaDeConversas() {
 	                <div class="info-section">
 	                    <div class="star-timing">
 	                        <div class="time">
-	                            <span>2.38 pm</span>
+	                            <span>${conversa.dataDaUltimaMensagem}</span>
 	                        </div>
 	                    </div>
-	                    <span novas-mensagens="${0}" class="badge badge pill red"></span>
+	                    <span novas-mensagens="${1}" class="badge badge pill red"></span>
 	                </div>
 	        </div>`);
 	});

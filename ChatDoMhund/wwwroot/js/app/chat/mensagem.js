@@ -2,4 +2,5 @@
 	groupNameOrigem = "";
 	groupNameDestino = "";
 	texto = "";
+	dataDaMensagem = "";
 }

@@ -1,4 +1,5 @@
-﻿using ChatDoMhund.Models.Tratamento;
+﻿using System;
+using ChatDoMhund.Models.Tratamento;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace ChatDoMhund.Models.Poco
 		public string Tipo { get; set; }
 		public int CodigoDaEscola { get; set; }
 		public string GroupName { get; set; }
+		public string DataDaUltimaMensagem { get; set; }
 		public List<PkMensagem> Mensagens { get; set; }
 
 		public PkConversa()
@@ -32,11 +34,39 @@ namespace ChatDoMhund.Models.Poco
 			this.CodigoDaEscola = codigoDaEscola;
 			this.GroupName = groupBuilder.GetGroupName(codigoDaEscola, usuario.Tipo, usuario.Codigo);
 			this.Mensagens = mensagensDoUsuario.Select(mensagem => new PkMensagem(mensagem, groupBuilder, codigoDaEscola)).ToList();
+
+			this.SetDataDaUltimaMensagem();
 		}
 
 		public override string ToString()
 		{
 			return $"{this.CodigoDaEscola} - {this.Codigo} - {this.Nome}";
+		}
+
+		private void SetDataDaUltimaMensagem()
+		{
+			if (this.Mensagens.Any())
+			{
+				DateTime data = this.Mensagens.Last().DataDaMensagem;
+				DateTime hoje = DateTime.Today;
+				DateTime umaSemanaAtras = DateTime.Today.AddDays(-7);
+				if (data.Date == hoje)
+				{
+					this.DataDaUltimaMensagem = data.ToString("HH:mm");
+				}
+				else if (data > umaSemanaAtras)
+				{
+					this.DataDaUltimaMensagem = data.ToString("dddd");
+				}
+				else if (data.Year == hoje.Year)
+				{
+					this.DataDaUltimaMensagem = data.ToString("dd/MM");
+				}
+				else
+				{
+					this.DataDaUltimaMensagem = data.ToString("dd/MM/yyyy");
+				}
+			}
 		}
 	}
 }
