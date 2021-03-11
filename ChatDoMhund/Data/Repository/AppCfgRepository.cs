@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ChatDoMhund.Data.Repository
 {
-    public class AppCfgRepository : RepositoryBase<AppCfg>
+	public class AppCfgRepository : RepositoryBase<AppCfg>
     {
         public AppCfgRepository(MhundDbContext db) : base(db)
         {

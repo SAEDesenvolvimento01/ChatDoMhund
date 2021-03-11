@@ -44,7 +44,8 @@ namespace ChatDoMhund.Models.Infra
 
         public UsuarioLogado GetUsuarioLogado()
         {
-            if (this._saeHelperSession.GetSession(ESession.UsuarioLogado).TryDeserialize(out PkUsuarioLogado usuarioLogado))
+	        string logado = this._saeHelperSession.GetUsuarioLogado();
+	        if (logado.TryDeserialize(out PkUsuarioLogado usuarioLogado))
             {
                 this.Codigo = usuarioLogado.Codigo;
                 this.Nome = usuarioLogado.Nome;

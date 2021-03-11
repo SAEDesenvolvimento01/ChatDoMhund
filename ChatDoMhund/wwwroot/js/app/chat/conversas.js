@@ -19,6 +19,14 @@
 		sessionStorage.setItem("conversas", jsonConversas);
 	}
 
+	AddConversa(conversa = new Conversa()) {
+		const conversas = this.GetConversas();
+
+		conversas.unshift(conversa);
+
+		this.SetConversas(conversas);
+	}
+
 	AddMensagem(groupNameOrigem, groupNameDestino, message) {
 		const listaConversas = this.GetConversas();
 
