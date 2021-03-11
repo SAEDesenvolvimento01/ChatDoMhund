@@ -35,6 +35,9 @@
 		<Reference Include="HelperMhundCore31">
 			<HintPath>..\..\HelperMhund\HelperMhundCore31\bin\Release\netcoreapp3.1\HelperMhundCore31.dll</HintPath>
 		</Reference>
+		<Reference Include="HelperMhundStandard">
+		  <HintPath>..\..\HelperMhund\HelperMhundStandard\bin\Release\netstandard2.0\HelperMhundStandard.dll</HintPath>
+		</Reference>
 		<Reference Include="HelperSaeCore31">
 			<HintPath>..\..\HelperMhund\HelperSaeCore31\bin\Release\netcoreapp3.1\HelperSaeCore31.dll</HintPath>
 		</Reference>

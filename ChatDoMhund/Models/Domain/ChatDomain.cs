@@ -52,20 +52,23 @@ namespace ChatDoMhund.Models.Domain
 
 			if (codigosETipos.CodigosDosAlunos.Any())
 			{
-				usuariosDasConversas =
-					this._alunosRepository.GetAlunosDasConversas(codigosETipos.CodigosDosAlunos).Content;
+				List<PkUsuarioConversa> alunos = this._alunosRepository.GetAlunosDasConversas(codigosETipos.CodigosDosAlunos).Content;
+				usuariosDasConversas.AddRange(
+					alunos);
 			}
 
 			if (codigosETipos.CodigosDosCoordenadores.Any() || codigosETipos.CodigosDosProfessores.Any())
 			{
-				usuariosDasConversas = this._cadforpsRepository.GetProfessoresECoordenadoresDasConversas(
+				List<PkUsuarioConversa> coordenadoresEProfessores = this._cadforpsRepository.GetProfessoresECoordenadoresDasConversas(
 					codigosETipos.CodigosDosCoordenadores, codigosETipos.CodigosDosProfessores).Content;
+				usuariosDasConversas.AddRange(coordenadoresEProfessores);
 			}
 
 			if (codigosETipos.CodigosDosResponsaveis.Any())
 			{
-				usuariosDasConversas = this._pessoasRepository
+				List<PkUsuarioConversa> responsaveis = this._pessoasRepository
 					.GetResponsaveisDasConversas(codigosETipos.CodigosDosResponsaveis).Content;
+				usuariosDasConversas.AddRange(responsaveis);
 			}
 
 			if (usuariosDasConversas.Any())

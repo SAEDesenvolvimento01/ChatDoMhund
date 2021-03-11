@@ -63,6 +63,7 @@ namespace ChatDoMhund
             .AddTransient<GroupBuilder>()
             //Domínios
             .AddTransient<ChatDomain>()
+            .AddTransient<PesquisarContatosDomain>()
             ;
 
             services.AddSignalR();

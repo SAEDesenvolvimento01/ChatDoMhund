@@ -193,7 +193,27 @@ async function AtualizarListaDeConversas() {
 	$chatList.html("");
 	const listaDeConversas = conversas.GetConversas();
 	$(listaDeConversas).each((i, conversa) => {
-		$chatList.append(`
+		AdicionarConversaNaLista({
+			$chatList: $chatList,
+			conversa: conversa
+		});
+	});
+}
+
+function AdicionarConversaNaLista({
+	$chatList = $(".chat-list"),
+	conversa = new Conversa(),
+	inserirNoInicio = false
+}) {
+	let funcao;
+
+	if (inserirNoInicio) {
+		funcao = "prepend";
+	} else {
+		funcao = "append";
+	}
+
+	$chatList[funcao](`
             <div conversar-com-usuario
 				codigo="${conversa.codigo}"
 				tipo="${conversa.tipo}"
@@ -220,7 +240,6 @@ async function AtualizarListaDeConversas() {
 	                    <span novas-mensagens="${1}" class="badge badge pill red"></span>
 	                </div>
 	        </div>`);
-	});
 }
 
 async function InicializarChat() {
@@ -297,3 +316,30 @@ function PlaySound(soundObj) {
 		console.error(e);
 	}
 }
+
+$("[nova-conversa]").on("click", async () => {
+	await new PesquisarContatos({
+		callback: response => {
+			const conversa = new Conversa();
+			conversa.mensagens = null;
+			conversa.codigo = response.codigo;
+			conversa.groupName = response.groupName;
+			conversa.tipo = response.tipo;
+			conversa.codigoDaEscola = response.codigoDaEscola;
+			conversa.dataDaUltimaMensagem = "agora";
+			conversa.foto = response.foto;
+			conversa.nome = response.nome;
+			conversa.status = response.status;
+
+			conversas.AddConversa(conversa);
+
+			AdicionarConversaNaLista({
+				conversa: conversa,
+				inserirNoInicio: true
+			});
+
+			$(`.chat-list [group-name="${conversa.groupName}"]`)
+				.click();
+		}
+	}).Start();
+});

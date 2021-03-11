@@ -1,0 +1,30 @@
+﻿@using ChatDoMhund.Models.Poco
+@model ChatDoMhund.Models.ViewModels.PesquisaContatosIndexModel
+@{
+	this.Layout = null;
+}
+
+<div class="modal modal-fixed-footer" id="modal-pesquisar-contatos" tabindex="-1" role="dialog" aria-labelledby="modal-bairros-form-Label" aria-hidden="true">
+	<div class="modal-content">
+		<div class="header-modal">
+			<a class="btn-floating waves-effect waves-light red accent-2 modal-action modal-close float-right">
+				<i class="material-icons">clear</i>
+			</a>
+			<h4 class="modal-title"><i class="fa fa-phone"></i> @this.Model.TituloDaModal</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col s12">
+					@foreach (PkUsuarioConversa usuario in this.Model.Usuarios)
+					{
+						<partial name="_CardUsuario" model="usuario"/>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button id="closeFormBairros" type="button" class="btn waves-effect waves-light transparent black-text modal-action modal-close">Fechar</button>&nbsp;&nbsp;
+		<button type="submit" class="btn waves-effect waves-light gradient-45deg-light-blue-cyan">Salvar</button>
+	</div>
+</div>
