@@ -331,15 +331,20 @@ $("[nova-conversa]").on("click", async () => {
 			conversa.nome = response.nome;
 			conversa.status = response.status;
 
-			conversas.AddConversa(conversa);
+			const $conversaComPessoaSelecionadaJaExistente = $(`.chat-list [group-name="${conversa.groupName}"]`);
+			if (!$conversaComPessoaSelecionadaJaExistente.length) {
+				conversas.AddConversa(conversa);
 
-			AdicionarConversaNaLista({
-				conversa: conversa,
-				inserirNoInicio: true
-			});
+				AdicionarConversaNaLista({
+					conversa: conversa,
+					inserirNoInicio: true
+				});
 
-			$(`.chat-list [group-name="${conversa.groupName}"]`)
-				.click();
+				$(`.chat-list [group-name="${conversa.groupName}"]`)
+					.click();
+			} else {
+				$conversaComPessoaSelecionadaJaExistente.click();
+			}
 		}
 	}).Start();
 });
