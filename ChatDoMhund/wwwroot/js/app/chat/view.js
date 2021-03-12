@@ -30,19 +30,45 @@ $("#sendButton").on("click", function (event) {
 	SendMessage();
 });
 
-function AtualizarConversa() {
+function AtualizarConversa(mensagem = new Mensagem()) {
 	const $conversaSelecionada = $GetConversaSelecionada();
-	const groupNameDestino = $conversaSelecionada.attr("group-name");
 	if ($conversaSelecionada.length) {
+		const groupNameDestino = $conversaSelecionada.attr("group-name");
 		const listaDeConversas = conversas.GetConversas();
 		const conversa = listaDeConversas.find(x => x.groupName === groupNameDestino);
 		InserirMensagensNoChat(conversa);
 	} else {
-		const $mensagensNovas = $conversaSelecionada.find("[novas-mensagens]");
+		const usuarioLogadoQueEnviou = groupNameUsuarioLogado === mensagem.groupNameOrigem;
+		let groupName;
+		if (usuarioLogadoQueEnviou) {
+			groupName = mensagem.groupNameDestino;
+		} else {
+			groupName = mensagem.groupNameOrigem;
+		}
+
+		const conversa = conversas.GetConversas().find(x => x.groupName === groupName);
+
+		const $mensagensNovas = $("[conversar-com-usuario].active").find("[novas-mensagens]");
 		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
 		$mensagensNovas.attr("novas-mensagens", mensagensNovas);
 		$mensagensNovas.html(mensagensNovas);
+
 		PlaySound("new-message");
+
+		if (!usuarioLogadoQueEnviou) {
+			const mensagens = conversa.mensagens;
+			if (mensagens.length) {
+				const ultimaMensagem = mensagens[mensagens.length - 1];
+				let texto = ultimaMensagem.texto;
+				if (texto) {
+					if (texto.length > 10) {
+						texto = texto.subString(0, 9);
+					}
+
+					new MaterialToast({ html: `${conversa.nome}: ${texto}` }).Show();
+				}
+			}
+		}
 	}
 }
 
@@ -56,7 +82,6 @@ async function SendMessage() {
 		const tipo = $conversaSelecionada.attr("tipo");
 		const codigoDaEscola = parseInt($conversaSelecionada.attr("codigo-da-escola"));
 		const groupNameDestino = `${codigoDaEscola}-${tipo}-${codigo}`;
-		const groupNameOrigem = $("#group-name-usuario-logado").val();
 
 		await hub.SendMessage(groupNameDestino, message);
 

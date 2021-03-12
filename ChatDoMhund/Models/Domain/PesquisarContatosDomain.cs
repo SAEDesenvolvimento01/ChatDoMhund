@@ -53,13 +53,15 @@ namespace ChatDoMhund.Models.Domain
 									x.CodAluh != codigoDoUsuarioLogado)
 							 join outroAluno in this._db.Alunos
 								 on historicoDeOutroAluno.CodAluh equals outroAluno.Codigo
+							 join curso in this._db.Cursos
+							on historicoDeOutroAluno.Nseqc equals curso.Nseq
 							 select new PkUsuarioConversa
 							 {
 								 Codigo = outroAluno.Codigo,
 								 Foto = outroAluno.Foto,
 								 Tipo = TipoDeUsuarioTrata.Aluno,
 								 Nome = outroAluno.Nome,
-								 Status = TipoDeUsuarioTrata.Aluno,
+								 Status = $"Curso: {curso.Descricao}",
 								 CodigoDoCliente = codigoDoCliente
 							 }).ToList();
 

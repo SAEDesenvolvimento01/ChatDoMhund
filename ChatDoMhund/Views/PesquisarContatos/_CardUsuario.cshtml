@@ -7,21 +7,21 @@
 }
 
 <div selecionar-para-conversar
-     codigo="@this.Model.Codigo"
-     tipo="@this.Model.Tipo"
+	 codigo="@this.Model.Codigo"
+	 tipo="@TipoDeUsuarioTrata.TipoExtenso(this.Model.Tipo)"
 	 codigo-da-escola="@this.Model.CodigoDoCliente"
-     group-name="@this._groupBuilder.GetGroupName(this.Model.CodigoDoCliente, this.Model.Tipo, this.Model.Codigo)"
-     nome="@this.Model.Nome"
+	 group-name="@this._groupBuilder.GetGroupName(this.Model.CodigoDoCliente, this.Model.Tipo, this.Model.Codigo)"
+	 nome="@this.Model.Nome"
 	 status="@this.Model.Status"
-     class="col s12 card-width ">
-	<div class="card card-border center-align gradient-45deg-indigo-purple">
+	 class="col s12 m6 card-width pointer">
+	<div class="card card-border center-align gradient-45deg-indigo-purple hoverable animated bounceInLeft">
 		<div class="card-content white-text">
 			<img foto class="responsive-img circle z-depth-4" width="100" src="@FotoTrata.ToBase64String(this.Model.Foto)" alt="">
 			<h5 class="white-text mb-1">@this.Model.Nome</h5>
-			<p class="m-0">@TipoDeUsuarioTrata.TipoExtenso(this.Model.Tipo)</p>
-			<a class="waves-effect waves-light btn gradient-45deg-deep-orange-orange border-round mt-7 z-depth-4">
+			<p class="m-0">@TipoDeUsuarioTrata.TipoExtenso(this.Model.Tipo) - Curso: @this.Model.Status</p>
+			@*<a class="waves-effect waves-light btn gradient-45deg-deep-orange-orange border-round z-depth-4">
 				Selecionar
-			</a>
+			</a>*@
 		</div>
 	</div>
 </div>
