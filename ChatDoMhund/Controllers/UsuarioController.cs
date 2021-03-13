@@ -33,15 +33,15 @@ namespace ChatDoMhund.Controllers
 
             int codigoDoUsuario = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario).ConvertToInt32();
             string tipoDeUsuario = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
-            if (tipoDeUsuario == TipoDeUsuarioTrata.Aluno)
+            if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Aluno)
             {
                 responseRepository = this._alunosRepository.GetFoto(codigoDoUsuario);
             }
-            else if (tipoDeUsuario == TipoDeUsuarioTrata.Responsavel)
+            else if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
             {
                 responseRepository = this._pessoasRepository.GetFoto(codigoDoUsuario);
             }
-            else if (tipoDeUsuario == TipoDeUsuarioTrata.Coordenador || tipoDeUsuario == TipoDeUsuarioTrata.Professor)
+            else if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador || tipoDeUsuario == TipoDeUsuarioDoChatTrata.Professor)
             {
                 responseRepository = this._cadforpsRepository.GetFoto(codigoDoUsuario);
             }

@@ -53,8 +53,7 @@ namespace ChatDoMhund.Models.Domain
 			if (codigosETipos.CodigosDosAlunos.Any())
 			{
 				List<PkUsuarioConversa> alunos = this._alunosRepository.GetAlunosDasConversas(codigosETipos.CodigosDosAlunos).Content;
-				usuariosDasConversas.AddRange(
-					alunos);
+				usuariosDasConversas.AddRange(alunos);
 			}
 
 			if (codigosETipos.CodigosDosCoordenadores.Any() || codigosETipos.CodigosDosProfessores.Any())
@@ -82,6 +81,7 @@ namespace ChatDoMhund.Models.Domain
 				}
 			}
 
+			conversas = conversas.OrderByDescending(x => x.GetDataDaUltimaMensagem()).ToList();
 			return conversas;
 		}
 
@@ -89,7 +89,7 @@ namespace ChatDoMhund.Models.Domain
 		{
 			PkCodigosDasPessoasDasMensagens codigosETipos = new PkCodigosDasPessoasDasMensagens();
 
-			TipoDeUsuarioTrata.GetTipos().ForEach(tipo =>
+			TipoDeUsuarioDoChatTrata.GetTipos().ForEach(tipo =>
 			{
 				codigosETipos
 					.Add(this.GetDestinatariosDoTipo(mensagens, tipo), tipo)

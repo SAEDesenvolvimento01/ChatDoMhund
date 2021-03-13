@@ -24,7 +24,7 @@ namespace ChatDoMhund.Data.Repository
 				{
 					Codigo = x.Codigo,
 					Nome = x.Nome,
-					TipoDeUsuario = TipoDeUsuarioTrata.Aluno
+					TipoDeUsuario = TipoDeUsuarioDoChatTrata.Aluno
 				})
 				.FirstOrDefault(x => x.Codigo == codigoDoUsuario);
 
@@ -52,9 +52,9 @@ namespace ChatDoMhund.Data.Repository
 				{
 					Nome = aluno.Nome,
 					Foto = aluno.Foto,
-					Status = TipoDeUsuarioTrata.Aluno,
+					Status = TipoDeUsuarioDoChatTrata.Aluno,
 					Codigo = aluno.Codigo,
-					Tipo = TipoDeUsuarioTrata.Aluno
+					Tipo = TipoDeUsuarioDoChatTrata.Aluno
 				}).ToList();
 
 			return new SaeResponseRepository<List<PkUsuarioConversa>>(true, alunos);

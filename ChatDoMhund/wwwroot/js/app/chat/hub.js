@@ -43,8 +43,8 @@
 	ConfigurarReceiveMessage() {
 		this._connection.on("ReceiveMessage", (groupNameOrigem, groupNameDestino, message) => {
 			try {
-				this._conversas.AddMensagem(groupNameOrigem, groupNameDestino, message);
-				AtualizarConversa();
+				const mensagem = this._conversas.AddMensagem(groupNameOrigem, groupNameDestino, message);
+				AtualizarConversa(mensagem);
 			} catch (e) {
 				console.error(e);
 			}

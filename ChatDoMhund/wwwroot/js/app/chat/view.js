@@ -30,19 +30,45 @@ $("#sendButton").on("click", function (event) {
 	SendMessage();
 });
 
-function AtualizarConversa() {
+function AtualizarConversa(mensagem = new Mensagem()) {
 	const $conversaSelecionada = $GetConversaSelecionada();
-	const groupNameDestino = $conversaSelecionada.attr("group-name");
 	if ($conversaSelecionada.length) {
+		const groupNameDestino = $conversaSelecionada.attr("group-name");
 		const listaDeConversas = conversas.GetConversas();
 		const conversa = listaDeConversas.find(x => x.groupName === groupNameDestino);
 		InserirMensagensNoChat(conversa);
 	} else {
-		const $mensagensNovas = $conversaSelecionada.find("[novas-mensagens]");
+		const usuarioLogadoQueEnviou = groupNameUsuarioLogado === mensagem.groupNameOrigem;
+		let groupName;
+		if (usuarioLogadoQueEnviou) {
+			groupName = mensagem.groupNameDestino;
+		} else {
+			groupName = mensagem.groupNameOrigem;
+		}
+
+		const conversa = conversas.GetConversas().find(x => x.groupName === groupName);
+
+		const $mensagensNovas = $("[conversar-com-usuario].active").find("[novas-mensagens]");
 		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
 		$mensagensNovas.attr("novas-mensagens", mensagensNovas);
 		$mensagensNovas.html(mensagensNovas);
+
 		PlaySound("new-message");
+
+		if (!usuarioLogadoQueEnviou) {
+			const mensagens = conversa.mensagens;
+			if (mensagens.length) {
+				const ultimaMensagem = mensagens[mensagens.length - 1];
+				let texto = ultimaMensagem.texto;
+				if (texto) {
+					if (texto.length > 10) {
+						texto = texto.subString(0, 9);
+					}
+
+					new MaterialToast({ html: `${conversa.nome}: ${texto}` }).Show();
+				}
+			}
+		}
 	}
 }
 
@@ -56,7 +82,6 @@ async function SendMessage() {
 		const tipo = $conversaSelecionada.attr("tipo");
 		const codigoDaEscola = parseInt($conversaSelecionada.attr("codigo-da-escola"));
 		const groupNameDestino = `${codigoDaEscola}-${tipo}-${codigo}`;
-		const groupNameOrigem = $("#group-name-usuario-logado").val();
 
 		await hub.SendMessage(groupNameDestino, message);
 
@@ -98,7 +123,7 @@ $(".chat-list")
 				$chatContentArea.find("[status-da-conversa]").html(conversa.status);
 
 				if ($("#chat-sidenav").hasClass("sidenav")) {
-					$(".sidenav-trigger[data-target=\"chat-sidenav\"]").click();
+					FecharMenu();
 				}
 
 				InserirMensagensNoChat(conversa);
@@ -131,19 +156,42 @@ function InserirMensagensNoChat(conversa) {
 			} else {
 				foto = conversa.foto;
 			}
+			let classes = "chat";
+			let classeDeOrientacaoDaHora;
+			if (origemEhUsuarioLogado) {
+				classes += " chat-right";
+				classeDeOrientacaoDaHora = "right";
+			} else {
+				classeDeOrientacaoDaHora = "left";
+			}
+			const date = new Date(mensagem.dataDaMensagem);
+			const hours = date.getHours().toLocaleString("pt-BR", {
+				minimumIntegerDigits: 2
+			});
+			const minutes = date.getMinutes().toLocaleString("pt-BR", {
+				minimumIntegerDigits: 2
+			});
+			const day = date.getDay().toLocaleString("pt-BR", {
+				minimumIntegerDigits: 2
+			});
+			const month = date.getMonth().toLocaleString("pt-BR", {
+				minimumIntegerDigits: 2
+			});
+			const data = `${day}/${month} às ${hours}:${minutes}`;
+
 			const $ultimaPessoaQueEnviou = $chats.find(".chat").last();
 			if ($ultimaPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
 				$ultimaPessoaQueEnviou.find(".chat-body")
 					.append(`
             <div class="chat-text">
-                <p>${mensagem.texto}</p>
+                <p>
+					<span>${mensagem.texto}</span>
+					<br />
+					<span class="${classeDeOrientacaoDaHora} data-mensagem">${data}</span>
+				</p>
             </div>
 `);
 			} else {
-				let classes = "chat";
-				if (origemEhUsuarioLogado) {
-					classes += " chat-right";
-				}
 				$chats.append(`
             <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
                 <div class="chat-avatar">
@@ -153,7 +201,11 @@ function InserirMensagensNoChat(conversa) {
                 </div>
                 <div class="chat-body">
                     <div class="chat-text">
-                        <p>${mensagem.texto}</p>
+                        <p>
+							<span>${mensagem.texto}</span>
+							<br />
+							<span class="${classeDeOrientacaoDaHora} data-mensagem">${data}</span>
+						</p>
                     </div>
                 </div>
             </div>
@@ -245,6 +297,17 @@ function AdicionarConversaNaLista({
 async function InicializarChat() {
 	await CarregaImagemDoUsuarioLogado();
 	InicializarInputMensagem();
+	if ($("#chat-sidenav").hasClass("sidenav")) {
+		AbrirMenu();
+	}
+}
+
+function AbrirMenu() {
+	$(".sidenav").sidenav("open");
+}
+
+function FecharMenu() {
+	$(".sidenav").sidenav("close");
 }
 
 async function CarregaImagemDoUsuarioLogado() {
@@ -331,15 +394,20 @@ $("[nova-conversa]").on("click", async () => {
 			conversa.nome = response.nome;
 			conversa.status = response.status;
 
-			conversas.AddConversa(conversa);
+			const $conversaComPessoaSelecionadaJaExistente = $(`.chat-list [group-name="${conversa.groupName}"]`);
+			if (!$conversaComPessoaSelecionadaJaExistente.length) {
+				conversas.AddConversa(conversa);
 
-			AdicionarConversaNaLista({
-				conversa: conversa,
-				inserirNoInicio: true
-			});
+				AdicionarConversaNaLista({
+					conversa: conversa,
+					inserirNoInicio: true
+				});
 
-			$(`.chat-list [group-name="${conversa.groupName}"]`)
-				.click();
+				$(`.chat-list [group-name="${conversa.groupName}"]`)
+					.click();
+			} else {
+				$conversaComPessoaSelecionadaJaExistente.click();
+			}
 		}
 	}).Start();
 });

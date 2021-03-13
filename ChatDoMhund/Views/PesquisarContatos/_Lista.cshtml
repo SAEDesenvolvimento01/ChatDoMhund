@@ -1,0 +1,15 @@
+﻿@using ChatDoMhund.Models.Poco
+@model ChatDoMhund.Models.ViewModels.PesquisaContatosListaModel
+
+@{
+	this.Layout = null;
+}
+
+<div class="row">
+	<div class="col s12 p-0">
+		@foreach (PkUsuarioConversa usuario in this.Model.Usuarios)
+		{
+			<partial name="_CardUsuario" model="usuario" />
+		}
+	</div>
+</div>

@@ -19,12 +19,12 @@ namespace ChatDoMhund.Data.Repository
         {
             PkUsuarioLogado usuario = this
                 ._db
-                .Cadforps
+                .Pessoas
                 .Select(x => new PkUsuarioLogado
                 {
                     Codigo = x.Codigo,
                     Nome = x.Nome,
-                    TipoDeUsuario = TipoDeUsuarioTrata.Responsavel
+                    TipoDeUsuario = TipoDeUsuarioDoChatTrata.Responsavel
                 })
                 .FirstOrDefault(x => x.Codigo == codigoDoUsuario);
 
@@ -52,9 +52,9 @@ namespace ChatDoMhund.Data.Repository
 		        {
 			        Nome = aluno.Nome,
 			        Foto = aluno.Foto,
-			        Status = TipoDeUsuarioTrata.Responsavel,
+			        Status = TipoDeUsuarioDoChatTrata.ResponsavelExtenso,
 			        Codigo = aluno.Codigo,
-			        Tipo = TipoDeUsuarioTrata.Responsavel
+			        Tipo = TipoDeUsuarioDoChatTrata.Responsavel
 		        }).ToList();
 
 	        return new SaeResponseRepository<List<PkUsuarioConversa>>(true, responsaveis);

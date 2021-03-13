@@ -55,6 +55,8 @@
 			conversa.mensagens.push(mensagem);
 
 			this.SetConversas(listaConversas);
+
+			return mensagem;
 		} else {
 			alert("Fluxo ausente");
 		}

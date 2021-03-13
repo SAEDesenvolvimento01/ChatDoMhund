@@ -20,19 +20,19 @@ namespace ChatDoMhund.Models.Poco
 
 		public PkCodigosDasPessoasDasMensagens Add(List<int> codigos, string tipo)
 		{
-			if (tipo == TipoDeUsuarioTrata.Aluno)
+			if (tipo == TipoDeUsuarioDoChatTrata.Aluno)
 			{
 				this.CodigosDosAlunos.AddRange(codigos);
 			}
-			if (tipo == TipoDeUsuarioTrata.Professor)
+			if (tipo == TipoDeUsuarioDoChatTrata.Professor)
 			{
 				this.CodigosDosProfessores.AddRange(codigos);
 			}
-			if (tipo == TipoDeUsuarioTrata.Coordenador)
+			if (tipo == TipoDeUsuarioDoChatTrata.Coordenador)
 			{
 				this.CodigosDosCoordenadores.AddRange(codigos);
 			}
-			if (tipo == TipoDeUsuarioTrata.Responsavel)
+			if (tipo == TipoDeUsuarioDoChatTrata.Responsavel)
 			{
 				this.CodigosDosResponsaveis.AddRange(codigos);
 			}
@@ -42,19 +42,19 @@ namespace ChatDoMhund.Models.Poco
 
 		public PkCodigosDasPessoasDasMensagens RemoverUsuarioLogado(int codigoDoUsuario, string tipoDoUsuario)
 		{
-			if (tipoDoUsuario == TipoDeUsuarioTrata.Aluno)
+			if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Aluno)
 			{
 				this.CodigosDosAlunos.Remove(codigoDoUsuario);
 			}
-			if (tipoDoUsuario == TipoDeUsuarioTrata.Professor)
+			if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Professor)
 			{
 				this.CodigosDosProfessores.Remove(codigoDoUsuario);
 			}
-			if (tipoDoUsuario == TipoDeUsuarioTrata.Coordenador)
+			if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Coordenador)
 			{
 				this.CodigosDosCoordenadores.Remove(codigoDoUsuario);
 			}
-			if (tipoDoUsuario == TipoDeUsuarioTrata.Responsavel)
+			if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
 			{
 				this.CodigosDosResponsaveis.Remove(codigoDoUsuario);
 			}
