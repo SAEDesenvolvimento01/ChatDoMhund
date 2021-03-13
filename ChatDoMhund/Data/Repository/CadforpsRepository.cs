@@ -24,7 +24,7 @@ namespace ChatDoMhund.Data.Repository
                 {
                     Codigo = x.Codigo,
                     Nome = x.Nome,
-                    TipoDeUsuario = tipoDoUsuario
+                    TipoDeUsuario = TipoDeUsuarioDoChatTrata.Professor//tipoDoUsuario
                 })
                 .FirstOrDefault(x => x.Codigo == codigoDoUsuario);
 
@@ -48,7 +48,7 @@ namespace ChatDoMhund.Data.Repository
         {
 	        List<PkUsuarioConversa> professoresECoordenadores = this._db
 		        .Cadforps
-		        .Where(x => x.Tipo == TipoDeUsuarioTrata.Professor &&
+		        .Where(x => x.Tipo == TipoDeUsuarioDoChatTrata.Professor &&
 		                    (codigosDosCoordenadores.Contains(x.Codigo) || codigosDosProfessores.Contains(x.Codigo)))
 		        .Select(cadforps => new PkUsuarioConversa
 		        {

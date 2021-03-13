@@ -1,4 +1,4 @@
-﻿@using ChatDoMhund.Models.Poco
+﻿@using ChatDoMhundStandard.Tratamento
 @model ChatDoMhund.Models.ViewModels.PesquisaContatosIndexModel
 @{
 	this.Layout = null;
@@ -14,13 +14,25 @@
 		</div>
 		<div class="modal-body">
 			<div class="row">
-				<div class="col s12">
-					@foreach (PkUsuarioConversa usuario in this.Model.Usuarios)
-					{
-						<partial name="_CardUsuario" model="usuario"/>
-					}
-				</div>
+				@if (this.Model.EhProfessorOuCoordenador)
+				{
+					<div class="col s12">
+						<div class="input-field">
+							<div class="select-wrapper select-index">
+								<select asp-for="CursoEFase" 
+								        class="validate select2" 
+										asp-items="this.Model.GetSelectListListaDeCursosHabilitados()">
+								</select>
+							</div>
+						</div>
+					</div>
+				}
 			</div>
+			@this.Model.GetChipAluno()
+			@this.Model.GetChipProfessor()
+			@this.Model.GetChipCoordenador()
+			@this.Model.GetChipResponsavel()
+			<div lista-usuarios-para-conversar></div>
 		</div>
 	</div>
 	<div class="modal-footer">

@@ -11,10 +11,10 @@
 		<div class="header-details">
 			<div class="row">
 				<div class="col s6">
-					<h5 class="m-0 sidebar-title"><i class="material-icons app-header-icon text-top">mail_outline</i> Chat</h5>
+					<h5 class="m-0 sidebar-title animated bounceInDown"><i class="material-icons app-header-icon">mail_outline</i> Chat</h5>
 				</div>
 				<div class="col s6">
-					<a class="waves-effect waves-block waves-light toggle-fullscreen right" href="javascript:void(0);"><i class="material-icons">settings_overscan</i></a>
+					<a class="waves-effect waves-block waves-light toggle-fullscreen right animated bounceInRight" href="javascript:void(0);"><i class="material-icons">settings_overscan</i></a>
 				</div>
 			</div>
 		</div>
@@ -22,7 +22,7 @@
 	<div class="app-chat">
 		<div class="content-area content-right">
 			<div class="app-wrapper">
-				<a href="#" data-target="chat-sidenav" class="sidenav-trigger hide-on-large-only">
+				<a href="#" data-target="chat-sidenav" class="sidenav-trigger hide-on-large-only animated bounceInLeft">
 					<i class="material-icons">menu</i>
 				</a>
 				<div class="card card card-default scrollspy border-radius-6 fixed-width">
@@ -38,7 +38,7 @@
 <audio src="/sound/new-message.wav" autoplay="" autostart="false" width="0" height="0" id="new-message" enablejavascript="true"></audio>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
 <script src="@this.Model.Routes.Helper/materialize/js/scripts/app-chat.min.js"></script>
-<script src="~/js/app/pesquisas/pesquisar-contatos/pesquisar-contatos-response.js"></script>
+<script asp-append-version="true" src="~/js/app/pesquisas/pesquisar-contatos/pesquisar-contatos-response.js"></script>
 <script asp-append-version="true" src="~/js/app/pesquisas/pesquisar-contatos/main.js"></script>
 <script asp-append-version="true" src="~/js/app/chat/mensagem.js"></script>
 <script asp-append-version="true" src="~/js/app/chat/conversa.js"></script>

@@ -4,6 +4,7 @@ using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using System.Collections.Generic;
 using System.Linq;
+using HelperSaeStandard11.Models.Extension;
 
 namespace ChatDoMhund.Models.Poco
 {
@@ -27,7 +28,7 @@ namespace ChatDoMhund.Models.Poco
 		public PkConversa(PkUsuarioConversa usuario, List<ChatProfess> mensagensDoUsuario, int codigoDaEscola, GroupBuilder groupBuilder)
 		{
 			this.Codigo = usuario.Codigo;
-			this.Nome = usuario.Nome;
+			this.Nome = usuario.Nome.GetPrimeiroEUltimoNome();
 			this.Foto = FotoTrata.ToBase64String(usuario.Foto);
 			this.Status = usuario.Status;
 			this.Tipo = usuario.Tipo;
@@ -47,12 +48,17 @@ namespace ChatDoMhund.Models.Poco
 		{
 			if (this.Mensagens.Any())
 			{
-				DateTime data = this.Mensagens.Last().DataDaMensagem;
+				DateTime data = this.GetDataDaUltimaMensagem();
 				DateTime hoje = DateTime.Today;
+				DateTime ontem = DateTime.Today.AddDays(-1);
 				DateTime umaSemanaAtras = DateTime.Today.AddDays(-7);
 				if (data.Date == hoje)
 				{
 					this.DataDaUltimaMensagem = data.ToString("HH:mm");
+				}
+				else if (data.Date == ontem)
+				{
+					this.DataDaUltimaMensagem = data.ToString("'ontem', HH:mm");
 				}
 				else if (data > umaSemanaAtras)
 				{
@@ -67,6 +73,11 @@ namespace ChatDoMhund.Models.Poco
 					this.DataDaUltimaMensagem = data.ToString("dd/MM/yyyy");
 				}
 			}
+		}
+
+		public DateTime GetDataDaUltimaMensagem()
+		{
+			return this.Mensagens.OrderBy(x => x.DataDaMensagem).LastOrDefault()?.DataDaMensagem ?? DateTime.MinValue;
 		}
 	}
 }

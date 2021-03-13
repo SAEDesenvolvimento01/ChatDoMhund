@@ -2,12 +2,16 @@
 
 namespace ChatDoMhundStandard.Tratamento
 {
-    public class TipoDeUsuarioTrata
+    public class TipoDeUsuarioDoChatTrata
     {
         public const string Aluno = "AL";
+        public const string AlunoExtenso = "Aluno(a)";
         public const string Professor = "PR";
+        public const string ProfessorExtenso = "Professor(a)";
         public const string Coordenador = "CO";
+        public const string CoordenadorExtenso = "Coordenador(a)";
         public const string Responsavel = "RE";
+        public const string ResponsavelExtenso = "Responsável";
 
         public static string TipoExtenso(string tipo)
         {
@@ -15,19 +19,19 @@ namespace ChatDoMhundStandard.Tratamento
             {
                 if (tipo == Aluno)
                 {
-                    return "Aluno(a)";
+                    return AlunoExtenso;
                 }
                 if (tipo == Professor)
                 {
-                    return "Professor(a)";
+                    return ProfessorExtenso;
                 }
                 if (tipo == Coordenador)
                 {
-                    return "Coordenador(a)";
+                    return CoordenadorExtenso;
                 }
                 if (tipo == Responsavel)
                 {
-                    return "Responsável";
+                    return ResponsavelExtenso;
                 }
             }
 

@@ -18,7 +18,7 @@ namespace ChatDoMhund.Models.Poco
 
 		public PkUsuarioLogadoPermissoes(string tipoDeUsuario, AppCfg configuracoesDeApp)
 		{
-			if (tipoDeUsuario == TipoDeUsuarioTrata.Aluno)
+			if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Aluno)
 			{
 				this.SetPermissoes(
 					conversaComProfessor: configuracoesDeApp.CAluXPro == SaeSituacao.Sim,
@@ -26,7 +26,7 @@ namespace ChatDoMhund.Models.Poco
 					conversaComResponsavel: true,
 					conversaComAluno: configuracoesDeApp.CAluXAlu == SaeSituacao.Sim);
 			}
-			else if (tipoDeUsuario == TipoDeUsuarioTrata.Responsavel)
+			else if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
 			{
 				this.SetPermissoes(
 					conversaComProfessor: configuracoesDeApp.CRespXProf == SaeSituacao.Sim,
@@ -34,7 +34,7 @@ namespace ChatDoMhund.Models.Poco
 					conversaComResponsavel: configuracoesDeApp.CRespXResp == SaeSituacao.Sim,
 					conversaComAluno: true);
 			}
-			else if (tipoDeUsuario == TipoDeUsuarioTrata.Coordenador || tipoDeUsuario == TipoDeUsuarioTrata.Professor)
+			else if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador || tipoDeUsuario == TipoDeUsuarioDoChatTrata.Professor)
 			{
 				this.SetPermissoes(
 					conversaComProfessor: true,

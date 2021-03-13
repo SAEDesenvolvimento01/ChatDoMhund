@@ -68,15 +68,15 @@ namespace ChatDoMhund.Models.Infra
             bool status = false;
             SaeResponseRepository<PkUsuarioLogado> response;
 
-            if (tipoDoUsuario == TipoDeUsuarioTrata.Aluno)
+            if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Aluno)
             {
                 response = this._alunosRepository.GetUsuarioParaLogar(codigoDoUsuario);
             }
-            else if (tipoDoUsuario == TipoDeUsuarioTrata.Professor || tipoDoUsuario == TipoDeUsuarioTrata.Coordenador)
+            else if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Professor || tipoDoUsuario == TipoDeUsuarioDoChatTrata.Coordenador)
             {
                 response = this._cadforpsRepository.GetUsuarioParaLogar(codigoDoUsuario, tipoDoUsuario: tipoDoUsuario);
             }
-            else if (tipoDoUsuario == TipoDeUsuarioTrata.Responsavel)
+            else if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
             {
                 response = this._pessoasRepository.GetUsuarioParaLogar(codigoDoUsuario);
             }
@@ -92,7 +92,7 @@ namespace ChatDoMhund.Models.Infra
                 SaeResponseRepository<AppCfg> responseConfig = this._appCfgRepository.GetFirstOrDefault();
                 usuarioLogado.SetOrigemDeChat(origemDeChat);
                 usuarioLogado.SetPermissoes(responseConfig.Content);
-                usuarioLogado.SetRelacaoComALuno(codigoDoAluno, tipoDeRelacao);
+                usuarioLogado.SetRelacaoComAluno(codigoDoAluno, tipoDeRelacao);
 
                 this.SetDados(usuarioLogado);
 
@@ -136,7 +136,7 @@ namespace ChatDoMhund.Models.Infra
             int codigoDoAluno = this._saeHelperCookie.GetCookie(EChatCookie.CodigoDoAlunoSelecionado.ToString()).ConvertToInt32();
             string origemDeChat = this._saeHelperCookie.GetCookie(EChatCookie.OrigemDeChat.ToString());
             string tipoDeRelacao = this._saeHelperCookie.GetCookie(EChatCookie.TipoDeRelacaoComAluno.ToString());
-            bool ehResponsavel = tipoDeRelacao == TipoDeUsuarioTrata.Responsavel;
+            bool ehResponsavel = tipoDeRelacao == TipoDeUsuarioDoChatTrata.Responsavel;
             bool relacaoComAlunoEstaPreenchida = codigoDoAluno > 0 && !string.IsNullOrEmpty(tipoDeRelacao);
             if (codigoDaEscola > 0 &&
                 codigoDoUsuario > 0 &&
@@ -179,7 +179,7 @@ namespace ChatDoMhund.Models.Infra
         public string GetHashUsuarioLogado(int codigoDaEscola, int codigoDoUsuario, string tipoDoUsuario,
             string origemDeChat, int codigoDoAluno, string tipoDeRelacao)
         {
-            if (tipoDoUsuario == TipoDeUsuarioTrata.Responsavel)
+            if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
             {
                 return this._saeCriptography
                     .GerarCriptografia($"{codigoDaEscola}{codigoDoUsuario}{tipoDoUsuario}{origemDeChat}{codigoDoAluno}{tipoDeRelacao}");
@@ -243,6 +243,12 @@ namespace ChatDoMhund.Models.Infra
         private void SetSessions(string json)
         {
             this._saeHelperSession.SetUsuarioLogado(json);
+        }
+
+        public bool EhProfessorOuCoordenador()
+        {
+	        return this.TipoDeUsuario == TipoDeUsuarioDoChatTrata.Professor ||
+	               this.TipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador;
         }
     }
 }
