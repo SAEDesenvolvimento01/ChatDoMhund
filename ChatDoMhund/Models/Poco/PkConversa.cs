@@ -33,7 +33,7 @@ namespace ChatDoMhund.Models.Poco
 			this.Status = usuario.Status;
 			this.Tipo = usuario.Tipo;
 			this.CodigoDaEscola = codigoDaEscola;
-			this.GroupName = groupBuilder.GetGroupName(codigoDaEscola, usuario.Tipo, usuario.Codigo);
+			this.GroupName = groupBuilder.BuildGroupName(codigoDaEscola, usuario.Tipo, usuario.Codigo);
 			this.Mensagens = mensagensDoUsuario.Select(mensagem => new PkMensagem(mensagem, groupBuilder, codigoDaEscola)).ToList();
 
 			this.SetDataDaUltimaMensagem();

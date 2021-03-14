@@ -32,9 +32,9 @@ $("#sendButton").on("click", function (event) {
 
 function AtualizarConversa(mensagem = new Mensagem()) {
 	const $conversaSelecionada = $GetConversaSelecionada();
+	const listaDeConversas = conversas.GetConversas();
 	if ($conversaSelecionada.length) {
 		const groupNameDestino = $conversaSelecionada.attr("group-name");
-		const listaDeConversas = conversas.GetConversas();
 		const conversa = listaDeConversas.find(x => x.groupName === groupNameDestino);
 		InserirMensagensNoChat(conversa);
 	} else {
@@ -46,7 +46,7 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 			groupName = mensagem.groupNameOrigem;
 		}
 
-		const conversa = conversas.GetConversas().find(x => x.groupName === groupName);
+		const conversa = listaDeConversas.find(x => x.groupName === groupName);
 
 		const $mensagensNovas = $("[conversar-com-usuario].active").find("[novas-mensagens]");
 		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
@@ -70,6 +70,8 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 			}
 		}
 	}
+
+	AtualizarListaDeConversas();
 }
 
 async function SendMessage() {
@@ -242,30 +244,10 @@ async function CarregarConversas() {
 
 async function AtualizarListaDeConversas() {
 	const $chatList = $(".chat-list");
-	$chatList.html("");
 	const listaDeConversas = conversas.GetConversas();
-	$(listaDeConversas).each((i, conversa) => {
-		AdicionarConversaNaLista({
-			$chatList: $chatList,
-			conversa: conversa
-		});
-	});
-}
-
-function AdicionarConversaNaLista({
-	$chatList = $(".chat-list"),
-	conversa = new Conversa(),
-	inserirNoInicio = false
-}) {
-	let funcao;
-
-	if (inserirNoInicio) {
-		funcao = "prepend";
-	} else {
-		funcao = "append";
-	}
-
-	$chatList[funcao](`
+	$(listaDeConversas).each((i, conversa = new Conversa()) => {
+		if (!$GetConversaNoSidebar(conversa).length) {
+			$chatList.prepend(`
             <div conversar-com-usuario
 				codigo="${conversa.codigo}"
 				tipo="${conversa.tipo}"
@@ -289,9 +271,31 @@ function AdicionarConversaNaLista({
 	                            <span>${conversa.dataDaUltimaMensagem}</span>
 	                        </div>
 	                    </div>
-	                    <span novas-mensagens="${1}" class="badge badge pill red"></span>
+	                    <span novas-mensagens="0" class="badge badge pill red" style="display: none;"></span>
 	                </div>
 	        </div>`);
+		}
+
+		const quantidadeDeMensagensNaoLidas = conversa.mensagens.filter(x => !x.lida).length;
+		const $quantidadeDeMensagensNaoLidas = $GetConversaNoSidebar(conversa)
+			.find(`span[novas-mensagens]`);
+
+		if (quantidadeDeMensagensNaoLidas) {
+			$quantidadeDeMensagensNaoLidas
+				.attr("novas-mensagens", quantidadeDeMensagensNaoLidas)
+				.html(quantidadeDeMensagensNaoLidas)
+				.show(600);
+		} else {
+			$quantidadeDeMensagensNaoLidas
+				.attr("novas-mensagens", 0)
+				.html("")
+				.hide(600);
+		}
+	});
+}
+
+function $GetConversaNoSidebar(conversa = new Conversa()) {
+	return $(".chat-list").find(`div[conversar-com-usuario][group-name="${conversa.groupName}"]`)
 }
 
 async function InicializarChat() {
@@ -398,10 +402,7 @@ $("[nova-conversa]").on("click", async () => {
 			if (!$conversaComPessoaSelecionadaJaExistente.length) {
 				conversas.AddConversa(conversa);
 
-				AdicionarConversaNaLista({
-					conversa: conversa,
-					inserirNoInicio: true
-				});
+				AtualizarListaDeConversas();
 
 				$(`.chat-list [group-name="${conversa.groupName}"]`)
 					.click();
@@ -411,3 +412,7 @@ $("[nova-conversa]").on("click", async () => {
 		}
 	}).Start();
 });
+
+$mensagem.on("focus", () => {
+	AtualizaScrollDaConversa();
+})

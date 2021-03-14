@@ -19,8 +19,8 @@ namespace ChatDoMhund.Models.Poco
 
 		public PkMensagem(ChatProfess mensagem, GroupBuilder groupBuilder, int codigoDoCliente)
 		{
-			this.GroupNameOrigem = groupBuilder.GetGroupName(codigoDoCliente, mensagem.TipoOrigem, mensagem.IdOrigem.ConvertToInt32());
-			this.GroupNameDestino = groupBuilder.GetGroupName(codigoDoCliente, mensagem.TipoDestino, mensagem.IdDestino.ConvertToInt32());
+			this.GroupNameOrigem = groupBuilder.BuildGroupName(codigoDoCliente, mensagem.TipoOrigem, mensagem.IdOrigem.ConvertToInt32());
+			this.GroupNameDestino = groupBuilder.BuildGroupName(codigoDoCliente, mensagem.TipoDestino, mensagem.IdDestino.ConvertToInt32());
 			this.Texto = mensagem.TextMens;
 			this.DataDaMensagem = mensagem.DtMensagem ?? DateTime.MinValue;
 		}

@@ -13,7 +13,7 @@
 		return conversas;
 	}
 
-	SetConversas(conversas = new Conversa()) {
+	SetConversas(conversas = new Array(new Conversa())) {
 		const jsonConversas = JSON.stringify(conversas);
 
 		sessionStorage.setItem("conversas", jsonConversas);
@@ -27,32 +27,44 @@
 		this.SetConversas(conversas);
 	}
 
-	AddMensagem(groupNameOrigem, groupNameDestino, message) {
+	async AddMensagem(mensagem = new Mensagem()) {
 		const listaConversas = this.GetConversas();
-
 		if (listaConversas) {
 			let groupName = "";
 			const groupNameUsuarioLogado = $("#group-name-usuario-logado").val();
 
 			//Pego o que não seja a origem
-			if (groupNameOrigem !== groupNameUsuarioLogado) {
-				groupName = groupNameOrigem;
+			if (mensagem.groupNameOrigem !== groupNameUsuarioLogado) {
+				groupName = mensagem.groupNameOrigem;
 			} else {
-				groupName = groupNameDestino;
+				groupName = mensagem.groupNameDestino;
 			}
 
-			const conversa = listaConversas.find(x => x.groupName === groupName);
+			let conversa = listaConversas.find(x => x.groupName === groupName);
 
-			if (!conversa.mensagens) {
-				conversa.mensagens = new Array();
+			if (conversa) {
+				if (!conversa.mensagens) {
+					conversa.mensagens = new Array();
+				}
+
+				conversa.mensagens.push(mensagem);
+			} else {
+				const response = new SaeResponse(await new SaeAjax({
+					url: "/Chat/GetUsuarioParaConversa",
+					data: {
+						groupName: groupName
+					}
+				}).Start());
+
+				if (response.Status()) {
+					conversa = response.Content();
+
+					listaConversas.push(conversa);
+				} else {
+					await response.Swal();
+				}
 			}
 
-			const mensagem = new Mensagem();
-			mensagem.groupNameDestino = groupNameDestino;
-			mensagem.groupNameOrigem = groupNameOrigem;
-			mensagem.texto = message;
-
-			conversa.mensagens.push(mensagem);
 
 			this.SetConversas(listaConversas);
 

@@ -5,7 +5,7 @@
 
 <link rel="stylesheet" type="text/css" href="@this.Model.Routes.Helper/materialize/css/pages/app-chat.css">
 
-<input type="hidden" value="@this._groupBuilder.GetGroupName()" id="group-name-usuario-logado" />
+<input type="hidden" value="@this._groupBuilder.BuildGroupName()" id="group-name-usuario-logado" />
 
 @foreach (string tipo in TipoDeUsuarioDoChatTrata.GetTipos())
 {

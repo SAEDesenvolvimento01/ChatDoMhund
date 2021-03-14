@@ -1,20 +1,18 @@
-﻿using ChatDoMhund.Models.Infra;
+﻿using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Poco;
+using ChatDoMhund.Models.ViewModels;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Partials;
 using HelperMhundStandard.Models.Dominio;
 using HelperSaeCore31.Models.Enum;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
+using HelperSaeStandard11.Models.Extension;
+using HelperSaeStandard11.Models.Infra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ChatDoMhund.Data.Repository;
-using ChatDoMhund.Models.ViewModels;
-using HelperMhundCore31.Data.Entity.Models;
-using HelperSaeStandard11.Models.Extension;
-using HelperSaeStandard11.Models.Infra;
-using Microsoft.AspNetCore.Razor.Language.Intermediate;
 
 namespace ChatDoMhund.Models.Domain
 {
@@ -243,7 +241,7 @@ namespace ChatDoMhund.Models.Domain
 
 				if (responsaveisDoAluno.Any())
 				{
-					var responsaveisAgrupados = responsaveisDoAluno.GroupBy(x => x.Codigo, 
+					var responsaveisAgrupados = responsaveisDoAluno.GroupBy(x => x.Codigo,
 						(codigo, responsaveisIguais) =>
 						{
 							//Guardei numa lista para evitar múltipla enumeração
@@ -251,7 +249,7 @@ namespace ChatDoMhund.Models.Domain
 							var relacoes = responsaveisIguaisList
 								.Select(x => x.Status.Split(" do(a)").FirstOrDefault());
 
-							string relacoesJuntasESeparadasPorVirgula = 
+							string relacoesJuntasESeparadasPorVirgula =
 								string.Join(", ", relacoes);
 							var primeiroIndice = responsaveisIguaisList.FirstOrDefault();
 							string nomeDoAluno = primeiroIndice.Status.Split("do(a)").LastOrDefault();
@@ -278,28 +276,33 @@ namespace ChatDoMhund.Models.Domain
 		private List<PkUsuarioConversa> GetProfessoresOuCoordenadoresPeloHistorico(PkHistoricoDoAluno ultimoHistoricoDoAluno, string tipo,
 			int codigoDoCliente)
 		{
-			List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
-				.GetHabilitacoesPeloHistorico(ultimoHistoricoDoAluno)
-				.DistinctBy(x => x.CodigoDoProfessor)
-				.ToList();
+			List<PkUsuarioConversa> coordenadores = new List<PkUsuarioConversa>();
 
-			string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
+			if (ultimoHistoricoDoAluno != null)
+			{
+				List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
+					.GetHabilitacoesPeloHistorico(ultimoHistoricoDoAluno)
+					.DistinctBy(x => x.CodigoDoProfessor)
+					.ToList();
 
-			List<PkUsuarioConversa> coordenadores =
-				(from profHabilita in habilitacoes
-				 join cadforps in this._db.Cadforps.Where(x => x.ProfNivel == tipo)
-					 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
-				 join curso in this._db.Cursos
-					 on profHabilita.CodigoDoCurso equals curso.Nseq
-				 select new PkUsuarioConversa
-				 {
-					 Codigo = cadforps.Codigo,
-					 Tipo = TipoDeUsuarioDoChatTrata.Professor,
-					 Foto = cadforps.Foto,
-					 CodigoDoCliente = codigoDoCliente,
-					 Nome = cadforps.Nome,
-					 Status = $"{cargo} do curso: {curso.Descricao}"
-				 }).ToList();
+				string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
+
+				coordenadores = (from profHabilita in habilitacoes
+								 join cadforps in this._db.Cadforps.Where(x => x.ProfNivel == tipo)
+									 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
+								 join curso in this._db.Cursos
+									 on profHabilita.CodigoDoCurso equals curso.Nseq
+								 select new PkUsuarioConversa
+								 {
+									 Codigo = cadforps.Codigo,
+									 Tipo = TipoDeUsuarioDoChatTrata.Professor,
+									 Foto = cadforps.Foto,
+									 CodigoDoCliente = codigoDoCliente,
+									 Nome = cadforps.Nome,
+									 Status = $"{cargo} do curso: {curso.Descricao}"
+								 }).ToList();
+			}
+
 			return coordenadores;
 		}
 

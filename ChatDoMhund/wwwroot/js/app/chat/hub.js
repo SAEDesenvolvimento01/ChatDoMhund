@@ -41,9 +41,9 @@
 	}
 
 	ConfigurarReceiveMessage() {
-		this._connection.on("ReceiveMessage", (groupNameOrigem, groupNameDestino, message) => {
+		this._connection.on("ReceiveMessage", async mensagem => {
 			try {
-				const mensagem = this._conversas.AddMensagem(groupNameOrigem, groupNameDestino, message);
+				mensagem = await this._conversas.AddMensagem(mensagem);
 				AtualizarConversa(mensagem);
 			} catch (e) {
 				console.error(e);

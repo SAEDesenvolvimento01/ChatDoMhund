@@ -1,14 +1,15 @@
-﻿using ChatDoMhund.Models.Poco;
+﻿using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Models.Poco;
 using ChatDoMhund.Models.Tratamento;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
+using HelperMhundCore31.Data.Entity.Partials;
+using HelperSaeCore31.Models.Enum;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using ChatDoMhund.Data.Repository;
-using HelperSaeCore31.Models.Enum;
+using ChatDoMhund.Models.Infra;
 
 namespace ChatDoMhund.Models.Domain
 {
@@ -20,13 +21,17 @@ namespace ChatDoMhund.Models.Domain
 		private readonly AlunosRepository _alunosRepository;
 		private readonly CadforpsRepository _cadforpsRepository;
 		private readonly PessoasRepository _pessoasRepository;
+		private readonly MhundDbContext _db;
+		private readonly UsuarioLogado _usuarioLogado;
 
 		public ChatDomain(ISaeHelperCookie helperCookie,
 			GroupBuilder groupBuilder,
 			ChatProfessRepository chatProfessRepository,
 			AlunosRepository alunosRepository,
 			CadforpsRepository cadforpsRepository,
-			PessoasRepository pessoasRepository)
+			PessoasRepository pessoasRepository,
+			MhundDbContext db,
+			UsuarioLogado usuarioLogado)
 		{
 			this._helperCookie = helperCookie;
 			this._groupBuilder = groupBuilder;
@@ -34,6 +39,8 @@ namespace ChatDoMhund.Models.Domain
 			this._alunosRepository = alunosRepository;
 			this._cadforpsRepository = cadforpsRepository;
 			this._pessoasRepository = pessoasRepository;
+			this._db = db;
+			this._usuarioLogado = usuarioLogado;
 		}
 
 		public List<PkConversa> GetMensagensDoUsuario(int codigoDoUsuario, string tipoDoUsuario)
@@ -124,6 +131,33 @@ namespace ChatDoMhund.Models.Domain
 				.ToList();
 
 			return destinatarios;
+		}
+
+		public string LimparTodasAsMensagens()
+		{
+			int cliente = this._helperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
+			if (cliente == 99123)
+			{
+				List<ChatProfess> todasAsMensagens = this._db.ChatProfess.ToList();
+
+				this._db.ChatProfess.RemoveRange(todasAsMensagens);
+
+				int quantidadeRemovida = this._db.SaveChanges();
+
+				return $"{quantidadeRemovida} mensagens removidas";
+			}
+
+			return $"not allowed to {cliente}";
+		}
+
+		public List<ChatProfess> GetMensagens(PkUsuarioConversa conversa)
+		{
+			this._usuarioLogado.GetUsuarioLogado();
+			return this._chatProfessRepository.GetMensagens(
+				codigoDoUsuarioLogado: this._usuarioLogado.Codigo,
+				tipoDoUsuarioLogado: this._usuarioLogado.TipoDeUsuario,
+				codigoDoUsuarioDaConversa: conversa.Codigo,
+				tipoDoUsuarioDaConversa: conversa.Tipo).Content;
 		}
 	}
 }

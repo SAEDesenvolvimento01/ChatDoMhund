@@ -59,5 +59,22 @@ namespace ChatDoMhund.Data.Repository
 
 			return new SaeResponseRepository<List<PkUsuarioConversa>>(true, alunos);
 		}
+
+		public SaeResponseRepository<PkUsuarioConversa> GetAlunoParaConversa(int codigoDoAluno)
+		{
+			PkUsuarioConversa alunos = this._db
+				.Alunos
+				.Where(x => codigoDoAluno == x.Codigo)
+				.Select(aluno => new PkUsuarioConversa
+				{
+					Nome = aluno.Nome,
+					Foto = aluno.Foto,
+					Status = TipoDeUsuarioDoChatTrata.Aluno,
+					Codigo = aluno.Codigo,
+					Tipo = TipoDeUsuarioDoChatTrata.Aluno
+				}).FirstOrDefault();
+
+			return new SaeResponseRepository<PkUsuarioConversa>(true, alunos);
+		}
 	}
 }
