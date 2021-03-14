@@ -7,5 +7,6 @@
 		public string Fase { get; set; }
 		public int CodigoDaMateria { get; set; }
 		public string DescricaoDoCurso { get; set; }
+		public string NomeDaFase { get; set; }
 	}
 }

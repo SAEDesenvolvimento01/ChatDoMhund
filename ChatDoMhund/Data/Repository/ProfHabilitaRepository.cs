@@ -13,7 +13,7 @@ namespace ChatDoMhund.Data.Repository
 		{
 		}
 
-		public List<PkHabilitacaoProfessor> GetHabilitacoesDoProfessor(int codigoDoProfessor)
+		public List<PkHabilitacaoProfessor> GetHabilitacoesDoProfessorOuCoordenador(int codigoDoProfessor)
 		{
 			List<PkHabilitacaoProfessor> habilitacoes =
 				(from profHabilita in this._db.ProfHabilita.Where(x => x.CodProf == codigoDoProfessor)
@@ -25,7 +25,8 @@ namespace ChatDoMhund.Data.Repository
 					 CodigoDoCurso = profHabilita.CodCurso ?? 0,
 					 CodigoDaMateria = profHabilita.CodMateria ?? 0,
 					 CodigoDoProfessor = profHabilita.CodProf ?? 0,
-					 DescricaoDoCurso = curso.Descricao
+					 DescricaoDoCurso = curso.Descricao,
+					 NomeDaFase = curso.Nomedasfases
 				 })
 				.ToList();
 
@@ -45,7 +46,8 @@ namespace ChatDoMhund.Data.Repository
 						CodigoDoCurso = profHabilita.CodCurso ?? 0,
 						CodigoDaMateria = profHabilita.CodMateria ?? 0,
 						CodigoDoProfessor = profHabilita.CodProf ?? 0,
-						DescricaoDoCurso = curso.Descricao
+						DescricaoDoCurso = curso.Descricao,
+						NomeDaFase = curso.Nomedasfases
 					})
 				.ToList();
 

@@ -7,9 +7,24 @@
 
 <div class="row">
 	<div class="col s12 p-0">
-		@foreach (PkUsuarioConversa usuario in this.Model.Usuarios)
+		@if(this.Model.Usuarios.Any())
 		{
-			<partial name="_CardUsuario" model="usuario" />
+			@foreach (PkUsuarioConversa usuario in this.Model.Usuarios)
+			{
+				<partial name="_CardUsuario" model="usuario"/>
+			}
+		}
+		else
+		{
+			<div class="card row gradient-45deg-purple-deep-purple gradient-shadow white-text padding-4">
+				<div class="col s7 m7">
+					<i class="material-icons background-round">warning</i>
+					<p>Nenhum usuário encontrado para o filtro selecionado</p>
+				</div>
+				<div class="col s5 right-align">
+					<h5 class="white-text">Ops</h5>
+				</div>
+			</div>
 		}
 	</div>
 </div>

@@ -16,17 +16,17 @@
 		if (response.Status()) {
 			this._modal = new SaeMaterialModal({
 				id: "modal-pesquisar-contatos",
-				html: response.View()
-			}).Create();
+				html: response.View(),
+				maxHeight: 60,
+				overflowElementSelector: "#modal-pesquisar-contatos .modal-body [lista-usuarios-para-conversar]"
+			});
 
-			$("#CursosEFases")
+			this._modal.Create();
+
+			$("#CursoEFase")
 				.on("change", async () => {
 					await this.AtualizarLista();
-				})
-				.select2({
-				placeholder: "Selecione um curso",
-				escapeMarkup: function (es) { return es; }
-			});
+				});
 
 			$(this.GetTiposDeUsuariosSelecionadosDoStorage()).each((i, tipo) => {
 				const $item = $(`[tipo-de-usuario-para-filtrar="${tipo}"]`);
@@ -36,7 +36,7 @@
 				}
 			});
 
-			$("[tipo-de-usuario-para-filtrar]").on("click", async  event => {
+			$("[tipo-de-usuario-para-filtrar]").on("click", async event => {
 				const $elemento = $(event.target);
 				if ($elemento.is("[selecionado]")) {
 					this.CancelouSelecaoDeTipo($elemento);
@@ -55,21 +55,23 @@
 
 	SelecionouTipo($elemento) {
 		$elemento.attr("selecionado", true);
-		$elemento.addClass("gradient-45deg-purple-deep-orange gradient-shadow white-text");
 		const tipo = $elemento.attr("tipo-de-usuario-para-filtrar");
+		const cor = $(`#cor-${tipo}`).val()
+		$elemento.addClass(`${cor} gradient-shadow white-text`);
 		this.AdicionaTipoDeUsuarioSelecionadoNoStorage(tipo);
 	}
 
 	CancelouSelecaoDeTipo($elemento) {
 		$elemento.removeAttr("selecionado");
-		$elemento.removeClass("gradient-45deg-purple-deep-orange gradient-shadow white-text");
 		const tipo = $elemento.attr("tipo-de-usuario-para-filtrar");
+		const cor = $(`#cor-${tipo}`).val()
+		$elemento.removeClass(`${cor} gradient-shadow white-text`);
 		this.RemoveTipoDeUsuarioSelecionadoNoStorage(tipo);
 	}
 
 	GetTiposDeUsuariosSelecionadosDoStorage() {
 		const key = "tiposDeUsuariosSelecionados";
-		
+
 		let lista = localStorage.getItem(key);
 		if (!lista) {
 			lista = new Array();
@@ -84,7 +86,7 @@
 		const key = "tiposDeUsuariosSelecionados";
 		let lista = this.GetTiposDeUsuariosSelecionadosDoStorage();
 
-		if(!lista.includes(tipo)) {
+		if (!lista.includes(tipo)) {
 			lista.push(tipo);
 		}
 
@@ -101,7 +103,7 @@
 			lista = JSON.parse(lista);
 		}
 
-		if(lista.includes(tipo)) {
+		if (lista.includes(tipo)) {
 			const index = lista.indexOf(tipo);
 			lista.splice(index);
 		}
@@ -112,7 +114,7 @@
 
 	async AtualizarLista() {
 		const form = {
-			CursoEFase: $("#CursosEFases").val(),
+			CursoEFase: $("#CursoEFase").val(),
 			TiposSelecionados: new Array()
 		};
 
@@ -121,37 +123,47 @@
 			form.TiposSelecionados.push(tipo);
 		});
 
-		const response = new SaeResponse(await new SaeAjax({
-			type:"post",
-			url: "/PesquisarContatos/AtualizarLista",
-			data: form
-		}).Start());
-
-		if (response.Status()) {
+		if (form.TiposSelecionados.length) {
 			const $divLista = $("[lista-usuarios-para-conversar]");
-			$divLista.html(response.View());
 
-			$divLista.find("[selecionar-para-conversar]").on("click", event => {
-				const $usuario = $(event.target)
-					.closest("[selecionar-para-conversar]");
+			$divLista.html(new MaterialLoading().GetCircularLoading());
 
-				const response = new PesquisarContatosResponse();
-				response.codigo = parseInt($usuario.attr("codigo"));
-				response.groupName = $usuario.attr("group-name");
-				response.tipo = $usuario.attr("tipo");
-				response.codigoDaEscola = parseInt($usuario.attr("codigo-da-escola"));
-				response.foto = $usuario.find("img[foto]").attr("src");
-				response.nome = $usuario.attr("nome");
-				response.status = $usuario.attr("status");
+			const response = new SaeResponse(await new SaeAjax({
+				type: "post",
+				url: "/PesquisarContatos/AtualizarLista",
+				data: form
+			}).Start());
 
-				if (this._callback) {
-					this._callback(response);
-				}
+			if (response.Status()) {
+				$divLista.html(response.View());
 
-				this._modal.Close();
-			});
+				$divLista.find("[selecionar-para-conversar]")
+					.on("click",
+						event => {
+							const $usuario = $(event.target)
+								.closest("[selecionar-para-conversar]");
+
+							const response = new PesquisarContatosResponse();
+							response.codigo = parseInt($usuario.attr("codigo"));
+							response.groupName = $usuario.attr("group-name");
+							response.tipo = $usuario.attr("tipo");
+							response.codigoDaEscola = parseInt($usuario.attr("codigo-da-escola"));
+							response.foto = $usuario.find("img[foto]")
+								.attr("src");
+							response.nome = $usuario.attr("nome");
+							response.status = $usuario.attr("status");
+
+							if (this._callback) {
+								this._callback(response);
+							}
+
+							this._modal.Close();
+						});
+			} else {
+				await response.Swal();
+			}
 		} else {
-			await response.Swal();
+			new MaterialToast({ html: "Selecione ao menos um tipo de usuário para buscar!" }).Show();
 		}
 	}
 }

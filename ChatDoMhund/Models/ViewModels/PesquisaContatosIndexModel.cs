@@ -1,9 +1,9 @@
 ﻿using ChatDoMhund.Models.Poco;
+using ChatDoMhundStandard.Tratamento;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Linq;
-using ChatDoMhundStandard.Tratamento;
-using Microsoft.AspNetCore.Html;
 
 namespace ChatDoMhund.Models.ViewModels
 {
@@ -35,10 +35,21 @@ namespace ChatDoMhund.Models.ViewModels
 			List<SelectListItem> items = this
 				.ListaDeCursosHabilitados
 				.Select(x =>
-					new SelectListItem(x.DescricaoDoCurso, $"{x.CodigoDoCurso}-{x.Fase}"))
+					new SelectListItem(this.GetDadosDoCursoParaSelectList(x), 
+						$"{x.CodigoDoCurso}-{x.Fase}"))
 				.ToList();
 
 			return new SelectList(items.ToList(), "Value", "Text");
+		}
+
+		private string GetDadosDoCursoParaSelectList(PkHabilitacaoProfessor x)
+		{
+			if(x.Fase != "SAE")
+			{
+				return $"{x.CodigoDoCurso} - {x.DescricaoDoCurso}, {x.NomeDaFase}: {x.Fase}";
+			}
+
+			return $"{x.CodigoDoCurso} - {x.DescricaoDoCurso}";
 		}
 
 		public IHtmlContent GetChipAluno()
