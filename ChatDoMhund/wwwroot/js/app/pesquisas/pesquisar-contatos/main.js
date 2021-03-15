@@ -57,7 +57,7 @@
 		$elemento.attr("selecionado", true);
 		const tipo = $elemento.attr("tipo-de-usuario-para-filtrar");
 		const cor = $(`#cor-${tipo}`).val()
-		$elemento.addClass(`${cor} gradient-shadow`);
+		$elemento.addClass(`${cor} z-depth-3`);
 		this.AdicionaTipoDeUsuarioSelecionadoNoStorage(tipo);
 	}
 
@@ -65,7 +65,7 @@
 		$elemento.removeAttr("selecionado");
 		const tipo = $elemento.attr("tipo-de-usuario-para-filtrar");
 		const cor = $(`#cor-${tipo}`).val()
-		$elemento.removeClass(`${cor} gradient-shadow white-text`);
+		$elemento.removeClass(`${cor} z-depth-3`);
 		this.RemoveTipoDeUsuarioSelecionadoNoStorage(tipo);
 	}
 

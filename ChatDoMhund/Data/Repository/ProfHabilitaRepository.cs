@@ -5,6 +5,7 @@ using HelperMhundCore31.Data.Entity.Partials;
 using HelperSaeStandard11.Models.Tratamento;
 using System.Collections.Generic;
 using System.Linq;
+using HelperSaeStandard11.Models;
 
 namespace ChatDoMhund.Data.Repository
 {
@@ -14,7 +15,7 @@ namespace ChatDoMhund.Data.Repository
 		{
 		}
 
-		public List<PkHabilitacaoProfessor> GetHabilitacoesDoProfessorOuCoordenador(int codigoDoProfessor)
+		public SaeResponseRepository<List<PkHabilitacaoProfessor>> GetHabilitacoes(int codigoDoProfessor)
 		{
 			List<PkHabilitacaoProfessor> habilitacoes =
 				(from profHabilita in this._db.ProfHabilita.Where(x => x.CodProf == codigoDoProfessor)
@@ -31,28 +32,33 @@ namespace ChatDoMhund.Data.Repository
 				 })
 				.ToList();
 
-			return habilitacoes;
+			return new SaeResponseRepository<List<PkHabilitacaoProfessor>>(habilitacoes.Any(), habilitacoes);
 		}
 
-		public List<PkHabilitacaoProfessor> GetHabilitacoesPeloHistorico(PkHistoricoDoAluno historico)
+		public SaeResponseRepository<List<PkHabilitacaoProfessor>> GetHabilitacoes(PkHistoricoDoAluno historico)
 		{
-			List<PkHabilitacaoProfessor> habilitacoes =
+			return this.GetHabilitacoes(historico.CodigoDoCurso, historico.Fase);
+		}
+
+		public SaeResponseRepository<List<PkHabilitacaoProfessor>> GetHabilitacoes(int codigoDoCurso, string fase)
+		{
+			List<PkHabilitacaoProfessor> habilitacoes=
 				(from profHabilita in this._db.ProfHabilita.Where(x =>
-						x.CodCurso == historico.CodigoDoCurso && x.Fase == historico.Fase)
-				 join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
-					 on profHabilita.CodCurso equals curso.Nseq
-				 select new PkHabilitacaoProfessor
-				 {
-					 Fase = profHabilita.Fase,
-					 CodigoDoCurso = profHabilita.CodCurso ?? 0,
-					 CodigoDaMateria = profHabilita.CodMateria ?? 0,
-					 CodigoDoProfessor = profHabilita.CodProf ?? 0,
-					 DescricaoDoCurso = curso.Descricao,
-					 NomeDaFase = curso.Nomedasfases
-				 })
+						x.CodCurso == codigoDoCurso && x.Fase == fase)
+					join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
+						on profHabilita.CodCurso equals curso.Nseq
+					select new PkHabilitacaoProfessor
+					{
+						Fase = profHabilita.Fase,
+						CodigoDoCurso = profHabilita.CodCurso ?? 0,
+						CodigoDaMateria = profHabilita.CodMateria ?? 0,
+						CodigoDoProfessor = profHabilita.CodProf ?? 0,
+						DescricaoDoCurso = curso.Descricao,
+						NomeDaFase = curso.Nomedasfases
+					})
 				.ToList();
 
-			return habilitacoes;
+			return new SaeResponseRepository<List<PkHabilitacaoProfessor>>(habilitacoes.Any(), habilitacoes);
 		}
 	}
 }

@@ -54,10 +54,11 @@ namespace ChatDoMhund.Models.Domain
 			bool ehCoordenador = TipoDeUsuarioDoChatTrata.EhCoordenador(tipoDeUsuarioLogado);
 			bool ehCoordenadorOuProfessor = TipoDeUsuarioDoChatTrata.EhCoordenadorOuProfessor(tipoDeUsuarioLogado);
 
+			List<string> tiposSelecionados = index.TiposSelecionados;
 			if (ehAluno)
 			{
 				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					if (ultimoHistoricoDoAluno != null)
@@ -72,73 +73,80 @@ namespace ChatDoMhund.Models.Domain
 					}
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
-					coordenadores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno,
+					coordenadores = this.GetProfessoresOuCoordenadores(ultimoHistoricoDoAluno,
 						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
-					professores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno,
+					professores = this.GetProfessoresOuCoordenadores(ultimoHistoricoDoAluno,
 						TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
 				{
-
+					//não vai fazer por enquanto
 				}
 			}
 			else if (ehResponsavel)
 			{
 				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
 				{
-
+					//não vai fazer por enquanto
 				}
+
+				PkHistoricoDoAluno historicoDoAlunoRelacionado = this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
 				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				    tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
 				{
-					PkHistoricoDoAluno ultimoHistoricoDoAluno =
-						this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
-					coordenadores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno, TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
+					coordenadores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
 				{
-					PkHistoricoDoAluno ultimoHistoricoDoAluno =
-						this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
-					professores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno, TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
+					professores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
 				{
-
+					responsaveis = this.GetResponsaveis(historicoDoAlunoRelacionado.CodigoDoCurso,
+						historicoDoAlunoRelacionado.Fase, codigoDoCliente)
+						.Where(x=>x.Codigo != codigoDoUsuarioLogado)
+						.ToList();
 				}
 			}
 			else if (ehCoordenadorOuProfessor)
 			{
 				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
 				{
 					alunos = this.GetAlunos(codigoDoCurso, fase, codigoDoCliente).ToList();
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
 				{
-
+					coordenadores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
+						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente)
+						.Where(x=>x.Codigo != codigoDoUsuarioLogado)
+						.ToList();
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
 				{
-
+					professores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
+						TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente)
+						.Where(x=>x.Codigo != codigoDoUsuarioLogado)
+						.ToList();
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
 				{
-					responsaveis = this.GetResponsaveisParaProfessorOuCoordenador(codigoDoCurso, fase, codigoDoCliente);
+					responsaveis = this.GetResponsaveis(codigoDoCurso, fase, codigoDoCliente);
 				}
 			}
 
@@ -191,7 +199,7 @@ namespace ChatDoMhund.Models.Domain
 					}).AsQueryable();
 		}
 
-		private List<PkUsuarioConversa> GetResponsaveisParaProfessorOuCoordenador(int codigoDoCurso, string fase, int codigoDoCliente)
+		private List<PkUsuarioConversa> GetResponsaveis(int codigoDoCurso, string fase, int codigoDoCliente)
 		{
 			List<PkUsuarioConversa> responsaveisParaRetorno = new List<PkUsuarioConversa>();
 			var alunoComResponsaveis =
@@ -328,38 +336,72 @@ namespace ChatDoMhund.Models.Domain
 			return responsaveisParaRetorno;
 		}
 
-		private List<PkUsuarioConversa> GetProfessoresOuCoordenadoresPeloHistorico(PkHistoricoDoAluno ultimoHistoricoDoAluno, string tipo,
+		private List<PkUsuarioConversa> GetProfessoresOuCoordenadores(PkHistoricoDoAluno ultimoHistoricoDoAluno, string tipo,
 			int codigoDoCliente)
 		{
-			List<PkUsuarioConversa> coordenadores = new List<PkUsuarioConversa>();
+			List<PkUsuarioConversa> professoresOuCoordenadores = new List<PkUsuarioConversa>();
 
 			if (ultimoHistoricoDoAluno != null)
 			{
 				List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
-					.GetHabilitacoesPeloHistorico(ultimoHistoricoDoAluno)
+					.GetHabilitacoes(ultimoHistoricoDoAluno)
+					.Content
 					.DistinctBy(x => x.CodigoDoProfessor)
 					.ToList();
 
 				string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
 
-				coordenadores = (from profHabilita in habilitacoes
-								 join cadforps in this._db.Cadforps.Where(x =>
-										 x.ProfNivel == tipo && x.Situacao == SaeSituacao.Ativo)
-									 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
-								 join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
-									 on profHabilita.CodigoDoCurso equals curso.Nseq
-								 select new PkUsuarioConversa
-								 {
-									 Codigo = cadforps.Codigo,
-									 Tipo = TipoDeUsuarioDoChatTrata.Professor,
-									 Foto = cadforps.Foto,
-									 CodigoDoCliente = codigoDoCliente,
-									 Nome = cadforps.Nome,
-									 Status = $"{cargo} do curso: {curso.Descricao}"
-								 }).ToList();
+				professoresOuCoordenadores = (from profHabilita in habilitacoes
+											  join cadforps in this._db.Cadforps.Where(x =>
+													  x.ProfNivel == tipo && x.Situacao == SaeSituacao.Ativo)
+												  on profHabilita.CodigoDoProfessor equals cadforps.Codigo
+											  join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
+												  on profHabilita.CodigoDoCurso equals curso.Nseq
+											  select new PkUsuarioConversa
+											  {
+												  Codigo = cadforps.Codigo,
+												  Tipo = TipoDeUsuarioDoChatTrata.Professor,
+												  Foto = cadforps.Foto,
+												  CodigoDoCliente = codigoDoCliente,
+												  Nome = cadforps.Nome,
+												  Status = $"{cargo} do curso: {curso.Descricao}"
+											  }).ToList();
 			}
 
-			return coordenadores;
+			return professoresOuCoordenadores;
+		}
+
+		private List<PkUsuarioConversa> GetProfessoresOuCoordenadores(int codigoDoCurso, string fase, string tipo,
+			int codigoDoCliente)
+		{
+			List<PkUsuarioConversa> professoresOuCoordenadores = new List<PkUsuarioConversa>();
+
+			List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
+				.GetHabilitacoes(codigoDoCurso, fase)
+				.Content
+				.DistinctBy(x => x.CodigoDoProfessor)
+				.ToList();
+
+			string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
+
+			professoresOuCoordenadores = (from profHabilita in habilitacoes
+											 join cadforps in this._db.Cadforps.Where(x =>
+													 x.ProfNivel == tipo && x.Situacao == SaeSituacao.Ativo)
+												 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
+											 join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
+												 on profHabilita.CodigoDoCurso equals curso.Nseq
+											 select new PkUsuarioConversa
+											 {
+												 Codigo = cadforps.Codigo,
+												 Tipo = TipoDeUsuarioDoChatTrata.Professor,
+												 Foto = cadforps.Foto,
+												 CodigoDoCliente = codigoDoCliente,
+												 Nome = cadforps.Nome,
+												 Status = $"{cargo} do curso: {curso.Descricao}",
+												 TipoParaExibicao = tipo
+											 }).ToList();
+
+			return professoresOuCoordenadores;
 		}
 
 		private PkHistoricoDoAluno GetUltimoHistoricoDoAluno(int codigoDoAluno)

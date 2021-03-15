@@ -10,6 +10,7 @@ namespace ChatDoMhund.Models.Poco
 		public string Status { get; set; }
 		public string Tipo { get; set; }
 		public int CodigoDoCliente { get; set; }
+		public string TipoParaExibicao { get; set; }
 
 		public bool MensagemEhDesteUsuario(ChatProfess chatProfess)
 		{

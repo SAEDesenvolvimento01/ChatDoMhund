@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ChatDoMhund.Data.Repository;
 using ChatDoMhund.Models.Domain;
+using ChatDoMhund.Models.Enum;
 using ChatDoMhund.Models.Tratamento;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 
@@ -48,10 +49,13 @@ namespace ChatDoMhund.Controllers
 		{
 			this._usuarioLogado = this._usuarioLogado.GetUsuarioLogado();
 
+			string origem = this._saeHelperCookie.GetCookie(EChatCookie.OrigemDeChat.ToString());
+
 			return this.View("Index", new ChatIndexViewModel
 			{
 				UsuarioLogado = this._usuarioLogado,
-				GroupName = this._groupBuilder.BuildGroupName()
+				GroupName = this._groupBuilder.BuildGroupName(),
+				Title = $"Chat{OrigemDeChatTrata.GetOrigemExtenso(origem, " - ")}"
 			});
 		}
 
