@@ -74,7 +74,7 @@ namespace ChatDoMhund.Models.Infra
             }
             else if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Professor || tipoDoUsuario == TipoDeUsuarioDoChatTrata.Coordenador)
             {
-                response = this._cadforpsRepository.GetUsuarioParaLogar(codigoDoUsuario, tipoDoUsuario: tipoDoUsuario);
+                response = this._cadforpsRepository.GetUsuarioParaLogar(codigoDoUsuario);
             }
             else if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
             {

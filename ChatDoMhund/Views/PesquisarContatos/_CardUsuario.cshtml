@@ -16,7 +16,7 @@
      status="@this.Model.Status"
      class="col s12 l6 xl4 pl-1 pr-1 card-width pointer">
 	<div class="card card-border @CoresDosTiposDeUsuarios.GetCor(this.Model.Tipo) hoverable animated bounceInUp">
-		<div class="card-content white-text pl-5 pr-5 pt-2 pb-2">
+		<div class="card-content pl-5 pr-5 pt-2 pb-2">
 			<div class="row">
 				<div class="col s4 m2">
 					<img foto class="responsive-img circle z-depth-4"
@@ -26,8 +26,8 @@
 					     >
 				</div>
 				<div class="col s8 m10">
-					<p class="white-text right-align">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
-					<p class="white-text right-align ultra-small hide-on-small-only">@this.Model.Status</p>
+					<p class="right-align">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
+					<p class="right-align ultra-small hide-on-small-only">@this.Model.Status</p>
 				</div>
 				<div class="row">
 					<div class="col s12">

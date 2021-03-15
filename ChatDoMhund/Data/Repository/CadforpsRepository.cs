@@ -6,6 +6,7 @@ using HelperMhundCore31.Data.Entity.Partials;
 using HelperSaeStandard11.Models;
 using System.Linq;
 using ChatDoMhundStandard.Tratamento;
+using HelperSaeStandard11.Models.Tratamento;
 
 namespace ChatDoMhund.Data.Repository
 {
@@ -15,11 +16,12 @@ namespace ChatDoMhund.Data.Repository
 		{
 		}
 
-		public SaeResponseRepository<PkUsuarioLogado> GetUsuarioParaLogar(int codigoDoUsuario, string tipoDoUsuario)
+		public SaeResponseRepository<PkUsuarioLogado> GetUsuarioParaLogar(int codigoDoUsuario)
 		{
 			PkUsuarioLogado usuario = this
 				._db
 				.Cadforps
+				.Where(x => x.Situacao == SaeSituacao.Ativo)
 				.Select(x => new PkUsuarioLogado
 				{
 					Codigo = x.Codigo,
@@ -66,7 +68,7 @@ namespace ChatDoMhund.Data.Repository
 		{
 			PkUsuarioConversa professoresECoordenadores = this._db
 				.Cadforps
-				.Where(x => x.Tipo == TipoDeUsuarioDoChatTrata.Professor && x.Codigo == codigo)
+				.Where(x => x.Tipo == TipoDeUsuarioDoChatTrata.Professor && x.Codigo == codigo && x.Situacao == SaeSituacao.Ativo)
 				.Select(cadforps => new PkUsuarioConversa
 				{
 					Nome = cadforps.Nome,

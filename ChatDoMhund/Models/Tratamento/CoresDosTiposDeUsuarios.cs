@@ -9,19 +9,19 @@ namespace ChatDoMhund.Models.Tratamento
 			string cor = string.Empty;
 			if (tipo == TipoDeUsuarioDoChatTrata.Aluno)
 			{
-				cor = "gradient-45deg-amber-amber";
+				cor = "#f1f8e9 light-green lighten-5";
 			}
 			else if (tipo == TipoDeUsuarioDoChatTrata.Professor)
 			{
-				cor = "gradient-45deg-indigo-blue";
+				cor = "gradient-45deg-indigo-blue white-text";
 			}
 			else if (tipo == TipoDeUsuarioDoChatTrata.Coordenador)
 			{
-				cor = "gradient-45deg-indigo-purple";
+				cor = "gradient-45deg-indigo-purple white-text";
 			}
 			else if (tipo == TipoDeUsuarioDoChatTrata.Responsavel)
 			{
-				cor = "gradient-45deg-deep-orange-orange";
+				cor = "gradient-45deg-light-blue-teal";
 			}
 
 			return cor;

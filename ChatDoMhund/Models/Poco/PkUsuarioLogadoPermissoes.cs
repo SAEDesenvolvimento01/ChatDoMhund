@@ -23,7 +23,7 @@ namespace ChatDoMhund.Models.Poco
 				this.SetPermissoes(
 					conversaComProfessor: configuracoesDeApp.CAluXPro == SaeSituacao.Sim,
 					conversaComCoordenador: configuracoesDeApp.CAluXCoo == SaeSituacao.Sim,
-					conversaComResponsavel: true,
+					conversaComResponsavel: false,
 					conversaComAluno: configuracoesDeApp.CAluXAlu == SaeSituacao.Sim);
 			}
 			else if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
@@ -32,7 +32,7 @@ namespace ChatDoMhund.Models.Poco
 					conversaComProfessor: configuracoesDeApp.CRespXProf == SaeSituacao.Sim,
 					conversaComCoordenador: configuracoesDeApp.CRespXCoo == SaeSituacao.Sim,
 					conversaComResponsavel: configuracoesDeApp.CRespXResp == SaeSituacao.Sim,
-					conversaComAluno: true);
+					conversaComAluno: false);
 			}
 			else if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador || tipoDeUsuario == TipoDeUsuarioDoChatTrata.Professor)
 			{

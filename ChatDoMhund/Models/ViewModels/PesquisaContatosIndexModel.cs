@@ -100,7 +100,7 @@ namespace ChatDoMhund.Models.ViewModels
 		private IHtmlContent GetChip(string tipo, string tipoExtenso)
 		{
 			return new HtmlString(
-				$"<div class=\"chip pointer\" tipo-de-usuario-para-filtrar=\"{tipo}\">" +
+				$"<div class=\"chip pointer chip-filtro-usuario hoverable\" tipo-de-usuario-para-filtrar=\"{tipo}\">" +
 				$"{tipoExtenso}" +
 				"</div>");
 		}

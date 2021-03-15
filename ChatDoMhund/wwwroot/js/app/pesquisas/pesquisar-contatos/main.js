@@ -57,7 +57,7 @@
 		$elemento.attr("selecionado", true);
 		const tipo = $elemento.attr("tipo-de-usuario-para-filtrar");
 		const cor = $(`#cor-${tipo}`).val()
-		$elemento.addClass(`${cor} gradient-shadow white-text`);
+		$elemento.addClass(`${cor} gradient-shadow`);
 		this.AdicionaTipoDeUsuarioSelecionadoNoStorage(tipo);
 	}
 

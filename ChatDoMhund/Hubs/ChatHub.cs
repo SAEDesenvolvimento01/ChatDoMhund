@@ -71,5 +71,13 @@ namespace ChatDoMhund.Hubs
 						new PkMensagem(chatProfess, _groupBuilder, codigoDoCliente.ConvertToInt32()));
 			}
 		}
+
+		public async Task EstouDigitando(string groupName)
+		{
+			await this
+				.Clients
+				.OthersInGroup(groupName)
+				.SendAsync("EstaDigitando", this._groupBuilder.BuildGroupName());
+		}
 	}
 }

@@ -1,15 +1,15 @@
 ﻿@using ChatDoMhund.Models.Tratamento
 @using ChatDoMhundStandard.Tratamento
+@using HelperSaeCore31.Models.Infra.Cookie.Interface
 @model ChatDoMhund.Models.ViewModels.ChatIndexViewModel
-@inject GroupBuilder _groupBuilder
 
 <link rel="stylesheet" type="text/css" href="@this.Model.Routes.Helper/materialize/css/pages/app-chat.css">
 
-<input type="hidden" value="@this._groupBuilder.BuildGroupName()" id="group-name-usuario-logado" />
+<input type="hidden" value="@Html.Raw(this.Model.GroupName)" id="group-name-usuario-logado" />
 
 @foreach (string tipo in TipoDeUsuarioDoChatTrata.GetTipos())
 {
-	<input id="cor-@tipo" value="@CoresDosTiposDeUsuarios.GetCor(tipo)" type="hidden"/>
+<input id="cor-@tipo" value="@CoresDosTiposDeUsuarios.GetCor(tipo)" type="hidden" />
 }
 
 <div class="chat-application">

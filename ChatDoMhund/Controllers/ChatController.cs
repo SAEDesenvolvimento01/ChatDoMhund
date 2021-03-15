@@ -47,9 +47,11 @@ namespace ChatDoMhund.Controllers
 		public IActionResult Index()
 		{
 			this._usuarioLogado = this._usuarioLogado.GetUsuarioLogado();
+
 			return this.View("Index", new ChatIndexViewModel
 			{
-				UsuarioLogado = this._usuarioLogado
+				UsuarioLogado = this._usuarioLogado,
+				GroupName = this._groupBuilder.BuildGroupName()
 			});
 		}
 
@@ -104,7 +106,6 @@ namespace ChatDoMhund.Controllers
 				Content = conversa
 			});
 		}
-
 
 		public JsonResult LimparMensagens()
 		{

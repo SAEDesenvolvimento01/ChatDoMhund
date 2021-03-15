@@ -11,6 +11,8 @@ var observe = (element, event, handler) => {
 let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
+var estouDigitando = false;
+var timeOutReconexao = 1000
 
 $(() => {
 	CarregarConversas();
@@ -54,6 +56,11 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		$mensagensNovas.html(mensagensNovas);
 
 		PlaySound("new-message");
+
+		//As vezes a pessoa recém apertou enter (e desencadeou o "estou digitando")
+		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
+		NaoEstaMaisDigitando(conversa);
+
 
 		if (!usuarioLogadoQueEnviou) {
 			const mensagens = conversa.mensagens;
@@ -122,7 +129,10 @@ $(".chat-list")
 			if (conversa) {
 				$chatContentArea.find("[foto-da-conversa]").attr("src", conversa.foto);
 				$chatContentArea.find("[nome-da-conversa]").html(conversa.nome);
-				$chatContentArea.find("[status-da-conversa]").html(conversa.status);
+				$chatContentArea
+					.find("[status-da-conversa]")
+					.attr("status-da-conversa", conversa.status)
+					.html(conversa.status);
 
 				if ($("#chat-sidenav").hasClass("sidenav")) {
 					FecharMenu();
@@ -260,15 +270,15 @@ async function AtualizarListaDeConversas() {
 	                            <img src="${conversa.foto}" alt="" class="circle z-depth-2 responsive-img">
 	                        </div>
 	                        <div class="col s10">
-	                            <p class="m-0 blue-grey-text text-darken-4 font-weight-700">${conversa.nome}</p>
-	                            <p class="m-0 info-text">${conversa.status}</p>
+	                            <p class="m-0 blue-grey-text text-darken-4 font-weight-700" nome="${conversa.nome}">${conversa.nome}</p>
+	                            <p class="m-0 info-text" status="${conversa.status}">${conversa.status}</p>
 	                        </div>
 	                    </div>
 	                </div>
 	                <div class="info-section">
 	                    <div class="star-timing">
 	                        <div class="time">
-	                            <span>${conversa.dataDaUltimaMensagem}</span>
+	                            <span data-da-ultima-mensagem="${conversa.dataDaUltimaMensagem}">${conversa.dataDaUltimaMensagem}</span>
 	                        </div>
 	                    </div>
 	                    <span novas-mensagens="0" class="badge badge pill red" style="display: none;"></span>
@@ -355,7 +365,7 @@ async function ConexaoInterrompida() {
 	$mensagem.attr("disabled", "disabled");
 	$sendButton.attr("disabled", "disabled");
 	new MaterialToast({ html: "Reconectando..." }).Show();
-	await sleep(1000);
+	await sleep(timeOutReconexao += 1000);
 	const estaReconectando = true;
 	hub = new Hub().Inicializar(estaReconectando);
 }
@@ -415,4 +425,29 @@ $("[nova-conversa]").on("click", async () => {
 
 $mensagem.on("focus", () => {
 	AtualizaScrollDaConversa();
-})
+}).on("keydown", () => {
+	estouDigitando = true;
+
+	setTimeout(() => {
+		estouDigitando = false;
+	}, 2500);
+});
+
+function EstaDigitando(groupName) {
+	const conversa = conversas.GetConversas().find(x => x.groupName === groupName);
+	if (conversa) {
+		$GetConversaNoSidebar(conversa)
+			.find("[status]")
+			.html("Está digitando...");
+
+		setTimeout(() => {
+			NaoEstaMaisDigitando(conversa);
+		}, 3500);
+	}
+}
+
+function NaoEstaMaisDigitando(conversa) {
+	const $status = $GetConversaNoSidebar(conversa).find("[status]");
+
+	$status.html($status.attr("status"));
+}

@@ -20,6 +20,11 @@
 				await this.AddToGroup();
 				this.ConfigurarReceiveMessage();
 				this.ConfigurarOnDisconnected();
+				if(!estaReconectando) {
+					//Só rodo na primeira execução para não registrar várias vezes
+					await this.ConfigurarEstouDigitando();
+					await this.ConfigurarEstaDigitando();
+				}
 				await ConexaoEstabelecida(estaReconectando);
 			})
 			.catch((err) => {
@@ -36,7 +41,7 @@
 		await this._connection
 			.invoke("AddToGroup")
 			.catch((err) => {
-				console.error(err.toString());
+				console.error(err);
 			});
 	}
 
@@ -61,11 +66,38 @@
 		});
 	}
 
+	async ConfigurarEstouDigitando() {
+		setInterval(async () => {
+			if (estouDigitando) {
+				//console.log("esta digitando");
+				const conversa = new Conversa().Build({ $conversa: $GetConversaSelecionada() });
+				
+				await this._connection
+					.invoke("EstouDigitando", conversa.groupName)
+					.catch((err) => {
+						return console.error(err);
+					});
+			} else {
+				//console.log("nao esta digitando")
+			}
+		}, 2500);
+	}
+
+	async ConfigurarEstaDigitando() {
+		this._connection.on("EstaDigitando", groupName => {
+			try {
+				EstaDigitando(groupName);
+			} catch (e) {
+				console.error(e);
+			}
+		});
+	}
+
 	async SendMessage(groupNameDestino, message) {
 		await this._connection
 			.invoke("SendMessage", groupNameDestino, message)
 			.catch((err) => {
-				return console.error(err.toString());
+				return console.error(err);
 			});
 	}
 }
