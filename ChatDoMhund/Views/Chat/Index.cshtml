@@ -1,6 +1,5 @@
 ﻿@using ChatDoMhund.Models.Tratamento
 @using ChatDoMhundStandard.Tratamento
-@using HelperSaeCore31.Models.Infra.Cookie.Interface
 @model ChatDoMhund.Models.ViewModels.ChatIndexViewModel
 
 <link rel="stylesheet" type="text/css" href="@this.Model.Routes.Helper/materialize/css/pages/app-chat.css">
@@ -16,10 +15,10 @@
 	<div class="chat-content-head">
 		<div class="header-details">
 			<div class="row">
-				<div class="col s6">
-					<h5 class="m-0 sidebar-title animated bounceInDown"><i class="material-icons app-header-icon">mail_outline</i> Chat</h5>
+				<div class="col s8">
+					<h6 class="m-0 sidebar-title animated bounceInDown"><i class="material-icons app-header-icon">mail_outline</i> @this.Model.Title</h6>
 				</div>
-				<div class="col s6">
+				<div class="col s4">
 					<a class="waves-effect waves-block waves-light toggle-fullscreen right animated bounceInRight" href="javascript:void(0);"><i class="material-icons">settings_overscan</i></a>
 				</div>
 			</div>

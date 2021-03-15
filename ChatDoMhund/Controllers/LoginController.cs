@@ -8,6 +8,7 @@ using HelperSaeStandard11.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using ChatDoMhund.Models.Enum;
 
 namespace ChatDoMhund.Controllers
 {
@@ -58,6 +59,7 @@ namespace ChatDoMhund.Controllers
 			this._usuarioLogado.Sair();
 			int codigoDoAluno = ca.ConvertToInt32();
 			string hash = this._usuarioLogado.GetHashUsuarioLogado(e, c, t, o, codigoDoAluno, tr);
+			this._usuarioLogado.SetOrigem(o);
 			if (this._saeCriptography.Comparar(hash, h))
 			{
 				if (this._connectionManager.TryCreateConnectionString(codigoDoCliente: e, deveCriarCookie: true))

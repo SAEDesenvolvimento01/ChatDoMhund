@@ -19,15 +19,16 @@ $(() => {
 	InicializarChat();
 });
 
-
+const enterKey = 13;
 $(".message").on("keydown", event => {
-	if (event.keyCode === 13 && !event.shiftKey) {
+	if (event.keyCode === enterKey && !event.shiftKey) {
 		event.preventDefault();
 		SendMessage();
 	}
 });
 
-$("#sendButton").on("click", function (event) {
+const $btnSendMessage = $("#sendButton");
+$btnSendMessage.on("click", function (event) {
 	event.preventDefault();
 	SendMessage();
 });
@@ -255,9 +256,13 @@ async function CarregarConversas() {
 async function AtualizarListaDeConversas() {
 	const $chatList = $(".chat-list");
 	const listaDeConversas = conversas.GetConversas();
-	$(listaDeConversas).each((i, conversa = new Conversa()) => {
-		if (!$GetConversaNoSidebar(conversa).length) {
-			$chatList.prepend(`
+	const $mensagemNenhumaConversa = $("#no-data-listed");
+	if (listaDeConversas.length) {
+		$(listaDeConversas)
+			.each((i, conversa = new Conversa()) => {
+				if (!$GetConversaNoSidebar(conversa)
+					.length) {
+					$chatList.prepend(`
             <div conversar-com-usuario
 				codigo="${conversa.codigo}"
 				tipo="${conversa.tipo}"
@@ -270,7 +275,8 @@ async function AtualizarListaDeConversas() {
 	                            <img src="${conversa.foto}" alt="" class="circle z-depth-2 responsive-img">
 	                        </div>
 	                        <div class="col s10">
-	                            <p class="m-0 blue-grey-text text-darken-4 font-weight-700" nome="${conversa.nome}">${conversa.nome}</p>
+	                            <p class="m-0 blue-grey-text text-darken-4 font-weight-700" nome="${conversa
+							.nome}">${conversa.nome}</p>
 	                            <p class="m-0 info-text" status="${conversa.status}">${conversa.status}</p>
 	                        </div>
 	                    </div>
@@ -278,39 +284,65 @@ async function AtualizarListaDeConversas() {
 	                <div class="info-section">
 	                    <div class="star-timing">
 	                        <div class="time">
-	                            <span data-da-ultima-mensagem="${conversa.dataDaUltimaMensagem}">${conversa.dataDaUltimaMensagem}</span>
+	                            <span data-da-ultima-mensagem="${conversa.dataDaUltimaMensagem}">${conversa
+							.dataDaUltimaMensagem}</span>
 	                        </div>
 	                    </div>
 	                    <span novas-mensagens="0" class="badge badge pill red" style="display: none;"></span>
 	                </div>
 	        </div>`);
-		}
+				}
 
-		const quantidadeDeMensagensNaoLidas = conversa.mensagens.filter(x => !x.lida).length;
-		const $quantidadeDeMensagensNaoLidas = $GetConversaNoSidebar(conversa)
-			.find(`span[novas-mensagens]`);
+				let mensagens = conversa.mensagens;
+				let quantidadeDeMensagensNaoLidas;
+				if (mensagens) {
+					quantidadeDeMensagensNaoLidas = mensagens.filter(x => !x.lida)
+						.length;
+				} else {
+					quantidadeDeMensagensNaoLidas = 0;
+				}
+				const $quantidadeDeMensagensNaoLidas = $GetConversaNoSidebar(conversa)
+					.find(`span[novas-mensagens]`);
 
-		if (quantidadeDeMensagensNaoLidas) {
-			$quantidadeDeMensagensNaoLidas
-				.attr("novas-mensagens", quantidadeDeMensagensNaoLidas)
-				.html(quantidadeDeMensagensNaoLidas)
-				.show(600);
-		} else {
-			$quantidadeDeMensagensNaoLidas
-				.attr("novas-mensagens", 0)
-				.html("")
-				.hide(600);
-		}
-	});
+				if (quantidadeDeMensagensNaoLidas) {
+					$quantidadeDeMensagensNaoLidas
+						.attr("novas-mensagens", quantidadeDeMensagensNaoLidas)
+						.html(quantidadeDeMensagensNaoLidas)
+						.show(600);
+				} else {
+					$quantidadeDeMensagensNaoLidas
+						.attr("novas-mensagens", 0)
+						.html("")
+						.hide(600);
+				}
+			});
+		$mensagemNenhumaConversa
+			.hide(600);
+		$("#no-data-found")
+			.hide(600);
+	} else {
+		$mensagemNenhumaConversa
+			.show(600);
+	}
 }
 
 function $GetConversaNoSidebar(conversa = new Conversa()) {
-	return $(".chat-list").find(`div[conversar-com-usuario][group-name="${conversa.groupName}"]`)
+	return $GetConversasNoSidebar().filter(`[group-name="${conversa.groupName}"]`);
+}
+
+function $GetConversasNoSidebar() {
+	return $(".chat-list")
+		.find("div[conversar-com-usuario]");
 }
 
 async function InicializarChat() {
 	await CarregaImagemDoUsuarioLogado();
 	InicializarInputMensagem();
+	if (isMobile.any()) {
+		$btnSendMessage.addClass("btn-floating").html("<i class=\"material-icons\">send</i>")
+	} else {
+		$btnSendMessage.addClass("border-round").html("Enviar")
+	}
 	if ($("#chat-sidenav").hasClass("sidenav")) {
 		AbrirMenu();
 	}
@@ -361,7 +393,7 @@ function InicializarInputMensagem() {
 
 async function ConexaoInterrompida() {
 	const $mensagem = $("#mensagem");
-	const $sendButton = $("#sendButton");
+	const $sendButton = $btnSendMessage;
 	$mensagem.attr("disabled", "disabled");
 	$sendButton.attr("disabled", "disabled");
 	new MaterialToast({ html: "Reconectando..." }).Show();
@@ -372,7 +404,7 @@ async function ConexaoInterrompida() {
 
 function ConexaoEstabelecida(estaReconectando) {
 	const $mensagem = $("#mensagem");
-	const $sendButton = $("#sendButton");
+	const $sendButton = $btnSendMessage;
 	$mensagem.removeAttr("disabled");
 	if ($mensagem.is(":visible")) {
 		$mensagem.focus();
@@ -425,8 +457,13 @@ $("[nova-conversa]").on("click", async () => {
 
 $mensagem.on("focus", () => {
 	AtualizaScrollDaConversa();
-}).on("keydown", () => {
-	estouDigitando = true;
+}).on("keydown", event => {
+
+	if (event.keyCode !== enterKey) {
+		estouDigitando = true;
+	} else {
+		estouDigitando = false;
+	}
 
 	setTimeout(() => {
 		estouDigitando = false;
@@ -451,3 +488,38 @@ function NaoEstaMaisDigitando(conversa) {
 
 	$status.html($status.attr("status"));
 }
+
+$("#chat-filter").on("keyup", () => {
+	const filtro = $("#chat-filter").val().toLowerCase();
+	const listaDeConversas = conversas.GetConversas();
+	let itensMostrados = listaDeConversas.length;
+	$GetConversasNoSidebar().each((i, item) => {
+		const $conversa = $(item);
+		if (filtro) {
+			const conversa = listaDeConversas.find(x => x.groupName === $conversa.attr("group-name"));
+			if (conversa) {
+				if (conversa.nome) {
+					if (conversa.nome.toLowerCase().includes(filtro)) {
+						$conversa.show(600);
+					} else {
+						$conversa.hide(600);
+						itensMostrados--;
+					}
+				}
+			}
+		} else {
+			$conversa.show(600);
+		}
+	});
+
+	const $mensagemNenhumItemEncontrado = $("#no-data-found");
+	if (itensMostrados) {
+		$mensagemNenhumItemEncontrado
+			.hide(600);
+	} else {
+		$mensagemNenhumItemEncontrado
+			.show(600);
+		$("#no-data-listed")
+			.hide(600);
+	}
+});

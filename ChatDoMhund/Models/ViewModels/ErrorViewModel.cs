@@ -12,10 +12,13 @@ namespace ChatDoMhund.Models.ViewModels
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         public int StatusCode { get; set; }
+        public string Origem { get; }
 
-        public ErrorViewModel(int statusCode, string error, string message, IHttpContextAccessor httpContextAccessor)
+        public ErrorViewModel(int statusCode, string error, string message, IHttpContextAccessor httpContextAccessor,
+	        string origem)
         {
             this.StatusCode = statusCode;
+            Origem = origem;
             this._httpContextAccessor = httpContextAccessor;
 
             if (error is null)

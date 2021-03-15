@@ -8,5 +8,13 @@
 		public int CodigoDaMateria { get; set; }
 		public string DescricaoDoCurso { get; set; }
 		public string NomeDaFase { get; set; }
+
+		public override string ToString()
+		{
+			return $"Curso: {this.CodigoDoCurso}" +
+			       $", Fase: {this.Fase}" +
+			       $", Matéria: {this.CodigoDaMateria}" +
+			       $", Professor: {this.CodigoDoProfessor}";
+		}
 	}
 }

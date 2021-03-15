@@ -209,11 +209,7 @@ namespace ChatDoMhund.Models.Infra
                 duracaoEmMinutos: Tempo.SeteDiasEmMinutos,
                 serverOnly: true);
 
-            this._saeHelperCookie.SetCookie(
-                cookie: EChatCookie.OrigemDeChat.ToString(),
-                valor: origemDeChat,
-                duracaoEmMinutos: Tempo.SeteDiasEmMinutos,
-                serverOnly: true);
+            this.SetOrigem(origemDeChat);
 
             this._saeHelperCookie.SetCookie(
                 cookie: EChatCookie.CodigoDoAlunoSelecionado.ToString(),
@@ -240,15 +236,24 @@ namespace ChatDoMhund.Models.Infra
                 serverOnly: true);
         }
 
-        private void SetSessions(string json)
+        public void SetOrigem(string origemDeChat)
         {
-            this._saeHelperSession.SetUsuarioLogado(json);
+	        this._saeHelperCookie.SetCookie(
+		        cookie: EChatCookie.OrigemDeChat.ToString(),
+		        valor: origemDeChat,
+		        duracaoEmMinutos: Tempo.SeteDiasEmMinutos,
+		        serverOnly: true);
         }
 
         public bool EhProfessorOuCoordenador()
         {
 	        return this.TipoDeUsuario == TipoDeUsuarioDoChatTrata.Professor ||
 	               this.TipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador;
+        }
+
+        private void SetSessions(string json)
+        {
+            this._saeHelperSession.SetUsuarioLogado(json);
         }
     }
 }
