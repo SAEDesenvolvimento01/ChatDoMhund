@@ -1,18 +1,20 @@
-﻿using ChatDoMhund.Models.Infra;
+﻿using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Poco;
+using ChatDoMhund.Models.ViewModels;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Partials;
 using HelperMhundStandard.Models.Dominio;
 using HelperSaeCore31.Models.Enum;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
+using HelperSaeStandard11.Models.Extension;
+using HelperSaeStandard11.Models.Infra;
+using HelperSaeStandard11.Models.Tratamento;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ChatDoMhund.Data.Repository;
-using ChatDoMhund.Models.ViewModels;
-using HelperMhundCore31.Data.Entity.Models;
-using HelperSaeStandard11.Models.Extension;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ChatDoMhund.Models.Domain
 {
@@ -36,123 +38,327 @@ namespace ChatDoMhund.Models.Domain
 
 		public List<PkUsuarioConversa> Get(PesquisaContatosIndexModel index)
 		{
-			List<PkUsuarioConversa> lista = new List<PkUsuarioConversa>();
+			List<PkUsuarioConversa> listaParaRetorno = new List<PkUsuarioConversa>();
 			this._usuarioLogado.GetUsuarioLogado();
 			int codigoDoUsuarioLogado = this._usuarioLogado.Codigo;
 			string tipoDeUsuarioLogado = this._usuarioLogado.TipoDeUsuario;
 			int codigoDoCliente = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
+			this.ExtraiCodigoECursoSelecionado(index, out int codigoDoCurso, out string fase);
 			List<PkUsuarioConversa> professores = new List<PkUsuarioConversa>();
 			List<PkUsuarioConversa> coordenadores = new List<PkUsuarioConversa>();
 			List<PkUsuarioConversa> alunos = new List<PkUsuarioConversa>();
 			List<PkUsuarioConversa> responsaveis = new List<PkUsuarioConversa>();
-			bool ehResponsavel = this._usuarioLogado.TipoDeUsuario == TipoDeUsuarioDoChatTrata.Responsavel;
-			if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-			    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+			bool ehAluno = TipoDeUsuarioDoChatTrata.EhAluno(tipoDeUsuarioLogado);
+			bool ehResponsavel = TipoDeUsuarioDoChatTrata.EhResponsavel(tipoDeUsuarioLogado);
+			bool ehProfessor = TipoDeUsuarioDoChatTrata.EhProfessor(tipoDeUsuarioLogado);
+			bool ehCoordenador = TipoDeUsuarioDoChatTrata.EhCoordenador(tipoDeUsuarioLogado);
+			bool ehCoordenadorOuProfessor = TipoDeUsuarioDoChatTrata.EhCoordenadorOuProfessor(tipoDeUsuarioLogado);
+
+			if (ehAluno)
 			{
-				//todo fluxo responsavel
-				//todo fluxo professor e coordenador (usam mesma regra)
-				if (tipoDeUsuarioLogado == TipoDeUsuarioDoChatTrata.Aluno)
+				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					if (ultimoHistoricoDoAluno != null)
 					{
-						alunos = (from historicoDeOutroAluno in this._db.Histalu.Where(x =>
-								x.Resultado == ResultadoCursos.Cursando &&
-								x.Nseqc == ultimoHistoricoDoAluno.CodigoDoCurso &&
-								x.Fase == ultimoHistoricoDoAluno.Fase &&
-								x.CodAluh != codigoDoUsuarioLogado)
-								  join outroAluno in this._db.Alunos
-									  on historicoDeOutroAluno.CodAluh equals outroAluno.Codigo
-								  join curso in this._db.Cursos
-									  on historicoDeOutroAluno.Nseqc equals curso.Nseq
-								  select new PkUsuarioConversa
-								  {
-									  Codigo = outroAluno.Codigo,
-									  Foto = outroAluno.Foto,
-									  Tipo = TipoDeUsuarioDoChatTrata.Aluno,
-									  Nome = outroAluno.Nome,
-									  Status = $"{TipoDeUsuarioDoChatTrata.Aluno} do curso: {curso.Descricao}",
-									  CodigoDoCliente = codigoDoCliente
-								  }).ToList();
+						alunos =
+							this.GetAlunos(
+									ultimoHistoricoDoAluno.CodigoDoCurso,
+									ultimoHistoricoDoAluno.Fase,
+									codigoDoCliente)
+								.Where(x => x.Codigo != codigoDoUsuarioLogado)
+								.ToList();
 					}
 				}
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				{
+					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
+					coordenadores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno,
+						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
+				}
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				{
+					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
+					professores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno,
+						TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
+				}
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				{
+
+				}
 			}
-
-			if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-			    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+			else if (ehResponsavel)
 			{
-				//todo fluxo responsavel
-				//todo fluxo professor e coordenador (usam mesma regra)
+				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				{
 
-				if (ehResponsavel)
+				}
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno =
 						this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
 					coordenadores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno, TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
-				//todo fluxo aluno
-			}
-
-			if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-			    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
-			{
-				//todo fluxo responsavel
-				//todo fluxo professor e coordenador (usam mesma regra)
-				if (ehResponsavel)
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno =
 						this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
 					professores = this.GetProfessoresOuCoordenadoresPeloHistorico(ultimoHistoricoDoAluno, TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
 				}
-				//todo fluxo aluno
-			}
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				{
 
-			if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-			    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				}
+			}
+			else if (ehCoordenadorOuProfessor)
 			{
-				//todo fluxo responsavel
-				//todo fluxo professor e coordenador (usam mesma regra)
+				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				{
+					alunos = this.GetAlunos(codigoDoCurso, fase, codigoDoCliente).ToList();
+				}
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				{
 
-				//List<PkHabilitacaoProfessor> habilitacoesDoProfessor = this._habilitaRepository.GetHabilitacoesDoProfessor(codigoDoUsuarioLogado);
-				//(from )
+				}
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				{
 
-
-
-				//todo fluxo aluno
+				}
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
+				    index.TiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				{
+					responsaveis = this.GetResponsaveisParaProfessorOuCoordenador(codigoDoCurso, fase, codigoDoCliente);
+				}
 			}
 
-			lista.AddRange(professores);
-			lista.AddRange(coordenadores);
-			lista.AddRange(alunos);
-			lista.AddRange(responsaveis);
+			listaParaRetorno.AddRange(professores);
+			listaParaRetorno.AddRange(coordenadores);
+			listaParaRetorno.AddRange(alunos);
+			listaParaRetorno.AddRange(responsaveis);
 
-			return lista;
+			listaParaRetorno = listaParaRetorno
+				.OrderBy(x => x.Nome)
+				.ThenBy(x => x.Tipo)
+				.ToList();
+
+			return listaParaRetorno;
+		}
+
+		private void ExtraiCodigoECursoSelecionado(PesquisaContatosIndexModel index, out int codigoDoCurso, out string fase)
+		{
+			if (this._usuarioLogado.EhProfessorOuCoordenador())
+			{
+				string[] cursoEFase = index.CursoEFase.Split('-');
+				codigoDoCurso = cursoEFase.FirstOrDefault().ConvertToInt32();
+				fase = cursoEFase.LastOrDefault();
+			}
+			else
+			{
+				codigoDoCurso = 0;
+				fase = string.Empty;
+			}
+		}
+
+		private IQueryable<PkUsuarioConversa> GetAlunos(int codigoDoCurso, string fase, int codigoDoCliente)
+		{
+			return (from historicoDeOutroAluno in this._db.Histalu.Where(x =>
+					x.Resultado == ResultadoCursos.Cursando &&
+					x.Nseqc == codigoDoCurso &&
+					x.Fase == fase)
+					join outroAluno in this._db.Alunos
+						on historicoDeOutroAluno.CodAluh equals outroAluno.Codigo
+					join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
+						on historicoDeOutroAluno.Nseqc equals curso.Nseq
+					select new PkUsuarioConversa
+					{
+						Codigo = outroAluno.Codigo,
+						Foto = outroAluno.Foto,
+						Tipo = TipoDeUsuarioDoChatTrata.Aluno,
+						Nome = outroAluno.Nome,
+						Status = $"{TipoDeUsuarioDoChatTrata.AlunoExtenso} do curso: {curso.Descricao}",
+						CodigoDoCliente = codigoDoCliente
+					}).AsQueryable();
+		}
+
+		private List<PkUsuarioConversa> GetResponsaveisParaProfessorOuCoordenador(int codigoDoCurso, string fase, int codigoDoCliente)
+		{
+			List<PkUsuarioConversa> responsaveisParaRetorno = new List<PkUsuarioConversa>();
+			var alunoComResponsaveis =
+				(from historicoDoAluno in this._db.Histalu.Where(x =>
+						x.Nseqc == codigoDoCurso && x.Fase == fase && x.Resultado == ResultadoCursos.Cursando)
+				 join aluno in this._db.Alunos
+					 on historicoDoAluno.CodAluh equals aluno.Codigo
+				 join rf in this._db.Pessoas
+					 on historicoDoAluno.CodRespfi equals rf.Codigo
+					 into rfJoin
+				 from responsavelFinanceiro in rfJoin.DefaultIfEmpty()
+				 join p in this._db.Pessoas
+					 on aluno.CodPai equals p.Codigo
+					 into pJoin
+				 from pai in pJoin.DefaultIfEmpty()
+				 join m in this._db.Pessoas
+					 on aluno.CodMae equals m.Codigo
+					 into mJoin
+				 from mae in mJoin.DefaultIfEmpty()
+				 join rp in this._db.Pessoas
+					 on aluno.CodResppe equals rp.Codigo
+					 into rpJoin
+				 from responsavelPedagogico in rpJoin.DefaultIfEmpty()
+				 select new
+				 {
+					 codigoDoAluno = aluno.Codigo,
+					 nomeDoAluno = aluno.Nome,
+					 codigoDoResponsavelFinanceiro = (int?)responsavelFinanceiro.Codigo,
+					 nomeDoResponsavelFinanceiro = responsavelFinanceiro.Nome,
+					 fotoDoResponsavelFinanceiro = responsavelFinanceiro.Foto,
+					 codigoDoPai = (int?)pai.Codigo,
+					 nomeDoPai = pai.Nome,
+					 fotoDoPai = pai.Foto,
+					 codigoDaMae = (int?)mae.Codigo,
+					 nomeDaMae = mae.Nome,
+					 fotoDaMae = mae.Foto,
+					 codigoDoResponsavelPedagogico = (int?)responsavelPedagogico.Codigo,
+					 nomeDoResponsavelPedagogico = responsavelPedagogico.Nome,
+					 fotoDoResponsavelPedagogico = responsavelPedagogico.Foto,
+				 }).ToList();
+
+			foreach (var aluno in alunoComResponsaveis)
+			{
+				string codigoEPrimeiroEUltimoNomeDoAluno = $"{aluno.codigoDoAluno} - {aluno.nomeDoAluno.GetPrimeiroEUltimoNome()}";
+
+				List<PkUsuarioConversa> responsaveisDoAluno = new List<PkUsuarioConversa>();
+				if (!SaeUtil.IsNullOrZero(aluno.codigoDoResponsavelFinanceiro))
+				{
+					PkUsuarioConversa responsavelFinanceiro = new PkUsuarioConversa
+					{
+						Codigo = aluno.codigoDoResponsavelFinanceiro ?? 0,
+						Tipo = TipoDeUsuarioDoChatTrata.Responsavel,
+						CodigoDoCliente = codigoDoCliente,
+						Foto = aluno.fotoDoResponsavelFinanceiro,
+						Nome = aluno.nomeDoResponsavelFinanceiro,
+						Status = $"Resp. Fin. do(a) {codigoEPrimeiroEUltimoNomeDoAluno}"
+					};
+					responsaveisDoAluno.Add(responsavelFinanceiro);
+				}
+
+				if (!SaeUtil.IsNullOrZero(aluno.codigoDoPai))
+				{
+					PkUsuarioConversa pai = new PkUsuarioConversa
+					{
+						Codigo = aluno.codigoDoPai ?? 0,
+						Tipo = TipoDeUsuarioDoChatTrata.Responsavel,
+						CodigoDoCliente = codigoDoCliente,
+						Foto = aluno.fotoDoPai,
+						Nome = aluno.nomeDoPai,
+						Status = $"Pai do(a) {codigoEPrimeiroEUltimoNomeDoAluno}"
+					};
+					responsaveisDoAluno.Add(pai);
+				}
+
+				if (!SaeUtil.IsNullOrZero(aluno.codigoDaMae))
+				{
+					PkUsuarioConversa mae = new PkUsuarioConversa
+					{
+						Codigo = aluno.codigoDaMae ?? 0,
+						Tipo = TipoDeUsuarioDoChatTrata.Responsavel,
+						CodigoDoCliente = codigoDoCliente,
+						Foto = aluno.fotoDaMae,
+						Nome = aluno.nomeDaMae,
+						Status = $"Mãe do(a) {codigoEPrimeiroEUltimoNomeDoAluno}"
+					};
+					responsaveisDoAluno.Add(mae);
+				}
+
+				if (!SaeUtil.IsNullOrZero(aluno.codigoDoResponsavelPedagogico))
+				{
+					PkUsuarioConversa responsavelPedagogico = new PkUsuarioConversa
+					{
+						Codigo = aluno.codigoDoResponsavelPedagogico ?? 0,
+						Tipo = TipoDeUsuarioDoChatTrata.Responsavel,
+						CodigoDoCliente = codigoDoCliente,
+						Foto = aluno.fotoDoResponsavelPedagogico,
+						Nome = aluno.nomeDoResponsavelPedagogico,
+						Status = $"Resp. Ped. do(a) {codigoEPrimeiroEUltimoNomeDoAluno}"
+					};
+					responsaveisDoAluno.Add(responsavelPedagogico);
+				}
+
+				if (responsaveisDoAluno.Any())
+				{
+					var responsaveisAgrupados = responsaveisDoAluno.GroupBy(x => x.Codigo,
+						(codigo, responsaveisIguais) =>
+						{
+							//Guardei numa lista para evitar múltipla enumeração
+							List<PkUsuarioConversa> responsaveisIguaisList = responsaveisIguais.ToList();
+							var relacoes = responsaveisIguaisList
+								.Select(x => x.Status.Split(" do(a)").FirstOrDefault());
+
+							string relacoesJuntasESeparadasPorVirgula =
+								string.Join(", ", relacoes);
+							var primeiroIndice = responsaveisIguaisList.FirstOrDefault();
+							string nomeDoAluno = primeiroIndice.Status.Split("do(a)").LastOrDefault();
+							var responsavelTemporario = new PkUsuarioConversa
+							{
+								Codigo = codigo,
+								Tipo = TipoDeUsuarioDoChatTrata.Responsavel,
+								CodigoDoCliente = codigoDoCliente,
+								Foto = primeiroIndice.Foto,
+								Nome = primeiroIndice.Nome,
+								Status = $"{relacoesJuntasESeparadasPorVirgula} do(a) {nomeDoAluno}"
+							};
+
+							return responsavelTemporario;
+						}).ToList();
+
+					responsaveisParaRetorno.AddRange(responsaveisAgrupados);
+				}
+			}
+
+			return responsaveisParaRetorno;
 		}
 
 		private List<PkUsuarioConversa> GetProfessoresOuCoordenadoresPeloHistorico(PkHistoricoDoAluno ultimoHistoricoDoAluno, string tipo,
 			int codigoDoCliente)
 		{
-			List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
-				.GetHabilitacoesPeloHistorico(ultimoHistoricoDoAluno)
-				.DistinctBy(x => x.CodigoDoProfessor)
-				.ToList();
+			List<PkUsuarioConversa> coordenadores = new List<PkUsuarioConversa>();
 
-			string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
+			if (ultimoHistoricoDoAluno != null)
+			{
+				List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
+					.GetHabilitacoesPeloHistorico(ultimoHistoricoDoAluno)
+					.DistinctBy(x => x.CodigoDoProfessor)
+					.ToList();
 
-			List<PkUsuarioConversa> coordenadores = (from profHabilita in habilitacoes
-													 join cadforps in this._db.Cadforps.Where(x => x.ProfNivel == tipo)
-														 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
-													 join curso in this._db.Cursos
-														 on profHabilita.CodigoDoCurso equals curso.Nseq
-													 select new PkUsuarioConversa
-													 {
-														 Codigo = cadforps.Codigo,
-														 Tipo = TipoDeUsuarioDoChatTrata.Professor,
-														 Foto = cadforps.Foto,
-														 CodigoDoCliente = codigoDoCliente,
-														 Nome = cadforps.Nome,
-														 Status = $"{cargo} do curso: {curso.Descricao}"
-													 }).ToList();
+				string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
+
+				coordenadores = (from profHabilita in habilitacoes
+								 join cadforps in this._db.Cadforps.Where(x =>
+										 x.ProfNivel == tipo && x.Situacao == SaeSituacao.Ativo)
+									 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
+								 join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
+									 on profHabilita.CodigoDoCurso equals curso.Nseq
+								 select new PkUsuarioConversa
+								 {
+									 Codigo = cadforps.Codigo,
+									 Tipo = TipoDeUsuarioDoChatTrata.Professor,
+									 Foto = cadforps.Foto,
+									 CodigoDoCliente = codigoDoCliente,
+									 Nome = cadforps.Nome,
+									 Status = $"{cargo} do curso: {curso.Descricao}"
+								 }).ToList();
+			}
+
 			return coordenadores;
 		}
 

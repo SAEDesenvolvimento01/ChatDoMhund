@@ -6,5 +6,6 @@ namespace ChatDoMhund.Models.ViewModels
     public class ChatIndexViewModel : BaseViewModelIndex
     {
         public UsuarioLogado UsuarioLogado { get; set; }
+        public string GroupName { get; set; }
     }
 }

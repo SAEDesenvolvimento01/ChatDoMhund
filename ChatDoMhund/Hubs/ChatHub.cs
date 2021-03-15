@@ -7,6 +7,7 @@ using HelperSaeStandard11.Handlers;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
+using ChatDoMhund.Models.Poco;
 
 namespace ChatDoMhund.Hubs
 {
@@ -27,12 +28,12 @@ namespace ChatDoMhund.Hubs
 
 		public async Task AddToGroup()
 		{
-			await this.Groups.AddToGroupAsync(this.Context.ConnectionId, this._groupBuilder.GetGroupName());
+			await this.Groups.AddToGroupAsync(this.Context.ConnectionId, this._groupBuilder.BuildGroupName());
 		}
 
 		public async Task RemoveFromGroup()
 		{
-			await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, this._groupBuilder.GetGroupName());
+			await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, this._groupBuilder.BuildGroupName());
 		}
 
 		public async Task SendMessage(string groupNameDestino, string message)
@@ -40,17 +41,20 @@ namespace ChatDoMhund.Hubs
 			string codigoDoCliente = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente);
 			string tipoDeUsuarioOrigem = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
 			string codigoDoUsuarioOrigem = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario);
-			var destino = groupNameDestino.Split("-");
-			string tipoDeDestino = destino[1];
-			int codigoDeDestino = destino[2].ConvertToInt32();
+			groupNameDestino.Split("-");
+			this._groupBuilder.DismantleGroupName(groupNameDestino,
+				out int codigoDoClienteDestino,
+				out string tipoDoUsuarioDestino,
+				out int codigoDoUsuarioDestino);
+
 			var chatProfess = new ChatProfess
 			{
 				DtMensagem = DateTime.Now,
-				IdDestino = codigoDeDestino,
+				IdDestino = codigoDoUsuarioDestino,
 				IdOrigem = codigoDoUsuarioOrigem.ConvertToInt32(),
 				Lido = false,
 				TextMens = message,
-				TipoDestino = tipoDeDestino,
+				TipoDestino = tipoDoUsuarioDestino,
 				TipoOrigem = tipoDeUsuarioOrigem
 			};
 
@@ -59,12 +63,21 @@ namespace ChatDoMhund.Hubs
 				this._chatProfessRepository.Add(chatProfess);
 
 				string groupNameOrigem =
-					this._groupBuilder.GetGroupName(codigoDoCliente, tipoDeUsuarioOrigem, codigoDoUsuarioOrigem);
+					this._groupBuilder.BuildGroupName(codigoDoCliente, tipoDeUsuarioOrigem, codigoDoUsuarioOrigem);
 				await this
 					.Clients
 					.Groups(groupNameOrigem, groupNameDestino)
-					.SendAsync("ReceiveMessage", groupNameOrigem, groupNameDestino, message);
+					.SendAsync("ReceiveMessage",
+						new PkMensagem(chatProfess, _groupBuilder, codigoDoCliente.ConvertToInt32()));
 			}
+		}
+
+		public async Task EstouDigitando(string groupName)
+		{
+			await this
+				.Clients
+				.OthersInGroup(groupName)
+				.SendAsync("EstaDigitando", this._groupBuilder.BuildGroupName());
 		}
 	}
 }

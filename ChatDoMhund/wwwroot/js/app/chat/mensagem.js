@@ -3,4 +3,5 @@
 	groupNameDestino = "";
 	texto = "";
 	dataDaMensagem = "";
+	lida = false;
 }

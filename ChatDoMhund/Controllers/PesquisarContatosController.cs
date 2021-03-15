@@ -42,7 +42,7 @@ namespace ChatDoMhund.Controllers
 			if (ehProfessorOuCoordenador)
 			{
 				habilitacoes = this._profHabilitaRepository
-					.GetHabilitacoesDoProfessor(this._usuarioLogado.Codigo)
+					.GetHabilitacoesDoProfessorOuCoordenador(this._usuarioLogado.Codigo)
 					.DistinctBy(x => new { x.CodigoDoCurso, x.Fase })
 					.ToList();
 			}

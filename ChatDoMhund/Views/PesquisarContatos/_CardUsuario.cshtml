@@ -9,25 +9,25 @@
 
 <div selecionar-para-conversar
      codigo="@this.Model.Codigo"
-     tipo="@TipoDeUsuarioDoChatTrata.TipoExtenso(this.Model.Tipo)"
+     tipo="@this.Model.Tipo"
      codigo-da-escola="@this.Model.CodigoDoCliente"
-     group-name="@this._groupBuilder.GetGroupName(this.Model.CodigoDoCliente, this.Model.Tipo, this.Model.Codigo)"
+     group-name="@this._groupBuilder.BuildGroupName(this.Model.CodigoDoCliente, this.Model.Tipo, this.Model.Codigo)"
      nome="@this.Model.Nome"
      status="@this.Model.Status"
-     class="col s12 l6 pl-1 pr-1 card-width pointer">
-	<div class="card card-border gradient-45deg-indigo-purple hoverable animated bounceInLeft">
-		<div class="card-content white-text pl-5 pr-5 pt-2 pb-2">
+     class="col s12 l6 xl4 pl-1 pr-1 card-width pointer">
+	<div class="card card-border @CoresDosTiposDeUsuarios.GetCor(this.Model.Tipo) hoverable animated bounceInUp">
+		<div class="card-content pl-5 pr-5 pt-2 pb-2">
 			<div class="row">
-				<div class="col s2">
+				<div class="col s4 m2">
 					<img foto class="responsive-img circle z-depth-4"
 					     src="@FotoTrata.ToBase64String(this.Model.Foto)" 
 					     alt=""
 						 style="width: 40px;height: 40px; object-fit: cover;"
 					     >
 				</div>
-				<div class="col s10">
-					<p class="white-text right-align">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
-					<p class="white-text right-align hide-on-small-only">@this.Model.Status</p>
+				<div class="col s8 m10">
+					<p class="right-align">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
+					<p class="right-align ultra-small hide-on-small-only">@this.Model.Status</p>
 				</div>
 				<div class="row">
 					<div class="col s12">

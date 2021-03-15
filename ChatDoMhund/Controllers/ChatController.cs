@@ -10,7 +10,10 @@ using HelperSaeStandard11.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using ChatDoMhund.Data.Repository;
 using ChatDoMhund.Models.Domain;
+using ChatDoMhund.Models.Tratamento;
+using HelperSaeCore31.Models.Infra.Cookie.Interface;
 
 namespace ChatDoMhund.Controllers
 {
@@ -18,20 +21,37 @@ namespace ChatDoMhund.Controllers
 	{
 		private UsuarioLogado _usuarioLogado;
 		private readonly ChatDomain _chatDomain;
+		private readonly GroupBuilder _groupBuilder;
+		private readonly AlunosRepository _alunosRepository;
+		private readonly CadforpsRepository _cadforpsRepository;
+		private readonly PessoasRepository _pessoasRepository;
+		private readonly ISaeHelperCookie _saeHelperCookie;
 
 		public ChatController(UsuarioLogado usuarioLogado,
-			ChatDomain chatDomain)
+			ChatDomain chatDomain,
+			GroupBuilder groupBuilder,
+			AlunosRepository alunosRepository,
+			CadforpsRepository cadforpsRepository,
+			PessoasRepository pessoasRepository,
+			ISaeHelperCookie saeHelperCookie)
 		{
 			this._usuarioLogado = usuarioLogado;
 			this._chatDomain = chatDomain;
+			this._groupBuilder = groupBuilder;
+			this._alunosRepository = alunosRepository;
+			this._cadforpsRepository = cadforpsRepository;
+			this._pessoasRepository = pessoasRepository;
+			this._saeHelperCookie = saeHelperCookie;
 		}
 
 		public IActionResult Index()
 		{
 			this._usuarioLogado = this._usuarioLogado.GetUsuarioLogado();
+
 			return this.View("Index", new ChatIndexViewModel
 			{
-				UsuarioLogado = this._usuarioLogado
+				UsuarioLogado = this._usuarioLogado,
+				GroupName = this._groupBuilder.BuildGroupName()
 			});
 		}
 
@@ -53,6 +73,43 @@ namespace ChatDoMhund.Controllers
 			};
 
 			return this.Json(response);
+		}
+
+		public JsonResult GetUsuarioParaConversa(string groupName)
+		{
+			this._groupBuilder.DismantleGroupName(groupName, out int codigoDoCliente, out string tipoDeUsuario,
+				out int codigoDoUsuario);
+
+			PkUsuarioConversa usuarioConversa = new PkUsuarioConversa();
+			if (TipoDeUsuarioDoChatTrata.EhAluno(tipoDeUsuario))
+			{
+				usuarioConversa = this._alunosRepository.GetAlunoParaConversa(codigoDoUsuario).Content;
+			}
+			else if (TipoDeUsuarioDoChatTrata.EhCoordenadorOuProfessor(tipoDeUsuario))
+			{
+				usuarioConversa = this._cadforpsRepository.GetProfessorOuCoordenadorParaConversa(codigoDoUsuario)
+					.Content;
+			}
+			else if (TipoDeUsuarioDoChatTrata.EhResponsavel(tipoDeUsuario))
+			{
+				usuarioConversa = this._pessoasRepository.GetResponsavelParaConversa(codigoDoUsuario).Content;
+			}
+
+			int codigoDaEscola = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
+
+			List<ChatProfess> mensagens = this._chatDomain.GetMensagens(usuarioConversa);
+
+			PkConversa conversa = new PkConversa(usuarioConversa, mensagens, codigoDaEscola, this._groupBuilder);
+			return this.Json(new SaeResponse
+			{
+				Status = true,
+				Content = conversa
+			});
+		}
+
+		public JsonResult LimparMensagens()
+		{
+			return this.Json(this._chatDomain.LimparTodasAsMensagens());
 		}
 	}
 }

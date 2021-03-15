@@ -39,3 +39,19 @@
 .message {
     padding-top: 10px;
 }
+
+.data-mensagem {
+	font-size: 10px !important;
+}
+
+/*Mobile*/
+#modal-pesquisar-contatos {
+	width: 100% !important;
+	height: 100% !important;
+	max-height: 100% !important;
+	top: 0 !important;
+}
+
+.chip-filtro-usuario {
+	background-color: transparent;
+}
