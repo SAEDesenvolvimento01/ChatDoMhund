@@ -8,32 +8,34 @@
      id="modal-pesquisar-contatos" 
      tabindex="-1" role="dialog" aria-labelledby="modal-bairros-form-Label" aria-hidden="true">
 	<div class="modal-content">
-		<div class="header-modal">
+		<div class="modal-header">
 			<a class="btn-floating waves-effect waves-light red accent-2 modal-action modal-close float-right">
 				<i class="material-icons">clear</i>
 			</a>
 			<h4 class="modal-title"><i class="fa fa-phone"></i> @this.Model.TituloDaModal</h4>
 		</div>
 		<div class="modal-body">
-			<div class="row">
-				@if (this.Model.EhProfessorOuCoordenador)
-				{
-					<div class="col s12">
-						<div class="input-field">
-							<div class="select-wrapper select-index">
-								<select asp-for="CursoEFase" 
-								        class="validate select2" 
-										asp-items="this.Model.GetSelectListListaDeCursosHabilitados()">
-								</select>
+			<div id="filtro-pesquisa-usuarios">
+				<div class="row">
+					@if (this.Model.EhProfessorOuCoordenador)
+					{
+						<div class="col s12">
+							<div class="input-field">
+								<div class="select-wrapper select-index">
+									<select asp-for="CursoEFase"
+											class="validate select2"
+											asp-items="this.Model.GetSelectListListaDeCursosHabilitados()">
+									</select>
+								</div>
 							</div>
 						</div>
-					</div>
-				}
+					}
+				</div>
+				@this.Model.GetChipAluno()
+				@this.Model.GetChipProfessor()
+				@this.Model.GetChipCoordenador()
+				@this.Model.GetChipResponsavel()
 			</div>
-			@this.Model.GetChipAluno()
-			@this.Model.GetChipProfessor()
-			@this.Model.GetChipCoordenador()
-			@this.Model.GetChipResponsavel()
 			<div lista-usuarios-para-conversar></div>
 		</div>
 	</div>

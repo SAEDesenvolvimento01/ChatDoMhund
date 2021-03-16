@@ -102,7 +102,7 @@ namespace ChatDoMhund.Models.Domain
 
 				PkHistoricoDoAluno historicoDoAlunoRelacionado = this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
 				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-				    tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
 				{
 					coordenadores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
@@ -116,7 +116,7 @@ namespace ChatDoMhund.Models.Domain
 				{
 					responsaveis = this.GetResponsaveis(historicoDoAlunoRelacionado.CodigoDoCurso,
 						historicoDoAlunoRelacionado.Fase, codigoDoCliente)
-						.Where(x=>x.Codigo != codigoDoUsuarioLogado)
+						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
 			}
@@ -132,7 +132,7 @@ namespace ChatDoMhund.Models.Domain
 				{
 					coordenadores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
 						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente)
-						.Where(x=>x.Codigo != codigoDoUsuarioLogado)
+						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
@@ -140,7 +140,7 @@ namespace ChatDoMhund.Models.Domain
 				{
 					professores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
 						TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente)
-						.Where(x=>x.Codigo != codigoDoUsuarioLogado)
+						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
 				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
@@ -385,21 +385,21 @@ namespace ChatDoMhund.Models.Domain
 			string cargo = TipoDeUsuarioDoChatTrata.TipoExtenso(tipo);
 
 			professoresOuCoordenadores = (from profHabilita in habilitacoes
-											 join cadforps in this._db.Cadforps.Where(x =>
-													 x.ProfNivel == tipo && x.Situacao == SaeSituacao.Ativo)
-												 on profHabilita.CodigoDoProfessor equals cadforps.Codigo
-											 join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
-												 on profHabilita.CodigoDoCurso equals curso.Nseq
-											 select new PkUsuarioConversa
-											 {
-												 Codigo = cadforps.Codigo,
-												 Tipo = TipoDeUsuarioDoChatTrata.Professor,
-												 Foto = cadforps.Foto,
-												 CodigoDoCliente = codigoDoCliente,
-												 Nome = cadforps.Nome,
-												 Status = $"{cargo} do curso: {curso.Descricao}",
-												 TipoParaExibicao = tipo
-											 }).ToList();
+										  join cadforps in this._db.Cadforps.Where(x =>
+												  x.ProfNivel == tipo && x.Situacao == SaeSituacao.Ativo)
+											  on profHabilita.CodigoDoProfessor equals cadforps.Codigo
+										  join curso in this._db.Cursos.Where(x => x.Situacao == SaeSituacao.Ativo)
+											  on profHabilita.CodigoDoCurso equals curso.Nseq
+										  select new PkUsuarioConversa
+										  {
+											  Codigo = cadforps.Codigo,
+											  Tipo = TipoDeUsuarioDoChatTrata.Professor,
+											  Foto = cadforps.Foto,
+											  CodigoDoCliente = codigoDoCliente,
+											  Nome = cadforps.Nome,
+											  Status = $"{cargo} do curso: {curso.Descricao}",
+											  TipoParaExibicao = tipo
+										  }).ToList();
 
 			return professoresOuCoordenadores;
 		}
