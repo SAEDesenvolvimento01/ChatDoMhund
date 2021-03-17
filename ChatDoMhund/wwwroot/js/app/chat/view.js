@@ -295,7 +295,7 @@ async function AtualizarListaDeConversas() {
 				let mensagens = conversa.mensagens;
 				let quantidadeDeMensagensNaoLidas;
 				if (mensagens) {
-					quantidadeDeMensagensNaoLidas = mensagens.filter(x => !x.lida)
+					quantidadeDeMensagensNaoLidas = mensagens.filter(x => x.groupNameOrigem !== groupNameUsuarioLogado && !x.lida)
 						.length;
 				} else {
 					quantidadeDeMensagensNaoLidas = 0;
@@ -550,30 +550,31 @@ function LeuMensagens(
 	const $conversaSelecionada = $GetConversaSelecionada();
 	const conversaEstaAberta = $conversaSelecionada.attr("group-name") === groupName;
 
-	conversa
-		.mensagens
-		.filter(mensagem => mensagensLidas.some(x => x.id === mensagem.id))
-		.forEach(mensagem => {
-			const mensagemLida = mensagensLidas.find(x => x.id === mensagem.id);
+	if(conversa.mensagens && conversa.mensagens.length) {
+		conversa
+			.mensagens
+			.filter(mensagem => mensagensLidas.some(x => x.id === mensagem.id))
+			.forEach(mensagem => {
+				const mensagemLida = mensagensLidas.find(x => x.id === mensagem.id);
 
-			mensagem.lida = true;
-			mensagem.dataDeLeitura = mensagemLida.dataDeLeitura;
+				mensagem.lida = true;
+				mensagem.dataDeLeitura = mensagemLida.dataDeLeitura;
 
+				if (conversaEstaAberta) {
+					const iconeLida = GetIconeSeMensagemEstaLida(mensagem);
+					const $dataMensagem = $(`[mensagem][id="${mensagem.id}"]`)
+						.find("[data-mensagem]");
+					const htmlDaDataDaMensagem = $dataMensagem.html();
 
-			if (conversaEstaAberta) {
-				const iconeLida = GetIconeSeMensagemEstaLida(mensagem);
-				const $dataMensagem = $(`[mensagem][id="${mensagem.id}"]`)
-					.find("[data-mensagem]");
-				const htmlDaDataDaMensagem = $dataMensagem.html();
-
-				if (iconeLida && !htmlDaDataDaMensagem.includes(iconeLida)) {
-					$dataMensagem
-						.html(`${htmlDaDataDaMensagem}${iconeLida}`)
-						.show(600);
-					InicializaTooltip();
+					if (iconeLida && !htmlDaDataDaMensagem.includes(iconeLida)) {
+						$dataMensagem
+							.html(`${htmlDaDataDaMensagem}${iconeLida}`)
+							.show(600);
+						InicializaTooltip();
+					}
 				}
-			}
-		});
+			});
+	}
 
 	conversas.SetConversas(listaDeConversas);
 }

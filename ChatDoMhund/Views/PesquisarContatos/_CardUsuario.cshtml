@@ -26,7 +26,7 @@
 	 nome="@this.Model.Nome"
 	 status="@this.Model.Status"
 	 class="col s12 @tamanhoCardEmDesktop xl4 pl-1 pr-1 card-width pointer">
-	<div class="card card-border @CoresDosTiposDeUsuarios.GetCor(this.Model.TipoParaExibicao??this.Model.Tipo) hoverable animated bounceInUp">
+	<div class="card card-border @CoresDosTiposDeUsuarios.GetCor(this.Model.TipoParaExibicao??this.Model.Tipo) hoverable animated bounceInUp border-round">
 		<div class="card-content pl-5 pr-5 pt-2 pb-2">
 			<div class="row">
 				<div class="col s4 m2">
@@ -36,21 +36,23 @@
 						 style="width: 40px;height: 40px; object-fit: cover;">
 				</div>
 				<div class="col s8 m10">
-					<p class="right-align">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
+					<p class="right-align strong">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
 					<div class="right-align">
 						@{
-							string textoUltimoAcesso, corUltimoAcesso;
+							string textoUltimoAcesso, corUltimoAcesso, atributoEsteveOnline;
 							if (this.Model.UltimaVezOnline.IsValid())
 							{
 								textoUltimoAcesso = $"Ultimo acesso: {this.Model.UltimaVezOnline:dd/MM/yyyy 'às' HH:mm}.";
-								corUltimoAcesso = "green";
+								corUltimoAcesso = "#004d40 teal-text darken-4";
+								atributoEsteveOnline = "esteve-online";
 							}
 							else
 							{
 								textoUltimoAcesso = "Nunca acessou o chat.";
-								corUltimoAcesso = "red";
+								corUltimoAcesso = "red white-text";
+								atributoEsteveOnline = "nunca-esteve-online";
 							}
-							<span class="ultra-small @corUltimoAcesso white-text pr-1 pl-1">@textoUltimoAcesso</span>
+							<span class="ultra-small @corUltimoAcesso border-round pr-2 pl-2" @atributoEsteveOnline>@textoUltimoAcesso</span>
 						}
 					</div>
 					<p class="right-align ultra-small hide-on-small-only">@SaeUtil.CortarTexto(this.Model.Status, 40)</p>
