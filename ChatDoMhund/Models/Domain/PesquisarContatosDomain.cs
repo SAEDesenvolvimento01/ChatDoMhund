@@ -434,7 +434,8 @@ namespace ChatDoMhund.Models.Domain
 											  CodigoDoCliente = codigoDoCliente,
 											  Nome = cadforps.Nome,
 											  Status = $"{cargo} do curso: {curso.Descricao}",
-											  TipoParaExibicao = tipo
+											  TipoParaExibicao = tipo,
+											  TipoDeProfessor = tipo
 										  }).ToList();
 
 			return professoresOuCoordenadores;

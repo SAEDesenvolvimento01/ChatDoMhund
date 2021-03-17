@@ -13,6 +13,7 @@ namespace ChatDoMhund.Models.Poco
 		public int CodigoDoCliente { get; set; }
 		public string TipoParaExibicao { get; set; }
 		public DateTime UltimaVezOnline { get; set; }
+		public string TipoDeProfessor { get; set; }
 
 		public bool MensagemEhDesteUsuario(ChatProfess chatProfess)
 		{
