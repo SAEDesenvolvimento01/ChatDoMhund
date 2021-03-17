@@ -55,8 +55,8 @@ namespace ChatDoMhund.Models.Domain
 			List<string> tiposSelecionados = index.TiposSelecionados;
 			if (ehAluno)
 			{
-				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				if (this._usuarioLogado.Permissoes.ConversaComAluno //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno)*/)
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					if (ultimoHistoricoDoAluno != null)
@@ -70,15 +70,15 @@ namespace ChatDoMhund.Models.Domain
 								.ToList();
 					}
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador)*/)
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					coordenadores = this.GetProfessoresOuCoordenadores(ultimoHistoricoDoAluno,
 						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor)*/)
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					professores = this.GetProfessoresOuCoordenadores(ultimoHistoricoDoAluno,
@@ -92,25 +92,25 @@ namespace ChatDoMhund.Models.Domain
 			}
 			else if (ehResponsavel)
 			{
-				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				if (this._usuarioLogado.Permissoes.ConversaComAluno //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno)*/)
 				{
 					//não vai fazer por enquanto
 				}
 
 				PkHistoricoDoAluno historicoDoAlunoRelacionado = this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
-				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador)*/)
 				{
 					coordenadores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor)*/)
 				{
 					professores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel)*/)
 				{
 					responsaveis = this.GetResponsaveis(historicoDoAlunoRelacionado.CodigoDoCurso,
 						historicoDoAlunoRelacionado.Fase, codigoDoCliente)
@@ -120,29 +120,29 @@ namespace ChatDoMhund.Models.Domain
 			}
 			else if (ehCoordenadorOuProfessor)
 			{
-				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				if (this._usuarioLogado.Permissoes.ConversaComAluno //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno)*/)
 				{
 					alunos = this.GetAlunos(codigoDoCurso, fase, codigoDoCliente).ToList();
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador)*/)
 				{
 					coordenadores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
 						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente)
 						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor)*/)
 				{
 					professores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
 						TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente)
 						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel)*/)
 				{
 					responsaveis = this.GetResponsaveis(codigoDoCurso, fase, codigoDoCliente);
 				}

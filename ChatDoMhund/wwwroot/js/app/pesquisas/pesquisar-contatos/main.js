@@ -149,58 +149,91 @@
 			form.TiposSelecionados.push(tipo);
 		});
 
+		const $divLista = $("[lista-usuarios-para-conversar]");
+		//$divLista.html("");
+
+		//$("[selecionar-para-conversar]")
+		//	.hide();
+
 		if (form.TiposSelecionados.length) {
-			const $divLista = $("[lista-usuarios-para-conversar]");
-
-			$divLista.html(new MaterialLoading().GetCircularLoading());
-
-			const response = new SaeResponse(await new SaeAjax({
-				type: "post",
-				url: "/PesquisarContatos/AtualizarLista",
-				data: form
-			}).Start());
-
-			if (response.Status()) {
-				$divLista.html(response.View());
-
-				$divLista.find("[selecionar-para-conversar]")
-					.on("click",
-						async event => {
-							const $usuario = $(event.target)
-								.closest("[selecionar-para-conversar]");
-
-							const response = new PesquisarContatosResponse();
-							response.codigo = parseInt($usuario.attr("codigo"));
-							response.groupName = $usuario.attr("group-name");
-							response.tipo = $usuario.attr("tipo");
-							response.codigoDaEscola = parseInt($usuario.attr("codigo-da-escola"));
-							response.foto = $usuario.find("img[foto]")
-								.attr("src");
-							response.nome = $usuario.attr("nome");
-							response.status = $usuario.attr("status");
-
-							if (this._callback) {
-								if ($usuario.find("[nunca-esteve-online]").length) {
-									await new SaeMaterialSwal().Confirm({
-										titulo: `${response.nome} ainda não usou o chat.`,
-										mensagem: "Deseja mesmo enviar uma mensagem?",
-										callback: confirmou => {
-											if (confirmou) {
-												this._callback(response);
-												this._modal.Close();
-											}
-										}
-									});
-								}
-								else {
-									this._callback(response);
-									this._modal.Close();
-								}
-							}
-						});
-			} else {
-				await response.Swal();
+			let view = sessionStorage.getItem("viewContatos");
+			if (view) {
+				if (!$divLista.html()) {
+					$divLista.html(view);
+				}
 			}
+			else {
+				$divLista.html(new MaterialLoading().GetCircularLoading());
+				const response = new SaeResponse(await new SaeAjax({
+					type: "post",
+					url: "/PesquisarContatos/AtualizarLista",
+					data: form
+				}).Start());
+
+				if (response.Status()) {
+					view = response.View();
+
+					sessionStorage.setItem("viewContatos", view);
+
+					$divLista.html(view);
+
+					$divLista.find("[selecionar-para-conversar]")
+						.on("click",
+							async event => {
+								const $usuario = $(event.target)
+									.closest("[selecionar-para-conversar]");
+
+								const response = new PesquisarContatosResponse();
+								response.codigo = parseInt($usuario.attr("codigo"));
+								response.groupName = $usuario.attr("group-name");
+								response.tipo = $usuario.attr("tipo");
+								response.codigoDaEscola = parseInt($usuario.attr("codigo-da-escola"));
+								response.foto = $usuario.find("img[foto]")
+									.attr("src");
+								response.nome = $usuario.attr("nome");
+								response.status = $usuario.attr("status");
+
+								if (this._callback) {
+									if ($usuario.find("[nunca-esteve-online]")
+										.length) {
+										await new SaeMaterialSwal().Confirm({
+											titulo: `${response.nome} ainda não usou o chat.`,
+											mensagem: "Deseja mesmo enviar uma mensagem?",
+											botaoConfirmar: "Continuar",
+											callback: confirmou => {
+												if (confirmou) {
+													this._callback(response);
+													this._modal.Close();
+												}
+											}
+										});
+									} else {
+										this._callback(response);
+										this._modal.Close();
+									}
+								}
+							});
+				} else {
+					await response.Swal();
+				}
+			}
+
+			$("[tipo-de-usuario-para-filtrar]")
+				.each((i, item) => {
+					const $tipo = $(item);
+					const tipo = $tipo.attr("tipo-de-usuario-para-filtrar");
+
+					if ($tipo.is("[selecionado]")) {
+						console.log(`Mostrou: ${tipo}`);
+						$(`[selecionar-para-conversar][tipo="${tipo}"]`)
+							.show();
+					}
+					else {
+						console.log(`Escondeu: ${tipo}`);
+						$(`[selecionar-para-conversar][tipo="${tipo}"]`)
+							.hide(600);
+					}
+				});
 		} else {
 			new MaterialToast({ html: "Selecione ao menos um tipo de usuário para buscar!" }).Show();
 		}
