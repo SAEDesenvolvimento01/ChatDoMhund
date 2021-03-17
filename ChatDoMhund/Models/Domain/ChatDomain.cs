@@ -133,6 +133,16 @@ namespace ChatDoMhund.Models.Domain
 			return destinatarios;
 		}
 
+		public List<ChatProfess> GetMensagens(PkUsuarioConversa conversa)
+		{
+			this._usuarioLogado.GetUsuarioLogado();
+			return this._chatProfessRepository.GetMensagens(
+				codigoDoUsuario1: this._usuarioLogado.Codigo,
+				tipoDoUsuario1: this._usuarioLogado.TipoDeUsuario,
+				codigoDoUsuario2: conversa.Codigo,
+				tipoDoUsuario2: conversa.Tipo).Content;
+		}
+
 		public string LimparTodasAsMensagens()
 		{
 			int cliente = this._helperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
@@ -150,14 +160,21 @@ namespace ChatDoMhund.Models.Domain
 			return $"not allowed to {cliente}";
 		}
 
-		public List<ChatProfess> GetMensagens(PkUsuarioConversa conversa)
+		public string LimparTodosOsLogs()
 		{
-			this._usuarioLogado.GetUsuarioLogado();
-			return this._chatProfessRepository.GetMensagens(
-				codigoDoUsuario1: this._usuarioLogado.Codigo,
-				tipoDoUsuario1: this._usuarioLogado.TipoDeUsuario,
-				codigoDoUsuario2: conversa.Codigo,
-				tipoDoUsuario2: conversa.Tipo).Content;
+			int cliente = this._helperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
+			if (cliente == 99123)
+			{
+				List<ChatLog> todasAsMensagens = this._db.ChatLog.ToList();
+
+				this._db.ChatLog.RemoveRange(todasAsMensagens);
+
+				int quantidadeRemovida = this._db.SaveChanges();
+
+				return $"{quantidadeRemovida} logs removidos";
+			}
+
+			return $"not allowed to {cliente}";
 		}
 	}
 }

@@ -110,8 +110,8 @@ namespace ChatDoMhund.Hubs
 					.Clients
 					.Groups(groupNameQueAbriuAConversa, groupNameConversaAberta)
 					.SendAsync("LeuMensagens",
-						groupNameConversaAberta, 
-						groupNameQueAbriuAConversa, 
+						groupNameConversaAberta,
+						groupNameQueAbriuAConversa,
 						response.Content);
 			}
 		}

@@ -165,7 +165,7 @@
 
 				$divLista.find("[selecionar-para-conversar]")
 					.on("click",
-						event => {
+						async event => {
 							const $usuario = $(event.target)
 								.closest("[selecionar-para-conversar]");
 
@@ -180,7 +180,20 @@
 							response.status = $usuario.attr("status");
 
 							if (this._callback) {
-								this._callback(response);
+								if ($usuario.find("[nunca-esteve-online]").length) {
+									await new SaeMaterialSwal().Confirm({
+										title:`<b>${response.nome}</b> ainda não usou o chat.`,
+										mensagem: "Deseja mesmo enviar uma mensagem?",
+										callback: confirmou => {
+											if(confirmou) {
+												this._callback(response);
+											}
+										}
+									});
+								}
+								else {
+									this._callback(response);
+								}
 							}
 
 							this._modal.Close();
