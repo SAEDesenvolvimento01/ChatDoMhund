@@ -40,6 +40,7 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		const groupNameDestino = $conversaSelecionada.attr("group-name");
 		const conversa = listaDeConversas.find(x => x.groupName === groupNameDestino);
 		InserirMensagensNoChat(conversa);
+		hub.AbriuConversa(conversa.groupName);
 	} else {
 		const usuarioLogadoQueEnviou = groupNameUsuarioLogado === mensagem.groupNameOrigem;
 		let groupName;
@@ -111,10 +112,10 @@ $(".chat-list")
 	.on("click",
 		"[conversar-com-usuario]",
 		async event => {
-			const $pessoa = $(event.target).closest("[conversar-com-usuario]");
+			const $conversaSelecionada = $(event.target).closest("[conversar-com-usuario]");
 
-			$pessoa.siblings().removeClass("active");
-			$pessoa.addClass("active");
+			$conversaSelecionada.siblings().removeClass("active");
+			$conversaSelecionada.addClass("active");
 
 			const $chatContentArea = $(".chat-content-area");
 
@@ -123,7 +124,7 @@ $(".chat-list")
 				await sleep(400);
 			}
 
-			const codigo = parseInt($pessoa.attr("codigo"));
+			const codigo = parseInt($conversaSelecionada.attr("codigo"));
 			const listaDeConversas = conversas.GetConversas();
 			const conversa = listaDeConversas.find(conversa => conversa.codigo === codigo);
 
@@ -146,15 +147,18 @@ $(".chat-list")
 					await sleep(400);
 				}
 
-				//if ($mensagem.attr("disabled")) {
-				//	$mensagem.removeAttr("disabled");
-				//}
-
 				AtualizaScrollDaConversa();
 
 				if (!isMobile.any() && !$mensagem.is("[disabled]")) {
 					$mensagem.focus();
 				}
+
+				$conversaSelecionada.find("[novas-mensagens]")
+					.attr("novas-mensagens", "0")
+					.html("")
+					.hide(600);
+
+				await hub.AbriuConversa(conversa.groupName);
 			}
 		});
 
@@ -178,29 +182,22 @@ function InserirMensagensNoChat(conversa) {
 				classeDeOrientacaoDaHora = "left";
 			}
 			const date = new Date(mensagem.dataDaMensagem);
-			const hours = date.getHours().toLocaleString("pt-BR", {
-				minimumIntegerDigits: 2
-			});
-			const minutes = date.getMinutes().toLocaleString("pt-BR", {
-				minimumIntegerDigits: 2
-			});
-			const day = date.getDay().toLocaleString("pt-BR", {
-				minimumIntegerDigits: 2
-			});
-			const month = date.getMonth().toLocaleString("pt-BR", {
-				minimumIntegerDigits: 2
-			});
-			const data = `${day}/${month} às ${hours}:${minutes}`;
+			const hours = ConverteToLocaleString(date.getHours());
+			const minutes = ConverteToLocaleString(date.getMinutes());
+			const data = `${date.toLocaleDateString()} às ${hours}:${minutes}`;
+
+			const iconeLida = GetIconeSeMensagemEstaLida(mensagem);
 
 			const $ultimaPessoaQueEnviou = $chats.find(".chat").last();
 			if ($ultimaPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
-				$ultimaPessoaQueEnviou.find(".chat-body")
+				$ultimaPessoaQueEnviou
+					.find(".chat-body")
 					.append(`
-            <div class="chat-text">
+            <div class="chat-text" mensagem id="${mensagem.id}">
                 <p>
 					<span>${mensagem.texto}</span>
 					<br />
-					<span class="${classeDeOrientacaoDaHora} data-mensagem">${data}</span>
+					<span class="${classeDeOrientacaoDaHora} data-mensagem" data-mensagem>${data}${iconeLida}</span>
 				</p>
             </div>
 `);
@@ -213,11 +210,11 @@ function InserirMensagensNoChat(conversa) {
                     </a>
                 </div>
                 <div class="chat-body">
-                    <div class="chat-text">
+                    <div class="chat-text" mensagem id="${mensagem.id}">
                         <p>
 							<span>${mensagem.texto}</span>
 							<br />
-							<span class="${classeDeOrientacaoDaHora} data-mensagem">${data}</span>
+							<span class="${classeDeOrientacaoDaHora} data-mensagem" data-mensagem>${data}${iconeLida}</span>
 						</p>
                     </div>
                 </div>
@@ -225,6 +222,8 @@ function InserirMensagensNoChat(conversa) {
 `);
 			}
 		});
+
+	InicializaTooltip();
 
 	AtualizaScrollDaConversa();
 }
@@ -427,8 +426,12 @@ function PlaySound(soundObj) {
 }
 
 $("[nova-conversa]").on("click", async () => {
+	await IniciarPesquisaDeContatos();
+});
+
+async function IniciarPesquisaDeContatos() {
 	await new PesquisarContatos({
-		callback: response => {
+		callback: async response => {
 			const conversa = new Conversa();
 			conversa.mensagens = null;
 			conversa.codigo = response.codigo;
@@ -440,25 +443,24 @@ $("[nova-conversa]").on("click", async () => {
 			conversa.nome = response.nome;
 			conversa.status = response.status;
 
-			const $conversaComPessoaSelecionadaJaExistente = $(`.chat-list [group-name="${conversa.groupName}"]`);
+			let $conversaComPessoaSelecionadaJaExistente = $(`.chat-list [group-name="${conversa.groupName}"]`);
+
 			if (!$conversaComPessoaSelecionadaJaExistente.length) {
 				conversas.AddConversa(conversa);
 
 				AtualizarListaDeConversas();
 
-				$(`.chat-list [group-name="${conversa.groupName}"]`)
-					.click();
-			} else {
-				$conversaComPessoaSelecionadaJaExistente.click();
+				$conversaComPessoaSelecionadaJaExistente = $(`.chat-list [group-name="${conversa.groupName}"]`);
 			}
+
+			$conversaComPessoaSelecionadaJaExistente.click();
 		}
 	}).Start();
-});
+}
 
 $mensagem.on("focus", () => {
 	AtualizaScrollDaConversa();
 }).on("keydown", event => {
-
 	if (event.keyCode !== enterKey) {
 		estouDigitando = true;
 	} else {
@@ -490,6 +492,10 @@ function NaoEstaMaisDigitando(conversa) {
 }
 
 $("#chat-filter").on("keyup", () => {
+	FiltrarChats();
+});
+
+function FiltrarChats() {
 	const filtro = $("#chat-filter").val().toLowerCase();
 	const listaDeConversas = conversas.GetConversas();
 	let itensMostrados = listaDeConversas.length;
@@ -522,4 +528,81 @@ $("#chat-filter").on("keyup", () => {
 		$("#no-data-listed")
 			.hide(600);
 	}
-});
+}
+
+function LeuMensagens(
+	groupNameConversaAberta,
+	groupNameQueAbriuAConversa,
+	mensagensLidas = new Array(new MensagemLida())) {
+	let groupName;
+
+	if (groupNameUsuarioLogado !== groupNameConversaAberta) {
+		groupName = groupNameConversaAberta
+	} else {
+		groupName = groupNameQueAbriuAConversa;
+	}
+
+	const listaDeConversas = conversas
+		.GetConversas();
+	const conversa = listaDeConversas
+		.find(x => x.groupName === groupName);
+
+	const $conversaSelecionada = $GetConversaSelecionada();
+	const conversaEstaAberta = $conversaSelecionada.attr("group-name") === groupName;
+
+	conversa
+		.mensagens
+		.filter(mensagem => mensagensLidas.some(x => x.id === mensagem.id))
+		.forEach(mensagem => {
+			const mensagemLida = mensagensLidas.find(x => x.id === mensagem.id);
+
+			mensagem.lida = true;
+			mensagem.dataDeLeitura = mensagemLida.dataDeLeitura;
+
+
+			if (conversaEstaAberta) {
+				const iconeLida = GetIconeSeMensagemEstaLida(mensagem);
+				const $dataMensagem = $(`[mensagem][id="${mensagem.id}"]`)
+					.find("[data-mensagem]");
+				const htmlDaDataDaMensagem = $dataMensagem.html();
+
+				if (iconeLida && !htmlDaDataDaMensagem.includes(iconeLida)) {
+					$dataMensagem
+						.html(`${htmlDaDataDaMensagem}${iconeLida}`)
+						.show(600);
+					InicializaTooltip();
+				}
+			}
+		});
+
+	conversas.SetConversas(listaDeConversas);
+}
+
+function ConverteToLocaleString(input) {
+	return input
+		.toLocaleString("pt-BR",
+			{
+				minimumIntegerDigits: 2
+			});
+}
+
+function GetIconeSeMensagemEstaLida(mensagem = new Mensagem()) {
+	let iconeLida = "";
+	if (mensagem.lida && mensagem.groupNameOrigem === groupNameUsuarioLogado) {
+		if (mensagem.dataDeLeitura) {
+			const dataDeLeitura = new Date(mensagem.dataDeLeitura);
+			const horaDeLeitura = ConverteToLocaleString(dataDeLeitura.getHours());
+			const minutosDeLeitura = ConverteToLocaleString(dataDeLeitura.getMinutes());
+			const dataLeitura = `${dataDeLeitura.toLocaleDateString()} às ${horaDeLeitura}:${minutosDeLeitura}`;
+			iconeLida =
+				`<i class="material-icons tiny tooltipped" data-position="left" data-tooltip="Visualizado em ${dataLeitura}">check</i>`;
+		}
+	}
+
+	return iconeLida;
+}
+
+function InicializaTooltip() {
+	$(".tooltipped")
+		.tooltip();
+}

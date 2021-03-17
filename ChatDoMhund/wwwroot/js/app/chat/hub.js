@@ -19,11 +19,12 @@
 			.then(async () => {
 				await this.AddToGroup();
 				this.ConfigurarReceiveMessage();
-				this.ConfigurarOnDisconnected();
-				if(!estaReconectando) {
+				if (!estaReconectando) {
 					//Só rodo na primeira execução para não registrar várias vezes
+					this.ConfigurarOnDisconnected();
 					await this.ConfigurarEstouDigitando();
 					await this.ConfigurarEstaDigitando();
+					await this.ConfigurarLeuMensagens();
 				}
 				await ConexaoEstabelecida(estaReconectando);
 			})
@@ -71,7 +72,7 @@
 			if (estouDigitando) {
 				//console.log("esta digitando");
 				const conversa = new Conversa().Build({ $conversa: $GetConversaSelecionada() });
-				
+
 				await this._connection
 					.invoke("EstouDigitando", conversa.groupName)
 					.catch((err) => {
@@ -93,9 +94,33 @@
 		});
 	}
 
+	async ConfigurarLeuMensagens() {
+		this._connection.on("LeuMensagens",
+			(groupNameConversaAberta,
+			groupNameQueAbriuAConversa,
+			mensagensLidas = new Array(new MensagemLida())) => {
+			try {
+				LeuMensagens(
+					groupNameConversaAberta, 
+					groupNameQueAbriuAConversa, 
+					mensagensLidas);
+			} catch (e) {
+				console.error(e);
+			}
+		});
+	}
+
 	async SendMessage(groupNameDestino, message) {
 		await this._connection
 			.invoke("SendMessage", groupNameDestino, message)
+			.catch((err) => {
+				return console.error(err);
+			});
+	}
+
+	async AbriuConversa(groupNameOrigem) {
+		await this._connection
+			.invoke("AbriuConversa", groupNameOrigem)
 			.catch((err) => {
 				return console.error(err);
 			});

@@ -30,7 +30,7 @@
 
 		if (conversas) {
 			const conversa = conversas.find(x => x.groupName === this.groupName);
-			this.mensgens = conversa.mensagens;
+			this.mensagens = conversa.mensagens;
 		}
 
 		return this;

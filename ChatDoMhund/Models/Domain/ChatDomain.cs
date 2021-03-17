@@ -154,10 +154,10 @@ namespace ChatDoMhund.Models.Domain
 		{
 			this._usuarioLogado.GetUsuarioLogado();
 			return this._chatProfessRepository.GetMensagens(
-				codigoDoUsuarioLogado: this._usuarioLogado.Codigo,
-				tipoDoUsuarioLogado: this._usuarioLogado.TipoDeUsuario,
-				codigoDoUsuarioDaConversa: conversa.Codigo,
-				tipoDoUsuarioDaConversa: conversa.Tipo).Content;
+				codigoDoUsuario1: this._usuarioLogado.Codigo,
+				tipoDoUsuario1: this._usuarioLogado.TipoDeUsuario,
+				codigoDoUsuario2: conversa.Codigo,
+				tipoDoUsuario2: conversa.Tipo).Content;
 		}
 	}
 }

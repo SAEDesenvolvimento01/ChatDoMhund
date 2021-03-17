@@ -8,7 +8,7 @@
 
 @foreach (string tipo in TipoDeUsuarioDoChatTrata.GetTipos())
 {
-<input id="cor-@tipo" value="@CoresDosTiposDeUsuarios.GetCor(tipo)" type="hidden" />
+	<input id="cor-@tipo" value="@CoresDosTiposDeUsuarios.GetCor(tipo)" type="hidden" />
 }
 
 <div class="chat-application">
@@ -46,6 +46,7 @@
 <script asp-append-version="true" src="~/js/app/pesquisas/pesquisar-contatos/pesquisar-contatos-response.js"></script>
 <script asp-append-version="true" src="~/js/app/pesquisas/pesquisar-contatos/main.js"></script>
 <script asp-append-version="true" src="~/js/app/chat/mensagem.js"></script>
+<script asp-append-version="true" src="~/js/app/chat/mensagem-lida.js"></script>
 <script asp-append-version="true" src="~/js/app/chat/conversa.js"></script>
 <script asp-append-version="true" src="~/js/app/chat/hub.js"></script>
 <script asp-append-version="true" src="~/js/app/chat/controller.js"></script>
