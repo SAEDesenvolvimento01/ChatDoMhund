@@ -34,13 +34,13 @@ namespace ChatDoMhund.Controllers
 			this._helperCookie = helperCookie;
 		}
 
-		//Aluno Gabriel (750) => http://chat.mhund.com.br/Login/Auth?e=99123&c=750&t=AL&o=MH&h=1C8AB2EB4AC2285F8028824878FD2884
+		//Aluno Gabriel (750) => https://chat.mhund.com.br/Login/Auth?e=99123&c=750&t=AL&o=MH&h=1C8AB2EB4AC2285F8028824878FD2884
 		//Aluno Gabriel (750) => http://localhost:61439/Login/Auth?e=99123&c=750&t=AL&o=MH&h=1C8AB2EB4AC2285F8028824878FD2884
 
-		//Professor Gabriel (1143) => http://chat.mhund.com.br/Login/Auth?e=99123&c=1143&t=PR&o=MH&h=845B2C6B43FEA5F4E8AB63479FD5CAFA
+		//Professor Gabriel (1143) => https://chat.mhund.com.br/Login/Auth?e=99123&c=1143&t=PR&o=MH&h=845B2C6B43FEA5F4E8AB63479FD5CAFA
 		//Professor Gabriel (1143) => http://localhost:61439/Login/Auth?e=99123&c=1143&t=PR&o=MH&h=845B2C6B43FEA5F4E8AB63479FD5CAFA
 
-		//Mariana (1182) Mãe do Gabriel (750) http://chat.mhund.com.br/Login/Auth?e=99123&c=1182&t=RE&o=MH&h=BB88C8A543003401DA5C832183B05141&ca=750&tr=M
+		//Mariana (1182) Mãe do Gabriel (750) https://chat.mhund.com.br/Login/Auth?e=99123&c=1182&t=RE&o=MH&h=BB88C8A543003401DA5C832183B05141&ca=750&tr=M
 		//Mariana (1182) Mãe do Gabriel (750) http://localhost:61439/Login/Auth?e=99123&c=1182&t=RE&o=MH&h=BB88C8A543003401DA5C832183B05141&ca=750&tr=M
 
 		/// <summary>

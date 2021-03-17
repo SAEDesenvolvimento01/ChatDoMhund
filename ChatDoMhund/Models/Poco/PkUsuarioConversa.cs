@@ -1,4 +1,5 @@
-﻿using HelperMhundCore31.Data.Entity.Models;
+﻿using System;
+using HelperMhundCore31.Data.Entity.Models;
 
 namespace ChatDoMhund.Models.Poco
 {
@@ -11,6 +12,7 @@ namespace ChatDoMhund.Models.Poco
 		public string Tipo { get; set; }
 		public int CodigoDoCliente { get; set; }
 		public string TipoParaExibicao { get; set; }
+		public DateTime UltimaVezOnline { get; set; }
 
 		public bool MensagemEhDesteUsuario(ChatProfess chatProfess)
 		{

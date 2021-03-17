@@ -14,7 +14,7 @@ using HelperSaeStandard11.Models.Tratamento;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using HelperMhundCore31.Data.Entity.Models;
 
 namespace ChatDoMhund.Models.Domain
 {
@@ -50,8 +50,6 @@ namespace ChatDoMhund.Models.Domain
 			List<PkUsuarioConversa> responsaveis = new List<PkUsuarioConversa>();
 			bool ehAluno = TipoDeUsuarioDoChatTrata.EhAluno(tipoDeUsuarioLogado);
 			bool ehResponsavel = TipoDeUsuarioDoChatTrata.EhResponsavel(tipoDeUsuarioLogado);
-			bool ehProfessor = TipoDeUsuarioDoChatTrata.EhProfessor(tipoDeUsuarioLogado);
-			bool ehCoordenador = TipoDeUsuarioDoChatTrata.EhCoordenador(tipoDeUsuarioLogado);
 			bool ehCoordenadorOuProfessor = TipoDeUsuarioDoChatTrata.EhCoordenadorOuProfessor(tipoDeUsuarioLogado);
 
 			List<string> tiposSelecionados = index.TiposSelecionados;
@@ -155,12 +153,50 @@ namespace ChatDoMhund.Models.Domain
 			listaParaRetorno.AddRange(alunos);
 			listaParaRetorno.AddRange(responsaveis);
 
+			listaParaRetorno = this.SetUltimaVezLogado(listaParaRetorno);
+
 			listaParaRetorno = listaParaRetorno
 				.OrderBy(x => x.Nome)
 				.ThenBy(x => x.Tipo)
 				.ToList();
 
 			return listaParaRetorno;
+		}
+
+		private List<PkUsuarioConversa> SetUltimaVezLogado(List<PkUsuarioConversa> lista)
+		{
+			var codigosETipos = lista.Select(x => new
+			{
+				x.Codigo,
+				x.Tipo
+			});
+
+			List<ChatLog> listaTemporaria = (from codigoETipo in codigosETipos
+											 join chatLog in this._db.ChatLog
+												 on new
+												 {
+													 codigo = (int?)codigoETipo.Codigo,
+													 tipo = codigoETipo.Tipo,
+												 } equals new
+												 {
+													 codigo = chatLog.CodPess,
+													 tipo = chatLog.TipoPess
+												 }
+											 select chatLog)
+				.ToList();
+
+			lista.ForEach(usuarioConversa =>
+			{
+				ChatLog chatLog = listaTemporaria.FirstOrDefault(log => log.CodPess == usuarioConversa.Codigo && log.TipoPess == usuarioConversa.Tipo);
+
+				if (chatLog != null)
+				{
+
+					usuarioConversa.UltimaVezOnline = chatLog.DataLog.ConvertToDateTime();
+				}
+			});
+
+			return lista;
 		}
 
 		private void ExtraiCodigoECursoSelecionado(PesquisaContatosIndexModel index, out int codigoDoCurso, out string fase)

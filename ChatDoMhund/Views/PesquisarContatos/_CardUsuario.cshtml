@@ -1,5 +1,6 @@
 ﻿@using ChatDoMhund.Models.Tratamento
 @using ChatDoMhundStandard.Tratamento
+@using HelperSaeStandard11.Handlers.Extension
 @using HelperSaeStandard11.Models.Extension
 @using HelperSaeStandard11.Models.Infra
 @model ChatDoMhund.Models.Poco.PkUsuarioConversa
@@ -36,6 +37,22 @@
 				</div>
 				<div class="col s8 m10">
 					<p class="right-align">@this.Model.Nome.GetPrimeiroEUltimoNome()</p>
+					<div class="right-align">
+						@{
+							string textoUltimoAcesso, corUltimoAcesso;
+							if (this.Model.UltimaVezOnline.IsValid())
+							{
+								textoUltimoAcesso = $"Ultimo acesso: {this.Model.UltimaVezOnline:dd/MM/yyyy 'às' HH:mm}.";
+								corUltimoAcesso = "green";
+							}
+							else
+							{
+								textoUltimoAcesso = "Nunca acessou o chat.";
+								corUltimoAcesso = "red";
+							}
+							<span class="ultra-small @corUltimoAcesso white-text pr-1 pl-1">@textoUltimoAcesso</span>
+						}
+					</div>
 					<p class="right-align ultra-small hide-on-small-only">@SaeUtil.CortarTexto(this.Model.Status, 40)</p>
 				</div>
 				<div class="row">

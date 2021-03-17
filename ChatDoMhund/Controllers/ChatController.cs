@@ -27,6 +27,7 @@ namespace ChatDoMhund.Controllers
 		private readonly CadforpsRepository _cadforpsRepository;
 		private readonly PessoasRepository _pessoasRepository;
 		private readonly ISaeHelperCookie _saeHelperCookie;
+		private readonly ChatLogRepository _chatLogRepository;
 
 		public ChatController(UsuarioLogado usuarioLogado,
 			ChatDomain chatDomain,
@@ -34,7 +35,8 @@ namespace ChatDoMhund.Controllers
 			AlunosRepository alunosRepository,
 			CadforpsRepository cadforpsRepository,
 			PessoasRepository pessoasRepository,
-			ISaeHelperCookie saeHelperCookie)
+			ISaeHelperCookie saeHelperCookie,
+			ChatLogRepository chatLogRepository)
 		{
 			this._usuarioLogado = usuarioLogado;
 			this._chatDomain = chatDomain;
@@ -43,11 +45,13 @@ namespace ChatDoMhund.Controllers
 			this._cadforpsRepository = cadforpsRepository;
 			this._pessoasRepository = pessoasRepository;
 			this._saeHelperCookie = saeHelperCookie;
+			this._chatLogRepository = chatLogRepository;
 		}
 
 		public IActionResult Index()
 		{
 			this._usuarioLogado = this._usuarioLogado.GetUsuarioLogado();
+			this._chatLogRepository.AtualizaUltimoAcesso(this._usuarioLogado.Codigo, this._usuarioLogado.TipoDeUsuario);
 
 			string origem = this._saeHelperCookie.GetCookie(EChatCookie.OrigemDeChat.ToString());
 
@@ -114,6 +118,11 @@ namespace ChatDoMhund.Controllers
 		public JsonResult LimparMensagens()
 		{
 			return this.Json(this._chatDomain.LimparTodasAsMensagens());
+		}
+
+		public JsonResult LimparLogs()
+		{
+			return this.Json(this._chatDomain.LimparTodosOsLogs());
 		}
 	}
 }

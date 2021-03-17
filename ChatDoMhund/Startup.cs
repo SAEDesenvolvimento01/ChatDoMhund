@@ -61,6 +61,7 @@ namespace ChatDoMhund
 				.AddTransient<PessoasRepository>()
 				.AddTransient<ChatProfessRepository>()
 				.AddTransient<ProfHabilitaRepository>()
+				.AddTransient<ChatLogRepository>()
 				.AddTransient<GroupBuilder>()
 				//Domínios
 				.AddTransient<ChatDomain>()
