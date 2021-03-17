@@ -66,7 +66,7 @@ namespace ChatDoMhundStandard.Tratamento
 			this._rodandoComoLocalhost = rodandoComoLocalhost;
 		}
 
-		public Uri Gerar()
+		public Uri GerarV2()
 		{
 			string domain;
 			if (this._rodandoComoLocalhost)

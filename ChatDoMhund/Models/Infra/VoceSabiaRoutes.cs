@@ -12,7 +12,7 @@
             }
             else
             {
-                this.Helper = "http://helper.mhund.com.br";
+                this.Helper = "https://helper.mhund.com.br";
             }
         }
     }

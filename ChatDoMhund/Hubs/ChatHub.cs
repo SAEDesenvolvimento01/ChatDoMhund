@@ -1,13 +1,15 @@
 ﻿using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Models.Poco;
 using ChatDoMhund.Models.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperSaeCore31.Models.Enum;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
+using HelperSaeStandard11.Models;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using ChatDoMhund.Models.Poco;
 
 namespace ChatDoMhund.Hubs
 {
@@ -47,7 +49,7 @@ namespace ChatDoMhund.Hubs
 				out string tipoDoUsuarioDestino,
 				out int codigoDoUsuarioDestino);
 
-			var chatProfess = new ChatProfess
+			ChatProfess chatProfess = new ChatProfess
 			{
 				DtMensagem = DateTime.Now,
 				IdDestino = codigoDoUsuarioDestino,
@@ -78,6 +80,40 @@ namespace ChatDoMhund.Hubs
 				.Clients
 				.OthersInGroup(groupName)
 				.SendAsync("EstaDigitando", this._groupBuilder.BuildGroupName());
+		}
+
+		public async Task AbriuConversa(string groupNameConversaAberta)
+		{
+			string groupNameQueAbriuAConversa = this._groupBuilder.BuildGroupName();
+
+			this._groupBuilder.DismantleGroupName(groupNameQueAbriuAConversa,
+				out int codigoDoClienteQueAbriu,
+				out string tipoDeUsuarioQueAbriu,
+				out int codigoDoUsuarioQueAbriu);
+
+			this._groupBuilder.DismantleGroupName(groupNameConversaAberta,
+				out int codigoDoClienteAberto,
+				out string tipoDeUsuarioAberto,
+				out int codigoDoUsuarioAberto);
+
+			SaeResponseRepository<List<PkMensagemLida>> response = this
+				._chatProfessRepository
+				.LerMensagens(
+				codigoDoUsuarioAberto,
+				tipoDeUsuarioAberto,
+				codigoDoUsuarioQueAbriu,
+				tipoDeUsuarioQueAbriu);
+
+			if (response.Status)
+			{
+				await this
+					.Clients
+					.Groups(groupNameQueAbriuAConversa, groupNameConversaAberta)
+					.SendAsync("LeuMensagens",
+						groupNameConversaAberta, 
+						groupNameQueAbriuAConversa, 
+						response.Content);
+			}
 		}
 	}
 }

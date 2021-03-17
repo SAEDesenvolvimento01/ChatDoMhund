@@ -13,11 +13,11 @@ namespace ChatDoMhund.Models.Tratamento
 			}
 			else if (tipo == TipoDeUsuarioDoChatTrata.Professor)
 			{
-				cor = "gradient-45deg-indigo-blue white-text";
+				cor = "gradient-45deg-deep-purple-purple";
 			}
 			else if (tipo == TipoDeUsuarioDoChatTrata.Coordenador)
 			{
-				cor = "gradient-45deg-indigo-purple white-text";
+				cor = "gradient-45deg-orange-deep-orange";
 			}
 			else if (tipo == TipoDeUsuarioDoChatTrata.Responsavel)
 			{

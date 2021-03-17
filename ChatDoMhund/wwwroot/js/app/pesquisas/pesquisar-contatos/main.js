@@ -17,11 +17,37 @@
 			this._modal = new SaeMaterialModal({
 				id: "modal-pesquisar-contatos",
 				html: response.View(),
-				maxHeight: 60,
-				overflowElementSelector: "#modal-pesquisar-contatos .modal-body [lista-usuarios-para-conversar]"
+				overflowElementSelector: "#modal-pesquisar-contatos .modal-body [lista-usuarios-para-conversar]",
+				maxHeight: 60
 			});
 
 			this._modal.Create();
+
+			//espero um tempo antes de calcular as alturas. 
+			//alguns elementos aumentam o tamanho no celular, porque quebram linha por falta de espaço
+			await sleep(1000);
+			const $modal = $("#modal-pesquisar-contatos");
+			const alguraDoModalHeader = $modal
+				.find(".modal-header")
+				.outerHeight();
+			const alturaDoModalFooter = $modal
+				.find(".modal-footer")
+				.outerHeight();
+			const alturaDoFiltro = $modal.find("#filtro-pesquisa-usuarios")
+				.outerHeight();
+
+			const paddingTopAndBottomDaModalContent = 24 + 24;
+
+			const espacoUtil = innerHeight -
+				alguraDoModalHeader -
+				alturaDoModalFooter -
+				alturaDoFiltro -
+				paddingTopAndBottomDaModalContent;
+
+			$modal.find("[lista-usuarios-para-conversar]")
+				.css("max-height", `${espacoUtil}px`);
+
+
 
 			$("#CursoEFase")
 				.on("change", async () => {
