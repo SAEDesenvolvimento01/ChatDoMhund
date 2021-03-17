@@ -182,21 +182,21 @@
 							if (this._callback) {
 								if ($usuario.find("[nunca-esteve-online]").length) {
 									await new SaeMaterialSwal().Confirm({
-										title:`<b>${response.nome}</b> ainda não usou o chat.`,
+										titulo: `${response.nome} ainda não usou o chat.`,
 										mensagem: "Deseja mesmo enviar uma mensagem?",
 										callback: confirmou => {
-											if(confirmou) {
+											if (confirmou) {
 												this._callback(response);
+												this._modal.Close();
 											}
 										}
 									});
 								}
 								else {
 									this._callback(response);
+									this._modal.Close();
 								}
 							}
-
-							this._modal.Close();
 						});
 			} else {
 				await response.Swal();
