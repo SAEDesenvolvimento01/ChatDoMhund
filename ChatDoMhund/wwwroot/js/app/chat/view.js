@@ -25,7 +25,7 @@ $btnSendMessage.on("click", function (event) {
 	SendMessage();
 });
 
-function AtualizarConversa(mensagem = new Mensagem()) {
+async function AtualizarConversa(mensagem = new Mensagem()) {
 	const $conversaSelecionada = $GetConversaSelecionada();
 	const listaDeConversas = conversas.GetConversas();
 	if ($conversaSelecionada.length) {
@@ -44,12 +44,9 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 
 		const conversa = listaDeConversas.find(x => x.groupName === groupName);
 
-		const $mensagensNovas = $("[conversar-com-usuario].active").find("[novas-mensagens]");
-		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
-		$mensagensNovas.attr("novas-mensagens", mensagensNovas);
-		$mensagensNovas.html(mensagensNovas);
-
-		PlaySound("new-message");
+		if (mensagem.groupNameOrigem !== groupNameUsuarioLogado) {
+			PlaySound("new-message");
+		}
 
 		//As vezes a pessoa recém apertou enter (e desencadeou o "estou digitando")
 		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
@@ -71,7 +68,7 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		}
 	}
 
-	AtualizarListaDeConversas({});
+	await AtualizarListaDeConversas({});
 }
 
 async function SendMessage() {
@@ -292,7 +289,7 @@ async function AtualizarListaDeConversas({ ehOCarregamentoInicial = false }) {
 	        </div>`);
 				}
 
-				let mensagens = conversa.mensagens;
+				const mensagens = conversa.mensagens;
 				let quantidadeDeMensagensNaoLidas;
 				if (mensagens) {
 					quantidadeDeMensagensNaoLidas = mensagens.filter(x => x.groupNameOrigem !== groupNameUsuarioLogado && !x.lida)
@@ -304,15 +301,18 @@ async function AtualizarListaDeConversas({ ehOCarregamentoInicial = false }) {
 					.find(`span[novas-mensagens]`);
 
 				if (quantidadeDeMensagensNaoLidas) {
+					if (quantidadeDeMensagensNaoLidas >= 10) {
+						quantidadeDeMensagensNaoLidas = "9+";
+					}
 					$quantidadeDeMensagensNaoLidas
 						.attr("novas-mensagens", quantidadeDeMensagensNaoLidas)
 						.html(quantidadeDeMensagensNaoLidas)
-						.show(600);
+						.show();
 				} else {
 					$quantidadeDeMensagensNaoLidas
 						.attr("novas-mensagens", 0)
 						.html("")
-						.hide(600);
+						.hide();
 				}
 			});
 		$mensagemNenhumaConversa
