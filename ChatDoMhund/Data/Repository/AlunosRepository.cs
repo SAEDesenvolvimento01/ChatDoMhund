@@ -76,5 +76,13 @@ namespace ChatDoMhund.Data.Repository
 
 			return new SaeResponseRepository<PkUsuarioConversa>(true, alunos);
 		}
+
+		public SaeResponseRepository<string> GetNomeDoAluno(int codigoDoAluno)
+		{
+			string nomeDoAluno = this._db.Alunos.Select(x => new {x.Codigo, x.Nome})
+				.FirstOrDefault(x => x.Codigo == codigoDoAluno)?.Nome;
+
+			return new SaeResponseRepository<string>(!string.IsNullOrEmpty(nomeDoAluno), nomeDoAluno);
+		}
 	}
 }

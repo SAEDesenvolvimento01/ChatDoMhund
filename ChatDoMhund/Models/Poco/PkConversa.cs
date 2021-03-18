@@ -32,6 +32,11 @@ namespace ChatDoMhund.Models.Poco
 			this.Foto = FotoTrata.ToBase64String(usuario.Foto);
 			this.Status = usuario.Status;
 			this.Tipo = usuario.Tipo;
+			if (this.Status == this.Tipo)
+			{
+				this.Status = TipoDeUsuarioDoChatTrata.TipoExtenso(this.Tipo);
+			}
+
 			this.CodigoDaEscola = codigoDaEscola;
 			this.GroupName = groupBuilder.BuildGroupName(codigoDaEscola, usuario.Tipo, usuario.Codigo);
 			this.Mensagens = mensagensDoUsuario.Select(mensagem => new PkMensagem(mensagem, groupBuilder, codigoDaEscola)).ToList();
@@ -77,7 +82,7 @@ namespace ChatDoMhund.Models.Poco
 
 		public DateTime GetDataDaUltimaMensagem()
 		{
-			return this.Mensagens.OrderBy(x => x.DataDaMensagem).LastOrDefault()?.DataDaMensagem ?? DateTime.MinValue;
+			return this.Mensagens.OrderByDescending(x => x.DataDaMensagem).FirstOrDefault()?.DataDaMensagem ?? DateTime.MinValue;
 		}
 	}
 }

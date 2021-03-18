@@ -86,7 +86,7 @@ namespace ChatDoMhund.Controllers
 					{
 						return this.RedirectToAction("HandleError", "Error", new
 						{
-							@message = "A sua escola não usa o chat.",
+							@message = "Chat não habilitado. Por favor, entre em contato com a sua secretaria.",
 							@code = 403
 						});
 					}

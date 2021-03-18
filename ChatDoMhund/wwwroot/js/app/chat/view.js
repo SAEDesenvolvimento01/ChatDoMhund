@@ -1,18 +1,10 @@
 ﻿const groupNameUsuarioLogado = $("#group-name-usuario-logado").val();
 const $mensagem = $("#mensagem");
-var observe = (element, event, handler) => {
-	if (window.attachEvent) {
-		element.attachEvent(`on${event}`, handler);
-	} else {
-		element.addEventListener(event, handler, false);
-	}
-};
-
 let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
 var estouDigitando = false;
-var timeOutReconexao = 1000
+var timeOutReconexao = 1000;
 
 $(() => {
 	CarregarConversas();
@@ -63,7 +55,6 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
 		NaoEstaMaisDigitando(conversa);
 
-
 		if (!usuarioLogadoQueEnviou) {
 			const mensagens = conversa.mensagens;
 			if (mensagens.length) {
@@ -80,7 +71,7 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		}
 	}
 
-	AtualizarListaDeConversas();
+	AtualizarListaDeConversas({});
 }
 
 async function SendMessage() {
@@ -88,6 +79,7 @@ async function SendMessage() {
 	const message = $message.val();
 	if (message) {
 		$message.val("");
+		M.textareaAutoResize($mensagem);
 		const $conversaSelecionada = $GetConversaSelecionada();
 		const codigo = parseInt($conversaSelecionada.attr("codigo"));
 		const tipo = $conversaSelecionada.attr("tipo");
@@ -204,7 +196,7 @@ function InserirMensagensNoChat(conversa) {
 			} else {
 				$chats.append(`
             <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
-                <div class="chat-avatar">
+                <div class="chat-avatar hide-on-small-only">
                     <a class="avatar">
                         <img src="${foto}" class="circle" alt="avatar">
                     </a>
@@ -246,22 +238,30 @@ async function CarregarConversas() {
 
 		conversas.SetConversas(listaDeConversas);
 
-		await AtualizarListaDeConversas();
+		await AtualizarListaDeConversas({
+			ehOCarregamentoInicial: true
+		});
 	} else {
 		await response.Swal();
 	}
 }
 
-async function AtualizarListaDeConversas() {
+async function AtualizarListaDeConversas({ ehOCarregamentoInicial = false }) {
 	const $chatList = $(".chat-list");
 	const listaDeConversas = conversas.GetConversas();
 	const $mensagemNenhumaConversa = $("#no-data-listed");
+
+	let acao = "prepend";
+	if (ehOCarregamentoInicial) {
+		acao = "append";
+	}
+
 	if (listaDeConversas.length) {
 		$(listaDeConversas)
 			.each((i, conversa = new Conversa()) => {
-				if (!$GetConversaNoSidebar(conversa)
-					.length) {
-					$chatList.prepend(`
+				const $conversaNoSidebar = $GetConversaNoSidebar(conversa);
+				if (!$conversaNoSidebar.length) {
+					$chatList[acao](`
             <div conversar-com-usuario
 				codigo="${conversa.codigo}"
 				tipo="${conversa.tipo}"
@@ -336,7 +336,7 @@ function $GetConversasNoSidebar() {
 
 async function InicializarChat() {
 	await CarregaImagemDoUsuarioLogado();
-	InicializarInputMensagem();
+	//InicializarInputMensagem();
 	if (isMobile.any()) {
 		$btnSendMessage.addClass("btn-floating").html("<i class=\"material-icons\">send</i>")
 	} else {
@@ -365,33 +365,7 @@ async function CarregaImagemDoUsuarioLogado() {
 	$("[foto-do-usuario-logado]").attr("src", foto);
 }
 
-function InicializarInputMensagem() {
-	var element = document.getElementById("mensagem");
-	function resize() {
-		element.style.minHeight = "64px";
-		element.style.height = "auto";
-		element.style.height = `${element.scrollHeight + 20}px`;
-	}
-	/* 0-timeout to get the already changed text */
-	function delayedResize() {
-		window.setTimeout(resize, 0);
-	}
-	observe(element, "change", resize);
-	observe(element, "focus", resize);
-	observe(element, "cut", delayedResize);
-	observe(element, "paste", delayedResize);
-	observe(element, "drop", delayedResize);
-	observe(element, "keydown", delayedResize);
-
-	if (!isMobile.any()) {
-		element.focus();
-		element.select();
-	}
-	resize();
-}
-
 async function ConexaoInterrompida() {
-	const $mensagem = $("#mensagem");
 	const $sendButton = $btnSendMessage;
 	$mensagem.attr("disabled", "disabled");
 	$sendButton.attr("disabled", "disabled");
@@ -402,7 +376,6 @@ async function ConexaoInterrompida() {
 }
 
 function ConexaoEstabelecida(estaReconectando) {
-	const $mensagem = $("#mensagem");
 	const $sendButton = $btnSendMessage;
 	$mensagem.removeAttr("disabled");
 	if ($mensagem.is(":visible")) {
@@ -448,7 +421,7 @@ async function IniciarPesquisaDeContatos() {
 			if (!$conversaComPessoaSelecionadaJaExistente.length) {
 				conversas.AddConversa(conversa);
 
-				AtualizarListaDeConversas();
+				AtualizarListaDeConversas({});
 
 				$conversaComPessoaSelecionadaJaExistente = $(`.chat-list [group-name="${conversa.groupName}"]`);
 			}
@@ -550,7 +523,7 @@ function LeuMensagens(
 	const $conversaSelecionada = $GetConversaSelecionada();
 	const conversaEstaAberta = $conversaSelecionada.attr("group-name") === groupName;
 
-	if(conversa.mensagens && conversa.mensagens.length) {
+	if (conversa.mensagens && conversa.mensagens.length) {
 		conversa
 			.mensagens
 			.filter(mensagem => mensagensLidas.some(x => x.id === mensagem.id))

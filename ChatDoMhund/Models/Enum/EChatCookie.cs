@@ -3,8 +3,8 @@
     public enum EChatCookie
     {
         OrigemDeChat,
-        SRID,
         CodigoDoAlunoSelecionado,
-        TipoDeRelacaoComAluno
+        TipoDeRelacaoComAluno,
+        AnoLetivo
     }
 }

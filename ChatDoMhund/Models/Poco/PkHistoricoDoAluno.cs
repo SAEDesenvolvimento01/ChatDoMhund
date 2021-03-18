@@ -8,5 +8,6 @@ namespace ChatDoMhund.Models.Poco
 		public string Fase { get; set; }
 		public int CodigoDoAluno { get; set; }
 		public DateTime DataDeCadastro { get; set; }
+		public string Ano { get; set; }
 	}
 }

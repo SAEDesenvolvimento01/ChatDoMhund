@@ -19,17 +19,20 @@ namespace ChatDoMhund.Controllers
 		private readonly PesquisarContatosDomain _pesquisarContatosDomain;
 		private readonly UsuarioLogado _usuarioLogado;
 		private readonly ProfHabilitaRepository _profHabilitaRepository;
+		private readonly HistoricoRepository _historicoRepository;
 
 		public PesquisarContatosController(IViewRenderService viewRenderService,
 			PesquisarContatosDomain pesquisarContatosDomain,
 			UsuarioLogado usuarioLogado,
-			ProfHabilitaRepository profHabilitaRepository
+			ProfHabilitaRepository profHabilitaRepository,
+			HistoricoRepository historicoRepository
 			)
 		{
 			this._viewRenderService = viewRenderService;
 			this._pesquisarContatosDomain = pesquisarContatosDomain;
 			this._usuarioLogado = usuarioLogado;
 			this._profHabilitaRepository = profHabilitaRepository;
+			this._historicoRepository = historicoRepository;
 		}
 
 		public IActionResult Index()
@@ -41,8 +44,9 @@ namespace ChatDoMhund.Controllers
 
 			if (ehProfessorOuCoordenador)
 			{
+				string anoLetivo = this._historicoRepository.GetAnoLetivo().Content;
 				habilitacoes = this._profHabilitaRepository
-					.GetHabilitacoes(this._usuarioLogado.Codigo)
+					.GetHabilitacoes(codigoDoProfessor:this._usuarioLogado.Codigo, anoLetivo:anoLetivo)
 					.Content
 					.DistinctBy(x => new { x.CodigoDoCurso, x.Fase })
 					.ToList();

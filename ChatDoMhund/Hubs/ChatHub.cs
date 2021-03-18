@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ChatDoMhund.Models.Enum;
 
 namespace ChatDoMhund.Hubs
 {
@@ -33,6 +34,7 @@ namespace ChatDoMhund.Hubs
 			await this.Groups.AddToGroupAsync(this.Context.ConnectionId, this._groupBuilder.BuildGroupName());
 		}
 
+		//Não implementei porque não precisa, aparentemente: https://stackoverflow.com/questions/23854979/signalr-is-it-necessary-to-remove-the-connection-id-from-group-ondisconnect
 		public async Task RemoveFromGroup()
 		{
 			await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, this._groupBuilder.BuildGroupName());
@@ -43,6 +45,7 @@ namespace ChatDoMhund.Hubs
 			string codigoDoCliente = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente);
 			string tipoDeUsuarioOrigem = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
 			string codigoDoUsuarioOrigem = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario);
+			string origem = this._saeHelperCookie.GetCookie(EChatCookie.OrigemDeChat.ToString());
 			groupNameDestino.Split("-");
 			this._groupBuilder.DismantleGroupName(groupNameDestino,
 				out int codigoDoClienteDestino,
@@ -57,7 +60,8 @@ namespace ChatDoMhund.Hubs
 				Lido = false,
 				TextMens = message,
 				TipoDestino = tipoDoUsuarioDestino,
-				TipoOrigem = tipoDeUsuarioOrigem
+				TipoOrigem = tipoDeUsuarioOrigem,
+				OrigemLcto = origem
 			};
 
 			if (chatProfess.IsValid())

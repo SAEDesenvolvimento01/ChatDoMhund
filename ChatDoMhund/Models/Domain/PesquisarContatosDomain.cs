@@ -24,16 +24,19 @@ namespace ChatDoMhund.Models.Domain
 		private readonly UsuarioLogado _usuarioLogado;
 		private readonly ISaeHelperCookie _saeHelperCookie;
 		private readonly ProfHabilitaRepository _habilitaRepository;
+		private readonly HistoricoRepository _historicoRepository;
 
 		public PesquisarContatosDomain(MhundDbContext db,
 			UsuarioLogado usuarioLogado,
 			ISaeHelperCookie saeHelperCookie,
-			ProfHabilitaRepository habilitaRepository)
+			ProfHabilitaRepository habilitaRepository,
+			HistoricoRepository historicoRepository)
 		{
 			this._db = db;
 			this._usuarioLogado = usuarioLogado;
 			this._saeHelperCookie = saeHelperCookie;
 			this._habilitaRepository = habilitaRepository;
+			this._historicoRepository = historicoRepository;
 		}
 
 		public List<PkUsuarioConversa> Get(PesquisaContatosIndexModel index)
@@ -55,8 +58,8 @@ namespace ChatDoMhund.Models.Domain
 			List<string> tiposSelecionados = index.TiposSelecionados;
 			if (ehAluno)
 			{
-				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				if (this._usuarioLogado.Permissoes.ConversaComAluno //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno)*/)
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					if (ultimoHistoricoDoAluno != null)
@@ -70,15 +73,15 @@ namespace ChatDoMhund.Models.Domain
 								.ToList();
 					}
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador)*/)
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					coordenadores = this.GetProfessoresOuCoordenadores(ultimoHistoricoDoAluno,
 						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor)*/)
 				{
 					PkHistoricoDoAluno ultimoHistoricoDoAluno = this.GetUltimoHistoricoDoAluno(codigoDoUsuarioLogado);
 					professores = this.GetProfessoresOuCoordenadores(ultimoHistoricoDoAluno,
@@ -92,25 +95,25 @@ namespace ChatDoMhund.Models.Domain
 			}
 			else if (ehResponsavel)
 			{
-				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				if (this._usuarioLogado.Permissoes.ConversaComAluno //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno)*/)
 				{
 					//não vai fazer por enquanto
 				}
 
 				PkHistoricoDoAluno historicoDoAlunoRelacionado = this.GetUltimoHistoricoDoAluno(this._usuarioLogado.RelacaoComAluno.CodigoDoAluno);
-				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador)*/)
 				{
 					coordenadores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente);
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor)*/)
 				{
 					professores = this.GetProfessoresOuCoordenadores(historicoDoAlunoRelacionado, TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente);
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel)*/)
 				{
 					responsaveis = this.GetResponsaveis(historicoDoAlunoRelacionado.CodigoDoCurso,
 						historicoDoAlunoRelacionado.Fase, codigoDoCliente)
@@ -120,29 +123,29 @@ namespace ChatDoMhund.Models.Domain
 			}
 			else if (ehCoordenadorOuProfessor)
 			{
-				if (this._usuarioLogado.Permissoes.ConversaComAluno &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno))
+				if (this._usuarioLogado.Permissoes.ConversaComAluno //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Aluno)*/)
 				{
 					alunos = this.GetAlunos(codigoDoCurso, fase, codigoDoCliente).ToList();
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComCoordenador &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador))
+				if (this._usuarioLogado.Permissoes.ConversaComCoordenador //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Coordenador)*/)
 				{
 					coordenadores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
 						TipoDeUsuarioDoChatTrata.Coordenador, codigoDoCliente)
 						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComProfessor &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor))
+				if (this._usuarioLogado.Permissoes.ConversaComProfessor //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Professor)*/)
 				{
 					professores = this.GetProfessoresOuCoordenadores(codigoDoCurso, fase,
 						TipoDeUsuarioDoChatTrata.Professor, codigoDoCliente)
 						.Where(x => x.Codigo != codigoDoUsuarioLogado)
 						.ToList();
 				}
-				if (this._usuarioLogado.Permissoes.ConversaComResponsavel &&
-					tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel))
+				if (this._usuarioLogado.Permissoes.ConversaComResponsavel //&&
+					/*tiposSelecionados.Contains(TipoDeUsuarioDoChatTrata.Responsavel)*/)
 				{
 					responsaveis = this.GetResponsaveis(codigoDoCurso, fase, codigoDoCliente);
 				}
@@ -400,7 +403,9 @@ namespace ChatDoMhund.Models.Domain
 												  Foto = cadforps.Foto,
 												  CodigoDoCliente = codigoDoCliente,
 												  Nome = cadforps.Nome,
-												  Status = $"{cargo} do curso: {curso.Descricao}"
+												  Status = $"{cargo} do curso: {curso.Descricao}",
+												  TipoDeProfessor = tipo,
+												  TipoParaExibicao = tipo
 											  }).ToList();
 			}
 
@@ -412,8 +417,10 @@ namespace ChatDoMhund.Models.Domain
 		{
 			List<PkUsuarioConversa> professoresOuCoordenadores = new List<PkUsuarioConversa>();
 
+			string anoLetivo = this._historicoRepository.GetAnoLetivo().Content;
+
 			List<PkHabilitacaoProfessor> habilitacoes = this._habilitaRepository
-				.GetHabilitacoes(codigoDoCurso, fase)
+				.GetHabilitacoes(codigoDoCurso: codigoDoCurso, fase: fase, anoLetivo: anoLetivo)
 				.Content
 				.DistinctBy(x => x.CodigoDoProfessor)
 				.ToList();
@@ -434,7 +441,8 @@ namespace ChatDoMhund.Models.Domain
 											  CodigoDoCliente = codigoDoCliente,
 											  Nome = cadforps.Nome,
 											  Status = $"{cargo} do curso: {curso.Descricao}",
-											  TipoParaExibicao = tipo
+											  TipoParaExibicao = tipo,
+											  TipoDeProfessor = tipo
 										  }).ToList();
 
 			return professoresOuCoordenadores;
@@ -445,12 +453,15 @@ namespace ChatDoMhund.Models.Domain
 			return (from aluno in this._db.Alunos.Where(x => x.Codigo == codigoDoAluno)
 					join histalu in this._db.Histalu.Where(x => x.Resultado == ResultadoCursos.Cursando)
 						on aluno.Codigo equals histalu.CodAluh
+						join curso in this._db.Cursos
+							on histalu.Nseqc equals curso.Nseq
 					select new PkHistoricoDoAluno
 					{
 						CodigoDoCurso = histalu.Nseqc ?? 0,
 						CodigoDoAluno = histalu.CodAluh ?? 0,
 						Fase = histalu.Fase,
-						DataDeCadastro = histalu.DataCad ?? DateTime.MinValue
+						DataDeCadastro = histalu.DataCad ?? DateTime.MinValue,
+						Ano = curso.Ano
 					})
 				.OrderByDescending(x => x.DataDeCadastro)
 				.FirstOrDefault();

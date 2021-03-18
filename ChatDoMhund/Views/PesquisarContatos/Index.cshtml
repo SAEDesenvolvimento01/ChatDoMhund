@@ -4,9 +4,9 @@
 	this.Layout = null;
 }
 
-<div class="modal modal-fixed-footer" 
-     id="modal-pesquisar-contatos" 
-     tabindex="-1" role="dialog" aria-labelledby="modal-bairros-form-Label" aria-hidden="true">
+<div class="modal modal-fixed-footer"
+	 id="modal-pesquisar-contatos"
+	 tabindex="-1" role="dialog" aria-labelledby="modal-bairros-form-Label" aria-hidden="true">
 	<div class="modal-content">
 		<div class="modal-header">
 			<a class="btn-floating waves-effect waves-light red accent-2 modal-action modal-close float-right">
@@ -19,9 +19,10 @@
 				<div class="row">
 					@if (this.Model.EhProfessorOuCoordenador)
 					{
-						<div class="col s12">
-							<div class="input-field">
+						<div class="col s12 m6 p-0">
+							<div class="input-field m-0">
 								<div class="select-wrapper select-index">
+									<label class="m-0">Selecione o curso</label>
 									<select asp-for="CursoEFase"
 											class="validate select2"
 											asp-items="this.Model.GetSelectListListaDeCursosHabilitados()">
@@ -30,11 +31,15 @@
 							</div>
 						</div>
 					}
+					<div class="col s12 m6 mt-2">
+						<div class="ml-3">
+							@this.Model.GetChipAluno()
+							@this.Model.GetChipProfessor()
+							@this.Model.GetChipCoordenador()
+							@this.Model.GetChipResponsavel()
+						</div>
+					</div>
 				</div>
-				@this.Model.GetChipAluno()
-				@this.Model.GetChipProfessor()
-				@this.Model.GetChipCoordenador()
-				@this.Model.GetChipResponsavel()
 			</div>
 			<div lista-usuarios-para-conversar></div>
 		</div>

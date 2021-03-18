@@ -55,3 +55,11 @@
 .chip-filtro-usuario {
 	background-color: transparent;
 }
+
+.chat-text p {
+	word-break: break-word;
+}
+
+#mensagem {
+	min-height: 64px;
+}

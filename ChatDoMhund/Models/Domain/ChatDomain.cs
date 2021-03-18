@@ -84,7 +84,7 @@ namespace ChatDoMhund.Models.Domain
 					List<ChatProfess> mensagensDoUsuario =
 						mensagens.Where(mensagem => usuario.MensagemEhDesteUsuario(mensagem)).ToList();
 
-					conversas.Add(new PkConversa(usuario, mensagensDoUsuario, codigoDaEscola, _groupBuilder));
+					conversas.Add(new PkConversa(usuario, mensagensDoUsuario, codigoDaEscola, this._groupBuilder));
 				}
 			}
 

@@ -1,20 +1,19 @@
 ﻿using ChatDoMhund.Controllers.Abstract;
+using ChatDoMhund.Data.Repository;
+using ChatDoMhund.Models.Domain;
+using ChatDoMhund.Models.Enum;
 using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Poco;
+using ChatDoMhund.Models.Tratamento;
 using ChatDoMhund.Models.ViewModels;
 using ChatDoMhundStandard.Tratamento;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperSaeCore31.Models.Enum;
+using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
 using HelperSaeStandard11.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
-using ChatDoMhund.Data.Repository;
-using ChatDoMhund.Models.Domain;
-using ChatDoMhund.Models.Enum;
-using ChatDoMhund.Models.Tratamento;
-using HelperSaeCore31.Models.Infra.Cookie.Interface;
 
 namespace ChatDoMhund.Controllers
 {
