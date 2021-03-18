@@ -63,7 +63,6 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
 		NaoEstaMaisDigitando(conversa);
 
-
 		if (!usuarioLogadoQueEnviou) {
 			const mensagens = conversa.mensagens;
 			if (mensagens.length) {
@@ -88,6 +87,7 @@ async function SendMessage() {
 	const message = $message.val();
 	if (message) {
 		$message.val("");
+		M.textareaAutoResize($mensagem);
 		const $conversaSelecionada = $GetConversaSelecionada();
 		const codigo = parseInt($conversaSelecionada.attr("codigo"));
 		const tipo = $conversaSelecionada.attr("tipo");
@@ -336,7 +336,7 @@ function $GetConversasNoSidebar() {
 
 async function InicializarChat() {
 	await CarregaImagemDoUsuarioLogado();
-	InicializarInputMensagem();
+	//InicializarInputMensagem();
 	if (isMobile.any()) {
 		$btnSendMessage.addClass("btn-floating").html("<i class=\"material-icons\">send</i>")
 	} else {
@@ -368,9 +368,15 @@ async function CarregaImagemDoUsuarioLogado() {
 function InicializarInputMensagem() {
 	var element = document.getElementById("mensagem");
 	function resize() {
-		element.style.minHeight = "64px";
+		//M.textareaAutoResize($mensagem);
+
+		//element.style.minHeight = "64px";
 		//element.style.height = "auto";
-		element.style.height = `${element.scrollHeight + 20}px`;
+		//element.style.height = `${element.scrollHeight + 20}px`;
+
+		//console.log(`element.style.minHeight: ${element.style.minHeight}`);
+		//console.log(`element.scrollHeight: ${element.scrollHeight}`);
+		//console.log(`element.style.height: ${element.style.height}`);
 	}
 	/* 0-timeout to get the already changed text */
 	function delayedResize() {
@@ -391,7 +397,6 @@ function InicializarInputMensagem() {
 }
 
 async function ConexaoInterrompida() {
-	const $mensagem = $("#mensagem");
 	const $sendButton = $btnSendMessage;
 	$mensagem.attr("disabled", "disabled");
 	$sendButton.attr("disabled", "disabled");
@@ -402,7 +407,6 @@ async function ConexaoInterrompida() {
 }
 
 function ConexaoEstabelecida(estaReconectando) {
-	const $mensagem = $("#mensagem");
 	const $sendButton = $btnSendMessage;
 	$mensagem.removeAttr("disabled");
 	if ($mensagem.is(":visible")) {
@@ -550,7 +554,7 @@ function LeuMensagens(
 	const $conversaSelecionada = $GetConversaSelecionada();
 	const conversaEstaAberta = $conversaSelecionada.attr("group-name") === groupName;
 
-	if(conversa.mensagens && conversa.mensagens.length) {
+	if (conversa.mensagens && conversa.mensagens.length) {
 		conversa
 			.mensagens
 			.filter(mensagem => mensagensLidas.some(x => x.id === mensagem.id))

@@ -60,6 +60,6 @@
 	word-break: break-word;
 }
 
-/*#mensagem {
-	height: fit-content;
-}*/
+#mensagem {
+	min-height: 64px;
+}
