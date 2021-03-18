@@ -12,7 +12,7 @@ let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
 var estouDigitando = false;
-var timeOutReconexao = 1000
+var timeOutReconexao = 1000;
 
 $(() => {
 	CarregarConversas();
@@ -369,7 +369,7 @@ function InicializarInputMensagem() {
 	var element = document.getElementById("mensagem");
 	function resize() {
 		element.style.minHeight = "64px";
-		element.style.height = "auto";
+		//element.style.height = "auto";
 		element.style.height = `${element.scrollHeight + 20}px`;
 	}
 	/* 0-timeout to get the already changed text */
