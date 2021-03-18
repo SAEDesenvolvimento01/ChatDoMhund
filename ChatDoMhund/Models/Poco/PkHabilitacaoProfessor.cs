@@ -8,6 +8,7 @@
 		public int CodigoDaMateria { get; set; }
 		public string DescricaoDoCurso { get; set; }
 		public string NomeDaFase { get; set; }
+		public string Ano { get; set; }
 
 		public override string ToString()
 		{

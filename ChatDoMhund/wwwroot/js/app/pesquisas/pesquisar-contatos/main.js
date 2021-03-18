@@ -14,74 +14,91 @@
 		}).Start());
 
 		if (response.Status()) {
-			this._modal = new SaeMaterialModal({
-				id: "modal-pesquisar-contatos",
-				html: response.View(),
-				overflowElementSelector: "#modal-pesquisar-contatos .modal-body [lista-usuarios-para-conversar]",
-				maxHeight: 60
-			});
-
-			this._modal.Create();
-
-			//espero um tempo antes de calcular as alturas. 
-			//alguns elementos aumentam o tamanho no celular, porque quebram linha por falta de espaço
-			await sleep(1000);
-			const $modal = $("#modal-pesquisar-contatos");
-			const alguraDoModalHeader = $modal
-				.find(".modal-header")
-				.outerHeight();
-			const alturaDoModalFooter = $modal
-				.find(".modal-footer")
-				.outerHeight();
-			const alturaDoFiltro = $modal.find("#filtro-pesquisa-usuarios")
-				.outerHeight();
-
-			const paddingTopAndBottomDaModalContent = 24 + 24;
-
-			const espacoUtil = innerHeight -
-				alguraDoModalHeader -
-				alturaDoModalFooter -
-				alturaDoFiltro -
-				paddingTopAndBottomDaModalContent;
-
-			$modal.find("[lista-usuarios-para-conversar]")
-				.css("max-height", `${espacoUtil}px`);
-
-			const $cursoEFase = $("#CursoEFase");
-			$cursoEFase
-				.on("change", async () => {
-					const cursoEFaseSelecionado = $cursoEFase.val();
-					sessionStorage.setItem("cursoEFaseSelecionado", cursoEFaseSelecionado);
-					await this.AtualizarLista(true);
+			let $modal = $("#modal-pesquisar-contatos");
+			if (!$modal.length) {
+				this._modal = new SaeMaterialModal({
+					id: "modal-pesquisar-contatos",
+					html: response.View(),
+					overflowElementSelector: "#modal-pesquisar-contatos .modal-body [lista-usuarios-para-conversar]",
+					maxHeight: 60,
+					removeAoFechar: false
 				});
 
-			const cursoEFaseSelecionado = sessionStorage.getItem("cursoEFaseSelecionado");
-			if (cursoEFaseSelecionado) {
+				this._modal.Create();
+
+				//espero um tempo antes de calcular as alturas. 
+				//alguns elementos aumentam o tamanho no celular, porque quebram linha por falta de espaço
+				await sleep(1000);
+				$modal = $("#modal-pesquisar-contatos");
+				const alguraDoModalHeader = $modal
+					.find(".modal-header")
+					.outerHeight();
+				const alturaDoModalFooter = $modal
+					.find(".modal-footer")
+					.outerHeight();
+				const alturaDoFiltro = $modal.find("#filtro-pesquisa-usuarios")
+					.outerHeight();
+
+				const paddingTopAndBottomDaModalContent = 24 + 24;
+
+				const espacoUtil = innerHeight -
+					alguraDoModalHeader -
+					alturaDoModalFooter -
+					alturaDoFiltro -
+					paddingTopAndBottomDaModalContent;
+
+				$modal.find("[lista-usuarios-para-conversar]")
+					.css("max-height", `${espacoUtil}px`);
+
+				const $cursoEFase = $("#CursoEFase");
 				$cursoEFase
-					.val(cursoEFaseSelecionado)
-					.formSelect();
-			}
+					.on("change",
+						async () => {
+							const cursoEFaseSelecionado = $cursoEFase.val();
+							sessionStorage.setItem("cursoEFaseSelecionado", cursoEFaseSelecionado);
+							await this.AtualizarLista(true);
+						});
 
-			$(this.GetTiposDeUsuariosSelecionadosDoStorage()).each((i, tipo) => {
-				const $item = $(`[tipo-de-usuario-para-filtrar="${tipo}"]`);
-
-				if ($item.length) {
-					this.SelecionouTipo($item);
+				const cursoEFaseSelecionado = sessionStorage.getItem("cursoEFaseSelecionado");
+				if (cursoEFaseSelecionado) {
+					$cursoEFase
+						.val(cursoEFaseSelecionado)
+						.formSelect();
 				}
-			});
 
-			$("[tipo-de-usuario-para-filtrar]").on("click", async event => {
-				const $elemento = $(event.target);
-				if ($elemento.is("[selecionado]")) {
-					this.CancelouSelecaoDeTipo($elemento);
-				} else {
-					this.SelecionouTipo($elemento);
-				}
+				$(this.GetTiposDeUsuariosSelecionadosDoStorage())
+					.each((i, tipo) => {
+						const $item = $(`[tipo-de-usuario-para-filtrar="${tipo}"]`);
+
+						if ($item.length) {
+							this.SelecionouTipo($item);
+						}
+					});
+
+				$("[tipo-de-usuario-para-filtrar]")
+					.on("click",
+						async event => {
+							const $elemento = $(event.target);
+							if ($elemento.is("[selecionado]")) {
+								this.CancelouSelecaoDeTipo($elemento);
+							} else {
+								this.SelecionouTipo($elemento);
+							}
+							
+							$("[tipo-de-usuario-para-filtrar]").not($elemento).each((i, item) => {
+								const $item = $(item);
+								this.CancelouSelecaoDeTipo($item);
+							})
+
+							await this.AtualizarLista();
+						});
 
 				await this.AtualizarLista();
-			});
-
-			await this.AtualizarLista();
+			} else {
+				this._modal = new SaeMaterialModal({
+					id: "modal-pesquisar-contatos"
+				}).Open();
+			}
 		} else {
 			await response.Swal();
 		}
@@ -192,7 +209,7 @@
 				}
 			}
 
-			const $cardNenhumUsuario = $("#card-nenhum-usuario").hide(600);
+			const $cardNenhumUsuario = $("#card-nenhum-usuario").hide();
 			$divLista.find("[selecionar-para-conversar]")
 				.on("click",
 					async event => {
@@ -249,17 +266,15 @@
 					}
 					else {
 						$(selector)
-							.hide(600);
+							.hide();
 					}
 				});
 
-			await sleep(1000);
-
 			if (!$("[selecionar-para-conversar]:visible").length) {
 				$cardNenhumUsuario
-					.show(600);
+					.show();
 			} else {
-				$cardNenhumUsuario.hide(600);
+				$cardNenhumUsuario.hide();
 			}
 		} else {
 			new MaterialToast({ html: "Selecione ao menos um tipo de usuário para buscar!" }).Show();

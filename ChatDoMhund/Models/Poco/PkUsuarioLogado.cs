@@ -27,13 +27,14 @@ namespace ChatDoMhund.Models.Poco
             this.OrigemDeChat = origemDeChat;
         }
 
-        public void SetRelacaoComAluno(int codigoDoAluno, string tipoDeRelacao)
+        public void SetRelacaoComAluno(int codigoDoAluno, string nomeDoAluno, string tipoDeRelacao)
         {
             if (this.TipoDeUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
             {
                 this.RelacaoComAluno = new PkUsuarioLogadoRelacaoComAluno
                 {
                     CodigoDoAluno = codigoDoAluno,
+                    NomeDoAluno = nomeDoAluno,
                     TipoDeRelacao = tipoDeRelacao
                 };
             }
