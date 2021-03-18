@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ChatDoMhund.Models.Enum;
 
 namespace ChatDoMhund.Hubs
 {
@@ -43,6 +44,7 @@ namespace ChatDoMhund.Hubs
 			string codigoDoCliente = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente);
 			string tipoDeUsuarioOrigem = this._saeHelperCookie.GetCookie(ECookie.TipoUsuario);
 			string codigoDoUsuarioOrigem = this._saeHelperCookie.GetCookie(ECookie.CodigoDoUsuario);
+			string origem = this._saeHelperCookie.GetCookie(EChatCookie.OrigemDeChat.ToString());
 			groupNameDestino.Split("-");
 			this._groupBuilder.DismantleGroupName(groupNameDestino,
 				out int codigoDoClienteDestino,
@@ -57,7 +59,8 @@ namespace ChatDoMhund.Hubs
 				Lido = false,
 				TextMens = message,
 				TipoDestino = tipoDoUsuarioDestino,
-				TipoOrigem = tipoDeUsuarioOrigem
+				TipoOrigem = tipoDeUsuarioOrigem,
+				OrigemLcto = origem
 			};
 
 			if (chatProfess.IsValid())
