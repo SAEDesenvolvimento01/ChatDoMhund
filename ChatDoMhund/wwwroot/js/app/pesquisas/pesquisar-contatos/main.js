@@ -47,12 +47,20 @@
 			$modal.find("[lista-usuarios-para-conversar]")
 				.css("max-height", `${espacoUtil}px`);
 
-
-
-			$("#CursoEFase")
+			const $cursoEFase = $("#CursoEFase");
+			$cursoEFase
 				.on("change", async () => {
+					const cursoEFaseSelecionado = $cursoEFase.val();
+					sessionStorage.setItem("cursoEFaseSelecionado", cursoEFaseSelecionado);
 					await this.AtualizarLista(true);
 				});
+
+			const cursoEFaseSelecionado = sessionStorage.getItem("cursoEFaseSelecionado");
+			if (cursoEFaseSelecionado) {
+				$cursoEFase
+					.val(cursoEFaseSelecionado)
+					.formSelect();
+			}
 
 			$(this.GetTiposDeUsuariosSelecionadosDoStorage()).each((i, tipo) => {
 				const $item = $(`[tipo-de-usuario-para-filtrar="${tipo}"]`);
@@ -139,6 +147,9 @@
 	}
 
 	async AtualizarLista(forcarAtualizacao = false) {
+		if (forcarAtualizacao) {
+			sessionStorage.setItem("viewContatos", "");
+		}
 		const form = {
 			CursoEFase: $("#CursoEFase").val(),
 			TiposSelecionados: new Array()
@@ -157,7 +168,7 @@
 
 		if (form.TiposSelecionados.length) {
 			let view = sessionStorage.getItem("viewContatos");
-			if (view && !forcarAtualizacao) {
+			if (view /*&& !forcarAtualizacao*/) {
 				if (!$divLista.html()) {
 					$divLista.html(view);
 				}
@@ -181,6 +192,7 @@
 				}
 			}
 
+			const $cardNenhumUsuario = $("#card-nenhum-usuario").hide(600);
 			$divLista.find("[selecionar-para-conversar]")
 				.on("click",
 					async event => {
@@ -240,6 +252,15 @@
 							.hide(600);
 					}
 				});
+
+			await sleep(1000);
+
+			if (!$("[selecionar-para-conversar]:visible").length) {
+				$cardNenhumUsuario
+					.show(600);
+			} else {
+				$cardNenhumUsuario.hide(600);
+			}
 		} else {
 			new MaterialToast({ html: "Selecione ao menos um tipo de usuário para buscar!" }).Show();
 		}
