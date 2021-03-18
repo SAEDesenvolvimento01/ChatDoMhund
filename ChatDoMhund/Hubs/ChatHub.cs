@@ -34,6 +34,7 @@ namespace ChatDoMhund.Hubs
 			await this.Groups.AddToGroupAsync(this.Context.ConnectionId, this._groupBuilder.BuildGroupName());
 		}
 
+		//Não implementei porque não precisa, aparentemente: https://stackoverflow.com/questions/23854979/signalr-is-it-necessary-to-remove-the-connection-id-from-group-ondisconnect
 		public async Task RemoveFromGroup()
 		{
 			await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, this._groupBuilder.BuildGroupName());
