@@ -8,20 +8,21 @@
 	}
 
 	async Start() {
-		const response = new SaeResponse(await new SaeAjax({
-			url: "/PesquisarContatos/Index",
-			showLoading: true
-		}).Start());
+		let $modal = $("#modal-pesquisar-contatos");
+		if (!$modal.length) {
+			const response = new SaeResponse(await new SaeAjax({
+				url: "/PesquisarContatos/Index",
+				showLoading: true
+			}).Start());
 
-		if (response.Status()) {
-			let $modal = $("#modal-pesquisar-contatos");
-			if (!$modal.length) {
+			if (response.Status()) {
 				this._modal = new SaeMaterialModal({
 					id: "modal-pesquisar-contatos",
 					html: response.View(),
 					overflowElementSelector: "#modal-pesquisar-contatos .modal-body [lista-usuarios-para-conversar]",
 					maxHeight: 60,
-					removeAoFechar: false
+					removeAoFechar: false,
+					dismissible: true
 				});
 
 				this._modal.Create();
@@ -84,7 +85,7 @@
 							} else {
 								this.SelecionouTipo($elemento);
 							}
-							
+
 							$("[tipo-de-usuario-para-filtrar]").not($elemento).each((i, item) => {
 								const $item = $(item);
 								this.CancelouSelecaoDeTipo($item);
@@ -95,12 +96,14 @@
 
 				await this.AtualizarLista();
 			} else {
-				this._modal = new SaeMaterialModal({
-					id: "modal-pesquisar-contatos"
-				}).Open();
+				await response.Swal();
 			}
 		} else {
-			await response.Swal();
+			this._modal = new SaeMaterialModal({
+				id: "modal-pesquisar-contatos",
+				removeAoFechar: false,
+				dismissible: true
+			}).Open();
 		}
 	}
 
