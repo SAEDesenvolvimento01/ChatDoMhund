@@ -50,7 +50,7 @@
 		this._connection.on("ReceiveMessage", async mensagem => {
 			try {
 				mensagem = await this._conversas.AddMensagem(mensagem);
-				AtualizarConversa(mensagem);
+				await AtualizarConversa(mensagem);
 			} catch (e) {
 				console.error(e);
 			}

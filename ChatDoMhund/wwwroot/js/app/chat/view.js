@@ -25,7 +25,22 @@ $btnSendMessage.on("click", function (event) {
 	SendMessage();
 });
 
-function AtualizarConversa(mensagem = new Mensagem()) {
+async function AtualizarConversa(mensagem = new Mensagem()) {
+	let groupName;
+	const usuarioLogadoQueEnviou = groupNameUsuarioLogado === mensagem.groupNameOrigem;
+	if (usuarioLogadoQueEnviou) {
+		groupName = mensagem.groupNameDestino;
+	} else {
+		groupName = mensagem.groupNameOrigem;
+	}
+	const $conversa = $GetConversasNoSidebar().filter(`[group-name="${groupName}"]`);
+	//Se a conversa não for a primeira, removo e adiciono novamente para o primeiro lugar da lista
+	if ($conversa.length && $GetConversasNoSidebar().first().attr("group-name") !== groupName) {
+		const html = $conversa.clone();
+		$conversa.remove();
+		$(".chat-list").prepend(html);
+	}
+
 	const $conversaSelecionada = $GetConversaSelecionada();
 	const listaDeConversas = conversas.GetConversas();
 	if ($conversaSelecionada.length) {
@@ -34,22 +49,10 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		InserirMensagensNoChat(conversa);
 		hub.AbriuConversa(conversa.groupName);
 	} else {
-		const usuarioLogadoQueEnviou = groupNameUsuarioLogado === mensagem.groupNameOrigem;
-		let groupName;
-		if (usuarioLogadoQueEnviou) {
-			groupName = mensagem.groupNameDestino;
-		} else {
-			groupName = mensagem.groupNameOrigem;
-		}
-
 		const conversa = listaDeConversas.find(x => x.groupName === groupName);
-
-		const $mensagensNovas = $("[conversar-com-usuario].active").find("[novas-mensagens]");
-		const mensagensNovas = parseInt($mensagensNovas.attr("novas-mensagens")) + 1;
-		$mensagensNovas.attr("novas-mensagens", mensagensNovas);
-		$mensagensNovas.html(mensagensNovas);
-
-		PlaySound("new-message");
+		if (mensagem.groupNameOrigem !== groupNameUsuarioLogado) {
+			PlaySound("new-message");
+		}
 
 		//As vezes a pessoa recém apertou enter (e desencadeou o "estou digitando")
 		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
@@ -71,7 +74,7 @@ function AtualizarConversa(mensagem = new Mensagem()) {
 		}
 	}
 
-	AtualizarListaDeConversas({});
+	await AtualizarListaDeConversas({});
 }
 
 async function SendMessage() {
@@ -292,36 +295,51 @@ async function AtualizarListaDeConversas({ ehOCarregamentoInicial = false }) {
 	        </div>`);
 				}
 
-				let mensagens = conversa.mensagens;
-				let quantidadeDeMensagensNaoLidas;
-				if (mensagens) {
-					quantidadeDeMensagensNaoLidas = mensagens.filter(x => x.groupNameOrigem !== groupNameUsuarioLogado && !x.lida)
-						.length;
-				} else {
-					quantidadeDeMensagensNaoLidas = 0;
-				}
-				const $quantidadeDeMensagensNaoLidas = $GetConversaNoSidebar(conversa)
-					.find(`span[novas-mensagens]`);
-
-				if (quantidadeDeMensagensNaoLidas) {
-					$quantidadeDeMensagensNaoLidas
-						.attr("novas-mensagens", quantidadeDeMensagensNaoLidas)
-						.html(quantidadeDeMensagensNaoLidas)
-						.show(600);
-				} else {
-					$quantidadeDeMensagensNaoLidas
-						.attr("novas-mensagens", 0)
-						.html("")
-						.hide(600);
-				}
+				AtualizaIconeDeMensagensNaoLidas({ conversa: conversa });
+				AtualizaHoraDaUltimaMensagem({ conversa: conversa });
 			});
 		$mensagemNenhumaConversa
-			.hide(600);
+			.hide();
 		$("#no-data-found")
-			.hide(600);
+			.hide();
 	} else {
 		$mensagemNenhumaConversa
-			.show(600);
+			.show();
+	}
+}
+
+function AtualizaHoraDaUltimaMensagem({ conversa: conversa }) {
+	const $dataDaUltimaMensagem = $GetConversaNoSidebar(conversa)
+		.find(`span[data-da-ultima-mensagem]`);
+
+	$dataDaUltimaMensagem.attr("data-da-ultima-mensagem", conversa.dataDaUltimaMensagem).html(conversa.dataDaUltimaMensagem);
+}
+
+function AtualizaIconeDeMensagensNaoLidas({ conversa = new Conversa() }) {
+	const mensagens = conversa.mensagens;
+	let quantidadeDeMensagensNaoLidas;
+	if (mensagens) {
+		quantidadeDeMensagensNaoLidas = mensagens.filter(x => x.groupNameOrigem !== groupNameUsuarioLogado && !x.lida)
+			.length;
+	} else {
+		quantidadeDeMensagensNaoLidas = 0;
+	}
+	const $quantidadeDeMensagensNaoLidas = $GetConversaNoSidebar(conversa)
+		.find(`span[novas-mensagens]`);
+
+	if (quantidadeDeMensagensNaoLidas) {
+		if (quantidadeDeMensagensNaoLidas >= 10) {
+			quantidadeDeMensagensNaoLidas = "9+";
+		}
+		$quantidadeDeMensagensNaoLidas
+			.attr("novas-mensagens", quantidadeDeMensagensNaoLidas)
+			.html(quantidadeDeMensagensNaoLidas)
+			.show();
+	} else {
+		$quantidadeDeMensagensNaoLidas
+			.attr("novas-mensagens", 0)
+			.html("")
+			.hide();
 	}
 }
 
@@ -547,6 +565,9 @@ function LeuMensagens(
 					}
 				}
 			});
+
+		AtualizaIconeDeMensagensNaoLidas({ conversa: conversa });
+		AtualizaHoraDaUltimaMensagem({ conversa: conversa });
 	}
 
 	conversas.SetConversas(listaDeConversas);

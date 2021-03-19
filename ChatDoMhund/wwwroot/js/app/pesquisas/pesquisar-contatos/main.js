@@ -191,7 +191,7 @@
 				}
 			}
 			else {
-				$divLista.html(new MaterialLoading().GetCircularLoading());
+				//$divLista.html(new MaterialLoading().GetCircularLoading());
 				const response = new SaeResponse(await new SaeAjax({
 					type: "post",
 					url: "/PesquisarContatos/AtualizarLista",
