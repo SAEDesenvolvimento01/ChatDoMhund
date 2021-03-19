@@ -48,6 +48,9 @@
 				}
 
 				conversa.mensagens.push(mensagem);
+				const date = new Date(mensagem.dataDaMensagem);
+
+				conversa.dataDaUltimaMensagem = `${date.getHours()}:${date.getMinutes()}`;
 			} else {
 				const response = new SaeResponse(await new SaeAjax({
 					url: "/Chat/GetUsuarioParaConversa",
