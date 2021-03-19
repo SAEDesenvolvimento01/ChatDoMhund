@@ -7,7 +7,21 @@
 	codigoDaEscola = 0;
 	groupName = "";
 	dataDaUltimaMensagem = "";
-	mensagens = new Array();
+	mensagens = [];
+
+	constructor(conversa) {
+		if (conversa) {
+			this.nome = conversa.nome;
+			this.foto = conversa.foto;
+			this.status = conversa.status;
+			this.codigo = conversa.codigo;
+			this.tipo = conversa.tipo;
+			this.codigoDaEscola = conversa.codigoDaEscola;
+			this.groupName = conversa.groupName;
+			this.dataDaUltimaMensagem = conversa.dataDaUltimaMensagem;
+			this.mensagens = conversa.mensagens;
+		}
+	}
 
 	Build({ $conversa, conversas }) {
 		if ($conversa && $mensagem.length) {
@@ -34,5 +48,11 @@
 		}
 
 		return this;
+	}
+
+	EstaSelecionada() {
+		const $conversaNoSidebar = $GetConversaNoSidebar(this);
+
+		return $conversaNoSidebar.hasClass("active");
 	}
 }

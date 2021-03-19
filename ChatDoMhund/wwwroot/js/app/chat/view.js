@@ -3,6 +3,7 @@ const $mensagem = $("#mensagem");
 let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
+const chatToast = new ChatToast();
 var estouDigitando = false;
 var timeOutReconexao = 1000;
 
@@ -40,12 +41,10 @@ async function AtualizarConversa(mensagem = new Mensagem()) {
 		$conversa.remove();
 		$(".chat-list").prepend(html);
 	}
-
-	const $conversaSelecionada = $GetConversaSelecionada();
+	
 	const listaDeConversas = conversas.GetConversas();
-	if ($conversaSelecionada.length) {
-		const groupNameDestino = $conversaSelecionada.attr("group-name");
-		const conversa = listaDeConversas.find(x => x.groupName === groupNameDestino);
+	const conversa = listaDeConversas.find(x => x.groupName === groupName);
+	if (conversa.EstaSelecionada()) {
 		InserirMensagensNoChat(conversa);
 		hub.AbriuConversa(conversa.groupName);
 	} else {
@@ -57,20 +56,8 @@ async function AtualizarConversa(mensagem = new Mensagem()) {
 		//As vezes a pessoa recém apertou enter (e desencadeou o "estou digitando")
 		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
 		NaoEstaMaisDigitando(conversa);
-
 		if (!usuarioLogadoQueEnviou) {
-			const mensagens = conversa.mensagens;
-			if (mensagens.length) {
-				const ultimaMensagem = mensagens[mensagens.length - 1];
-				let texto = ultimaMensagem.texto;
-				if (texto) {
-					if (texto.length > 10) {
-						texto = texto.subString(0, 9);
-					}
-
-					new MaterialToast({ html: `${conversa.nome}: ${texto}` }).Show();
-				}
-			}
+			chatToast.NotificaMensagem(conversa);
 		}
 	}
 
@@ -235,7 +222,7 @@ async function CarregarConversas() {
 		$(response.Content())
 			.each((i, conversa) => {
 				if (conversa) {
-					listaDeConversas.push(conversa);
+					listaDeConversas.push(new Conversa(conversa));
 				}
 			});
 
@@ -387,7 +374,7 @@ async function ConexaoInterrompida() {
 	const $sendButton = $btnSendMessage;
 	$mensagem.attr("disabled", "disabled");
 	$sendButton.attr("disabled", "disabled");
-	new MaterialToast({ html: "Reconectando..." }).Show();
+	chatToast.Reconectando();
 	await sleep(timeOutReconexao += 1000);
 	const estaReconectando = true;
 	hub = new Hub().Inicializar(estaReconectando);
@@ -401,7 +388,7 @@ function ConexaoEstabelecida(estaReconectando) {
 	}
 	$sendButton.removeAttr("disabled");
 	if (estaReconectando) {
-		new MaterialToast({ html: "Conexão estabelecida novamente." }).Show();
+		chatToast.Reconectado();
 	}
 }
 

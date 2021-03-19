@@ -7,7 +7,11 @@
 		let conversas = new Array(new Conversa());
 
 		if (conversasJson) {
-			conversas = JSON.parse(conversasJson);
+			conversas = new Array();
+			$(JSON.parse(conversasJson))
+				.each((i, conversa) => {
+					conversas.push(new Conversa(conversa));
+				});
 		}
 
 		return conversas;
@@ -22,6 +26,7 @@
 	AddConversa(conversa = new Conversa()) {
 		const conversas = this.GetConversas();
 
+		//Adiciona uma nova conversa no inicio da array
 		conversas.unshift(conversa);
 
 		this.SetConversas(conversas);
@@ -50,7 +55,9 @@
 				conversa.mensagens.push(mensagem);
 				const date = new Date(mensagem.dataDaMensagem);
 
-				conversa.dataDaUltimaMensagem = `${date.getHours()}:${date.getMinutes()}`;
+				const hours = ConverteToLocaleString(date.getHours());
+				const minutes = ConverteToLocaleString(date.getMinutes());
+				conversa.dataDaUltimaMensagem = `${hours}:${minutes}`;
 			} else {
 				const response = new SaeResponse(await new SaeAjax({
 					url: "/Chat/GetUsuarioParaConversa",
