@@ -250,28 +250,19 @@
 						}
 					});
 
-			const tipoProfessorCoordenador = "PR";
+			const listaDeTiposDeProfessor = ["PR", "CO"];
 
-			$("[tipo-de-usuario-para-filtrar]")
-				.each((i, item) => {
-					const $tipo = $(item);
-					const tipo = $tipo.attr("tipo-de-usuario-para-filtrar");
+			const $tipoSelecionado = $("[tipo-de-usuario-para-filtrar][selecionado]");
+			const tipo = $tipoSelecionado.attr("tipo-de-usuario-para-filtrar");
+			let selector = "[selecionar-para-conversar]";
+			if (listaDeTiposDeProfessor.includes(tipo)) {
+				selector += `[tipo-de-professor="${tipo}"]`
+			} else {
+				selector += `[tipo="${tipo}"]`;
+			}
 
-					let selector = "[selecionar-para-conversar]";
-					if (tipo === tipoProfessorCoordenador) {
-						selector += `[tipo-de-professor="${tipo}"]`
-					} else {
-						selector += `[tipo="${tipo}"]`;
-					}
-					if ($tipo.is("[selecionado]")) {
-						$(selector)
-							.show();
-					}
-					else {
-						$(selector)
-							.hide();
-					}
-				});
+			$(`[selecionar-para-conversar]${selector}`).show();
+			$(`[selecionar-para-conversar]:not(${selector})`).hide();
 
 			if (!$("[selecionar-para-conversar]:visible").length) {
 				$cardNenhumUsuario

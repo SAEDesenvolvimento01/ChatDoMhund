@@ -13,6 +13,7 @@ using HelperSaeStandard11.Models.Infra;
 using HelperSaeStandard11.Models.Tratamento;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using HelperMhundCore31.Data.Entity.Models;
 
