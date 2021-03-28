@@ -1,12 +1,12 @@
-﻿using System;
-using ChatDoMhund.Data.Repository.Abstract;
+﻿using ChatDoMhund.Data.Repository.Abstract;
+using ChatDoMhund.Models.Poco;
 using HelperMhundCore31.Data.Entity.Models;
 using HelperMhundCore31.Data.Entity.Partials;
 using HelperSaeStandard11.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ChatDoMhund.Models.Poco;
 
 namespace ChatDoMhund.Data.Repository
 {
@@ -20,29 +20,99 @@ namespace ChatDoMhund.Data.Repository
 			int codigoDoUsuario,
 			string tipoDoUsuario)
 		{
-			List<ChatProfess> mensagens = this
-				._db
-				.ChatProfess
-				.Where(x =>
-					(x.IdDestino == codigoDoUsuario && x.TipoDestino == tipoDoUsuario) ||
-					(x.IdOrigem == codigoDoUsuario && x.TipoOrigem == tipoDoUsuario))
-				.OrderBy(x => x.DtMensagem)
+			//PR 123
+			//AL 456 RE 789
+			var pessoas = (from mensagem in this
+						._db
+						.ChatProfess
+						.Where(x =>
+							(x.IdDestino == codigoDoUsuario && x.TipoDestino == tipoDoUsuario) ||
+							(x.IdOrigem == codigoDoUsuario && x.TipoOrigem == tipoDoUsuario))
+						   let usuarioDoParametroEhOrigem =
+							   codigoDoUsuario == mensagem.IdOrigem && tipoDoUsuario == mensagem.TipoOrigem
+						   select new
+						   {
+							   mensagem.Id,
+							   idDaOutraPessoa = usuarioDoParametroEhOrigem
+								   ? mensagem.IdDestino
+								   : mensagem.IdOrigem,
+							   tipoDaOutraPessoa = usuarioDoParametroEhOrigem
+								   ? mensagem.TipoDestino
+								   : mensagem.TipoOrigem,
+							   data = mensagem.DtMensagem
+						   })
+				//.ToList()
+				//.DistinctBy(x => new
+				//{
+				//	x.idDaOutraPessoa,
+				//	x.tipoDaOutraPessoa
+				//})
 				.ToList();
-			return mensagens;
+
+			var mensagensDasPessoas = pessoas.GroupBy(x => new
+			{
+				x.idDaOutraPessoa,
+				x.tipoDaOutraPessoa
+			}, (pessoa, mensagens) => mensagens
+					.OrderByDescending(x => x.data)
+					.Select(x => x.Id)
+					.Take(10)
+					.ToList())
+				.ToList();
+
+			List<int> ids = this.JuntarMensagensEmUmaListaSo(mensagensDasPessoas).ToList();
+
+			return this._db.ChatProfess.Where(x => ids.Contains(x.Id)).ToList();
 		}
 
-		public SaeResponseRepository<List<ChatProfess>> GetMensagens(
-			int codigoDoUsuario1,
+		private IEnumerable<int> JuntarMensagensEmUmaListaSo(List<List<int>> mensagensDasPessoas)
+		{
+			foreach (List<int> mensagensDaPessoa in mensagensDasPessoas)
+			{
+				foreach (int mensagemDaPessoa in mensagensDaPessoa)
+				{
+					yield return mensagemDaPessoa;
+				}
+			}
+		}
+
+		//public List<ChatProfess> GetMensagensDoUsuario(
+		//	int codigoDoUsuario,
+		//	string tipoDoUsuario)
+		//{
+		//	List<ChatProfess> mensagens = this
+		//		._db
+		//		.ChatProfess
+		//		.Where(x =>
+		//			(x.IdDestino == codigoDoUsuario && x.TipoDestino == tipoDoUsuario) ||
+		//			(x.IdOrigem == codigoDoUsuario && x.TipoOrigem == tipoDoUsuario))
+		//		.OrderBy(x => x.DtMensagem)
+		//		.ToList();
+		//	return mensagens;
+		//}
+
+		public SaeResponseRepository<List<ChatProfess>> GetMensagens(int codigoDoUsuario1,
 			string tipoDoUsuario1,
 			int codigoDoUsuario2,
-			string tipoDoUsuario2)
+			string tipoDoUsuario2, int codigoDaPrimeiraMensagemNoChat)
 		{
-			List<ChatProfess> lista = this
+			IQueryable<ChatProfess> query = this
 				.GetMensagensAsQueryable(
 					codigoDoUsuario1,
 					tipoDoUsuario1,
 					codigoDoUsuario2,
-					tipoDoUsuario2).ToList();
+					tipoDoUsuario2);
+
+			if (codigoDaPrimeiraMensagemNoChat > 0)
+			{
+				query = query
+					.Where(x => x.Id < codigoDaPrimeiraMensagemNoChat)
+					.OrderByDescending(x => x.DtMensagem)
+					.Take(10);
+			}
+
+
+			List<ChatProfess> lista = query.ToList();
 
 			return new SaeResponseRepository<List<ChatProfess>>(lista?.Any() ?? false, lista);
 		}

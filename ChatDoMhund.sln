@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatDoMhund", "ChatDoMhund\ChatDoMhund.csproj", "{A9E06B86-A544-44BD-8159-1A9612CCDE22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatDoMhundStandard", "ChatDoMhundStandard\ChatDoMhundStandard.csproj", "{11E99480-240A-4472-B5CB-15D8103FA831}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatDoMhundStandard", "ChatDoMhundStandard\ChatDoMhundStandard.csproj", "{11E99480-240A-4472-B5CB-15D8103FA831}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatDoMhundConsole", "ChatDoMhundConsole\ChatDoMhundConsole.csproj", "{39DB0F47-4D58-4736-82C6-DB16D461113F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{11E99480-240A-4472-B5CB-15D8103FA831}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11E99480-240A-4472-B5CB-15D8103FA831}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11E99480-240A-4472-B5CB-15D8103FA831}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39DB0F47-4D58-4736-82C6-DB16D461113F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39DB0F47-4D58-4736-82C6-DB16D461113F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39DB0F47-4D58-4736-82C6-DB16D461113F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39DB0F47-4D58-4736-82C6-DB16D461113F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,6 +8,7 @@
 	groupName = "";
 	dataDaUltimaMensagem = "";
 	mensagens = [];
+	carregouTodasAsMensagens = false;
 
 	constructor(conversa) {
 		if (conversa) {
@@ -20,6 +21,7 @@
 			this.groupName = conversa.groupName;
 			this.dataDaUltimaMensagem = conversa.dataDaUltimaMensagem;
 			this.mensagens = conversa.mensagens;
+			this.carregouTodasAsMensagens = conversa.carregouTodasAsMensagens;
 		}
 	}
 
@@ -39,7 +41,8 @@
 			this.dataDaUltimaMensagem = $conversa
 				.find("[data-da-ultima-mensagem]")
 				.attr("data-da-ultima-mensagem");
-
+			this.carregouTodasAsMensagens = $conversa
+				.is("[carregou-todas-as-conversas]");
 		}
 
 		if (conversas) {

@@ -32,7 +32,7 @@
 		this.SetConversas(conversas);
 	}
 
-	async AddMensagem(mensagem = new Mensagem()) {
+	async AddMensagem(mensagem = new Mensagem(), estaCarregandoMaisMensagens = false) {
 		const listaConversas = this.GetConversas();
 		if (listaConversas) {
 			let groupName = "";
@@ -52,7 +52,14 @@
 					conversa.mensagens = new Array();
 				}
 
-				conversa.mensagens.push(mensagem);
+				let acao;
+				if (estaCarregandoMaisMensagens) {
+					acao = "unshift";
+				} else {
+					acao = "push";
+				}
+
+				conversa.mensagens[acao](mensagem);
 				const date = new Date(mensagem.dataDaMensagem);
 
 				const hours = ConverteToLocaleString(date.getHours());

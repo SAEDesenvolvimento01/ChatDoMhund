@@ -27,4 +27,26 @@
 
 		return response;
 	}
+
+	async BuscarMaisMensagens({
+		groupName = "",
+		codigoDaPrimeiraMensagemNoChat = 0
+	}) {
+		const materialLoading = new MaterialLoading();
+		materialLoading.StartMaterialLoading();
+		const response = new SaeResponse(await new SaeAjax({
+			url: "/Chat/GetMensagens",
+			data: {
+				groupName: groupName,
+				codigoDaPrimeiraMensagemNoChat: codigoDaPrimeiraMensagemNoChat
+			},
+			showLoading: false
+		}).Start());
+		materialLoading.EndMaterialLoading();
+		if (!response.Status()) {
+			await response.Swal();
+		}
+
+		return response;
+	}
 }
