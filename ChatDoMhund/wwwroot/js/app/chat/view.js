@@ -457,9 +457,16 @@ $mensagem.on("focus", () => {
 function EstaDigitando(groupName) {
 	const conversa = conversas.GetConversas().find(x => x.groupName === groupName);
 	if (conversa) {
+		const estaDigitando = "Está digitando...";
 		$GetConversaNoSidebar(conversa)
 			.find("[status]")
-			.html("Está digitando...");
+			.html(estaDigitando);
+
+		
+		if (conversa.EstaSelecionada()) {
+			const $statusNoChat = $(".chat-header [status-da-conversa]");
+			$statusNoChat.html(`${$statusNoChat.attr("status-da-conversa")}: ${estaDigitando}`);
+		}
 
 		setTimeout(() => {
 			NaoEstaMaisDigitando(conversa);
@@ -468,9 +475,12 @@ function EstaDigitando(groupName) {
 }
 
 function NaoEstaMaisDigitando(conversa) {
-	const $status = $GetConversaNoSidebar(conversa).find("[status]");
+	const $statusNoSidebar = $GetConversaNoSidebar(conversa).find("[status]");
 
-	$status.html($status.attr("status"));
+	$statusNoSidebar.html($statusNoSidebar.attr("status"));
+
+	const $statusNoChat = $(".chat-header [status-da-conversa]");
+	$statusNoChat.html($statusNoChat.attr("status-da-conversa"));
 }
 
 $("#chat-filter").on("keyup", () => {
