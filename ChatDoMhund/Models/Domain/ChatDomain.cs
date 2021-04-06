@@ -133,14 +133,15 @@ namespace ChatDoMhund.Models.Domain
 			return destinatarios;
 		}
 
-		public List<ChatProfess> GetMensagens(PkUsuarioConversa conversa)
+		public List<ChatProfess> GetMensagens(PkUsuarioConversa conversa, int codigoDaPrimeiraMensagemNoChat = 0)
 		{
 			this._usuarioLogado.GetUsuarioLogado();
 			return this._chatProfessRepository.GetMensagens(
 				codigoDoUsuario1: this._usuarioLogado.Codigo,
 				tipoDoUsuario1: this._usuarioLogado.TipoDeUsuario,
 				codigoDoUsuario2: conversa.Codigo,
-				tipoDoUsuario2: conversa.Tipo).Content;
+				tipoDoUsuario2: conversa.Tipo,
+				codigoDaPrimeiraMensagemNoChat: codigoDaPrimeiraMensagemNoChat).Content;
 		}
 
 		public string LimparTodasAsMensagens()

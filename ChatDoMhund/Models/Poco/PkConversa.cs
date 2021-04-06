@@ -25,7 +25,7 @@ namespace ChatDoMhund.Models.Poco
 
 		}
 
-		public PkConversa(PkUsuarioConversa usuario, List<ChatProfess> mensagensDoUsuario, int codigoDaEscola, GroupBuilder groupBuilder)
+		public PkConversa(PkUsuarioConversa usuario, List<ChatProfess> mensagensDoUsuario, int codigoDoCliente, GroupBuilder groupBuilder, bool deveOrdenar = true)
 		{
 			this.Codigo = usuario.Codigo;
 			this.Nome = usuario.Nome.GetPrimeiroEUltimoNome();
@@ -37,9 +37,18 @@ namespace ChatDoMhund.Models.Poco
 				this.Status = TipoDeUsuarioDoChatTrata.TipoExtenso(this.Tipo);
 			}
 
-			this.CodigoDaEscola = codigoDaEscola;
-			this.GroupName = groupBuilder.BuildGroupName(codigoDaEscola, usuario.Tipo, usuario.Codigo);
-			this.Mensagens = mensagensDoUsuario.Select(mensagem => new PkMensagem(mensagem, groupBuilder, codigoDaEscola)).ToList();
+			this.CodigoDaEscola = codigoDoCliente;
+			this.GroupName = groupBuilder.BuildGroupName(codigoDoCliente, usuario.Tipo, usuario.Codigo);
+			this.Mensagens = mensagensDoUsuario
+				.Select(mensagem => new PkMensagem(mensagem, groupBuilder, codigoDoCliente))
+				.ToList();
+
+			if (deveOrdenar)
+			{
+				this.Mensagens = this.Mensagens
+					.OrderBy(x => x.DataDaMensagem)
+					.ToList();
+			}
 
 			this.SetDataDaUltimaMensagem();
 		}

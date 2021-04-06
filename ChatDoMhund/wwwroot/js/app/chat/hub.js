@@ -1,10 +1,12 @@
 ﻿class Hub {
 	_connection;
 	_conversas;
+	_chatToast;
 
 	constructor() {
 		this._connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 		this._conversas = new Conversas();
+		this._chatToast = new ChatToast();
 	}
 
 	Inicializar(estaReconectando = false) {
@@ -30,7 +32,7 @@
 			})
 			.catch((err) => {
 				if (estaReconectando) {
-					new MaterialToast({ html: "Falha ao tentar reconectar." }).Show();
+					this._chatToast.FalhaAoReconectar();
 					setTimeout(() => { ConexaoInterrompida(); }, 10000);
 				}
 				console.error(err);

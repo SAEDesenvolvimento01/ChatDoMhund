@@ -3,6 +3,7 @@ const $mensagem = $("#mensagem");
 let hub = new Hub().Inicializar();
 const chatController = new ChatController();
 const conversas = new Conversas();
+const chatToast = new ChatToast();
 var estouDigitando = false;
 var timeOutReconexao = 1000;
 
@@ -41,11 +42,9 @@ async function AtualizarConversa(mensagem = new Mensagem()) {
 		$(".chat-list").prepend(html);
 	}
 
-	const $conversaSelecionada = $GetConversaSelecionada();
 	const listaDeConversas = conversas.GetConversas();
-	if ($conversaSelecionada.length) {
-		const groupNameDestino = $conversaSelecionada.attr("group-name");
-		const conversa = listaDeConversas.find(x => x.groupName === groupNameDestino);
+	const conversa = listaDeConversas.find(x => x.groupName === groupName);
+	if (conversa.EstaSelecionada()) {
 		InserirMensagensNoChat(conversa);
 		hub.AbriuConversa(conversa.groupName);
 	} else {
@@ -57,20 +56,8 @@ async function AtualizarConversa(mensagem = new Mensagem()) {
 		//As vezes a pessoa recém apertou enter (e desencadeou o "estou digitando")
 		//Assim, eu limpo isso quando recebo a mensagem. Se ela continuar digitando, recebemos novamente o invoke disso
 		NaoEstaMaisDigitando(conversa);
-
 		if (!usuarioLogadoQueEnviou) {
-			const mensagens = conversa.mensagens;
-			if (mensagens.length) {
-				const ultimaMensagem = mensagens[mensagens.length - 1];
-				let texto = ultimaMensagem.texto;
-				if (texto) {
-					if (texto.length > 10) {
-						texto = texto.subString(0, 9);
-					}
-
-					new MaterialToast({ html: `${conversa.nome}: ${texto}` }).Show();
-				}
-			}
+			chatToast.NotificaMensagem(conversa);
 		}
 	}
 
@@ -223,8 +210,12 @@ function InserirMensagensNoChat(conversa) {
 	AtualizaScrollDaConversa();
 }
 
-function AtualizaScrollDaConversa() {
-	$(".chat-area").scrollTop($(".chat-area > .chats").height());
+function AtualizaScrollDaConversa(pixelsEmRelacaoAoTopo) {
+	if (!pixelsEmRelacaoAoTopo) {
+		pixelsEmRelacaoAoTopo = $(".chat-area > .chats").height();
+	}
+	$(".chat-area").scrollTop(pixelsEmRelacaoAoTopo);
+	//console.log(`Scroll atualizado para ${pixelsEmRelacaoAoTopo} px`);
 }
 
 async function CarregarConversas() {
@@ -235,7 +226,7 @@ async function CarregarConversas() {
 		$(response.Content())
 			.each((i, conversa) => {
 				if (conversa) {
-					listaDeConversas.push(conversa);
+					listaDeConversas.push(new Conversa(conversa));
 				}
 			});
 
@@ -387,7 +378,7 @@ async function ConexaoInterrompida() {
 	const $sendButton = $btnSendMessage;
 	$mensagem.attr("disabled", "disabled");
 	$sendButton.attr("disabled", "disabled");
-	new MaterialToast({ html: "Reconectando..." }).Show();
+	chatToast.Reconectando();
 	await sleep(timeOutReconexao += 1000);
 	const estaReconectando = true;
 	hub = new Hub().Inicializar(estaReconectando);
@@ -401,7 +392,7 @@ function ConexaoEstabelecida(estaReconectando) {
 	}
 	$sendButton.removeAttr("disabled");
 	if (estaReconectando) {
-		new MaterialToast({ html: "Conexão estabelecida novamente." }).Show();
+		chatToast.Reconectado();
 	}
 }
 
@@ -466,9 +457,16 @@ $mensagem.on("focus", () => {
 function EstaDigitando(groupName) {
 	const conversa = conversas.GetConversas().find(x => x.groupName === groupName);
 	if (conversa) {
+		const estaDigitando = "Está digitando...";
 		$GetConversaNoSidebar(conversa)
 			.find("[status]")
-			.html("Está digitando...");
+			.html(estaDigitando);
+
+		
+		if (conversa.EstaSelecionada()) {
+			const $statusNoChat = $(".chat-header [status-da-conversa]");
+			$statusNoChat.html(`${$statusNoChat.attr("status-da-conversa")}: ${estaDigitando}`);
+		}
 
 		setTimeout(() => {
 			NaoEstaMaisDigitando(conversa);
@@ -477,9 +475,12 @@ function EstaDigitando(groupName) {
 }
 
 function NaoEstaMaisDigitando(conversa) {
-	const $status = $GetConversaNoSidebar(conversa).find("[status]");
+	const $statusNoSidebar = $GetConversaNoSidebar(conversa).find("[status]");
 
-	$status.html($status.attr("status"));
+	$statusNoSidebar.html($statusNoSidebar.attr("status"));
+
+	const $statusNoChat = $(".chat-header [status-da-conversa]");
+	$statusNoChat.html($statusNoChat.attr("status-da-conversa"));
 }
 
 $("#chat-filter").on("keyup", () => {
@@ -601,3 +602,110 @@ function InicializaTooltip() {
 	$(".tooltipped")
 		.tooltip();
 }
+
+$(".chat-area").on("scroll", async e => {
+	const div = e.target;
+	//if (div.offsetHeight + div.scrollTop >= div.scrollHeight) {
+	//	//scrolledToBottom(e);
+	//}
+
+	if (!div.scrollTop) {
+		console.log(`offsetHeight: ${div.offsetHeight}`);
+		console.log(`offsetHeight + ScrollTop: ${div.offsetHeight + div.scrollTop}`);
+		console.log(`scrollHeight: ${div.scrollHeight}`);
+		//debugger;
+		const $conversaSelecionada = $GetConversaSelecionada();
+		const conversa = new Conversa().Build({ $conversa: $conversaSelecionada });
+		if (!conversa.carregouTodasAsMensagens) {
+			let primeiraMensagemAdicionadaNoChat = null;
+			const response = await chatController.BuscarMaisMensagens({
+				groupName: $conversaSelecionada.attr("group-name"),
+				codigoDaPrimeiraMensagemNoChat: parseInt($("[mensagem]").first().attr("id"))
+			});
+
+			const listaDeMensagens = response.Content().mensagens;
+
+			if (!listaDeMensagens.length) {
+				$conversaSelecionada.attr("carregou-todas-as-conversas", true);
+			}
+
+			$(listaDeMensagens)
+				.each(async (i, mensagem) => {
+					const estaCarregandoMaisMensagens = true;
+					mensagem = await conversas.AddMensagem(mensagem, estaCarregandoMaisMensagens);
+					//await AtualizarConversa(mensagem, estaCarregandoMaisMensagens, div.scrollHeight);
+
+					const $chats = $(".chats");
+					let foto;
+					const origemEhUsuarioLogado = groupNameUsuarioLogado === mensagem.groupNameOrigem;
+					if (origemEhUsuarioLogado) {
+						foto = sessionStorage.getItem("foto");
+					} else {
+						foto = conversa.foto;
+					}
+					let classes = "chat";
+					let classeDeOrientacaoDaHora;
+					if (origemEhUsuarioLogado) {
+						classes += " chat-right";
+						classeDeOrientacaoDaHora = "right";
+					} else {
+						classeDeOrientacaoDaHora = "left";
+					}
+					const date = new Date(mensagem.dataDaMensagem);
+					const hours = ConverteToLocaleString(date.getHours());
+					const minutes = ConverteToLocaleString(date.getMinutes());
+					const data = `${date.toLocaleDateString()} às ${hours}:${minutes}`;
+
+					const iconeLida = GetIconeSeMensagemEstaLida(mensagem);
+
+					const $primeiraPessoaQueEnviou = $chats.find(".chat").first();
+					if ($primeiraPessoaQueEnviou.is(`[group-name="${mensagem.groupNameOrigem}"]`)) {
+						$primeiraPessoaQueEnviou
+							.find(".chat-body")
+							.prepend(`
+            <div class="chat-text" mensagem id="${mensagem.id}">
+                <p>
+					<span>${mensagem.texto}</span>
+					<br />
+					<span class="${classeDeOrientacaoDaHora} data-mensagem" data-mensagem>${data}${iconeLida}</span>
+				</p>
+            </div>
+`);
+					} else {
+						$chats.prepend(`
+            <div class="${classes}" group-name="${mensagem.groupNameOrigem}">
+                <div class="chat-avatar hide-on-small-only">
+                    <a class="avatar">
+                        <img src="${foto}" class="circle" alt="avatar">
+                    </a>
+                </div>
+                <div class="chat-body">
+                    <div class="chat-text" mensagem id="${mensagem.id}">
+                        <p>
+							<span>${mensagem.texto}</span>
+							<br />
+							<span class="${classeDeOrientacaoDaHora} data-mensagem" data-mensagem>${data}${iconeLida
+							}</span>
+						</p>
+                    </div>
+                </div>
+            </div>
+`);
+					}
+					if (!primeiraMensagemAdicionadaNoChat) {
+						primeiraMensagemAdicionadaNoChat = $chats.find(".chat-text").first()[0];
+					}
+				});
+			await sleep(100);
+			InicializaTooltip();
+			//AtualizaScrollDaConversa(100);
+			//div.scrollTop = div.clientHeight;
+			if (primeiraMensagemAdicionadaNoChat && primeiraMensagemAdicionadaNoChat.offsetTop) {
+				if (top) {
+					$(".chat-area").scrollTop(primeiraMensagemAdicionadaNoChat.offsetTop);
+				}
+			}
+			//console.log(`scrollHeight depois: ${div.scrollHeight}`);
+		}
+	}
+});

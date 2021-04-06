@@ -3,6 +3,7 @@ using HelperSaeStandard11.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChatDoMhund.Data.Repository.Abstract
 {
@@ -38,6 +39,24 @@ namespace ChatDoMhund.Data.Repository.Abstract
                 response.Content = this._db.Set<TEntity>().Add(obj).Entity;
 
                 response.Status = this.SaveAll();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            return response;
+        }
+
+        public async Task<SaeResponseRepository<TEntity>> AddAsync(TEntity obj)
+        {
+            SaeResponseRepository<TEntity> response = new SaeResponseRepository<TEntity>();
+            try
+            {
+                await this._db.Set<TEntity>().AddAsync(obj);
+
+                response.Status = this.SaveAll();
+                response.Content = obj;
             }
             catch (Exception e)
             {

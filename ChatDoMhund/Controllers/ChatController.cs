@@ -87,6 +87,49 @@ namespace ChatDoMhund.Controllers
 			this._groupBuilder.DismantleGroupName(groupName, out int codigoDoCliente, out string tipoDeUsuario,
 				out int codigoDoUsuario);
 
+			PkUsuarioConversa usuarioConversa = this.GetUsuarioParaConversa(tipoDeUsuario, codigoDoUsuario);
+
+			int codigoDaEscola = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
+
+			List<ChatProfess> mensagens = this._chatDomain.GetMensagens(usuarioConversa);
+
+			PkConversa conversa = new PkConversa(usuarioConversa, mensagens, codigoDaEscola, this._groupBuilder);
+			return this.Json(new SaeResponse
+			{
+				Status = true,
+				Content = conversa
+			});
+		}
+
+		public JsonResult GetMensagens(string groupName, int codigoDaPrimeiraMensagemNoChat)
+		{
+			this._groupBuilder.DismantleGroupName(groupName, out int codigoDoCliente, out string tipoDeUsuario,
+				 out int codigoDoUsuario);
+			PkUsuarioConversa usuarioParaConversa = this.GetUsuarioParaConversa(tipoDeUsuario, codigoDoUsuario);
+			List<ChatProfess> mensagens = this._chatDomain.GetMensagens(usuarioParaConversa, codigoDaPrimeiraMensagemNoChat);
+
+			PkConversa conversa = new PkConversa(
+				usuario: usuarioParaConversa,
+				mensagensDoUsuario: mensagens,
+				codigoDoCliente: codigoDoCliente,
+				groupBuilder: this._groupBuilder,
+				deveOrdenar: false);
+
+			return this.Json(new SaeResponse { Status = true, Content = conversa });
+		}
+
+		public JsonResult LimparMensagens()
+		{
+			return this.Json(this._chatDomain.LimparTodasAsMensagens());
+		}
+
+		public JsonResult LimparLogs()
+		{
+			return this.Json(this._chatDomain.LimparTodosOsLogs());
+		}
+
+		private PkUsuarioConversa GetUsuarioParaConversa(string tipoDeUsuario, int codigoDoUsuario)
+		{
 			PkUsuarioConversa usuarioConversa = new PkUsuarioConversa();
 			if (TipoDeUsuarioDoChatTrata.EhAluno(tipoDeUsuario))
 			{
@@ -102,26 +145,7 @@ namespace ChatDoMhund.Controllers
 				usuarioConversa = this._pessoasRepository.GetResponsavelParaConversa(codigoDoUsuario).Content;
 			}
 
-			int codigoDaEscola = this._saeHelperCookie.GetCookie(ECookie.CodigoDoCliente).ConvertToInt32();
-
-			List<ChatProfess> mensagens = this._chatDomain.GetMensagens(usuarioConversa);
-
-			PkConversa conversa = new PkConversa(usuarioConversa, mensagens, codigoDaEscola, this._groupBuilder);
-			return this.Json(new SaeResponse
-			{
-				Status = true,
-				Content = conversa
-			});
-		}
-
-		public JsonResult LimparMensagens()
-		{
-			return this.Json(this._chatDomain.LimparTodasAsMensagens());
-		}
-
-		public JsonResult LimparLogs()
-		{
-			return this.Json(this._chatDomain.LimparTodosOsLogs());
+			return usuarioConversa;
 		}
 	}
 }
