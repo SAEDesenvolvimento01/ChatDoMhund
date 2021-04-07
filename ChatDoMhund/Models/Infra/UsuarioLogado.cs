@@ -52,12 +52,7 @@ namespace ChatDoMhund.Models.Infra
 			string logado = this._saeHelperSession.GetUsuarioLogado();
 			if (logado.TryDeserialize(out PkUsuarioLogado usuarioLogado))
 			{
-				this.Codigo = usuarioLogado.Codigo;
-				this.Nome = usuarioLogado.Nome;
-				this.OrigemDeChat = usuarioLogado.OrigemDeChat;
-				this.TipoDeUsuario = usuarioLogado.TipoDeUsuario;
-				this.RelacaoComAluno = usuarioLogado.RelacaoComAluno;
-				this.Permissoes = usuarioLogado.Permissoes;
+				this.SetDados(usuarioLogado);
 			}
 
 			return this;
@@ -79,7 +74,7 @@ namespace ChatDoMhund.Models.Infra
 			}
 			else if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Professor || tipoDoUsuario == TipoDeUsuarioDoChatTrata.Coordenador)
 			{
-				response = this._cadforpsRepository.GetUsuarioParaLogar(codigoDoUsuario);
+				response = this._cadforpsRepository.GetUsuarioParaLogar(codigoDoUsuario, tipoDoUsuario);
 			}
 			else if (tipoDoUsuario == TipoDeUsuarioDoChatTrata.Responsavel)
 			{
@@ -133,6 +128,7 @@ namespace ChatDoMhund.Models.Infra
 			this.Codigo = usuario.Codigo;
 			this.Nome = usuario.Nome;
 			this.TipoDeUsuario = usuario.TipoDeUsuario;
+			this.TipoDeProfessor = usuario.TipoDeProfessor;
 			this.Permissoes = usuario.Permissoes;
 			this.RelacaoComAluno = usuario.RelacaoComAluno;
 		}

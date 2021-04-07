@@ -6,6 +6,7 @@ using ChatDoMhund.Models.Domain;
 using ChatDoMhund.Models.Infra;
 using ChatDoMhund.Models.Poco;
 using ChatDoMhund.Models.ViewModels;
+using ChatDoMhundStandard.Tratamento;
 using HelperSaeCore31.Models.Infra.ControllerComponents.Interface;
 using HelperSaeStandard11.Models;
 using HelperSaeStandard11.Models.Extension;

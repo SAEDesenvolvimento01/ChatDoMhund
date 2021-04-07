@@ -16,7 +16,7 @@ namespace ChatDoMhund.Data.Repository
 		{
 		}
 
-		public SaeResponseRepository<PkUsuarioLogado> GetUsuarioParaLogar(int codigoDoUsuario)
+		public SaeResponseRepository<PkUsuarioLogado> GetUsuarioParaLogar(int codigoDoUsuario, string tipoDeProfessor)
 		{
 			PkUsuarioLogado usuario = this
 				._db
@@ -26,7 +26,8 @@ namespace ChatDoMhund.Data.Repository
 				{
 					Codigo = x.Codigo,
 					Nome = x.Nome,
-					TipoDeUsuario = TipoDeUsuarioDoChatTrata.Professor//tipoDoUsuario
+					TipoDeUsuario = TipoDeUsuarioDoChatTrata.Professor,//tipoDoUsuario
+					TipoDeProfessor = tipoDeProfessor
 				})
 				.FirstOrDefault(x => x.Codigo == codigoDoUsuario);
 

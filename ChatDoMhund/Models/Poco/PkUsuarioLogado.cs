@@ -11,6 +11,7 @@ namespace ChatDoMhund.Models.Poco
         public PkUsuarioLogadoPermissoes Permissoes { get; set; }
         public PkUsuarioLogadoRelacaoComAluno RelacaoComAluno { get; set; }
         public string OrigemDeChat { get; set; }
+        public string TipoDeProfessor { get; set; }
 
         public override string ToString()
         {

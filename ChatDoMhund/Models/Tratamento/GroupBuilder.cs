@@ -1,4 +1,5 @@
-﻿using HelperSaeCore31.Models.Enum;
+﻿using ChatDoMhundStandard.Tratamento;
+using HelperSaeCore31.Models.Enum;
 using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeStandard11.Handlers;
 
@@ -23,11 +24,21 @@ namespace ChatDoMhund.Models.Tratamento
 
 		public string BuildGroupName(string codigoDoCliente, string tipoDeUsuario, string codigoDoUsuario)
 		{
+			if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador)
+			{
+				tipoDeUsuario = TipoDeUsuarioDoChatTrata.Professor;
+			}
+
 			return $"{codigoDoCliente}-{tipoDeUsuario}-{codigoDoUsuario}";
 		}
 
 		public string BuildGroupName(int codigoDoCliente, string tipoDeUsuario, int codigoDoUsuario)
 		{
+			if (tipoDeUsuario == TipoDeUsuarioDoChatTrata.Coordenador)
+			{
+				tipoDeUsuario = TipoDeUsuarioDoChatTrata.Professor;
+			}
+
 			return $"{codigoDoCliente}-{tipoDeUsuario}-{codigoDoUsuario}";
 		}
 
