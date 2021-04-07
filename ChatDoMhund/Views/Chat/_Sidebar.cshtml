@@ -17,7 +17,7 @@
 							</div>
 							<div class="col s10">
 								<p class="m-0 blue-grey-text text-darken-4 font-weight-700">Bem-vindo(a), @this.Model.UsuarioLogado.Nome.GetPrimeiroEUltimoNome()</p>
-								<p class="m-0 info-text">Logado como: @TipoDeUsuarioDoChatTrata.TipoExtenso(this.Model.UsuarioLogado.TipoDeUsuario)</p>
+								<p class="m-0 info-text">Logado como: @TipoDeUsuarioDoChatTrata.TipoExtenso(this.Model.UsuarioLogado.TipoDeUsuario, this.Model.UsuarioLogado.TipoDeProfessor)</p>
 								@if(this.Model.UsuarioLogado.EhResponsavel())
 								{
 									<p class="m-0 info-text">Aluno: @this.Model.UsuarioLogado.GetNomeDoAluno()</p>

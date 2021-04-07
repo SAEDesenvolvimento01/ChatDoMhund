@@ -2,13 +2,11 @@
 using ChatDoMhund.Data.Repository;
 using ChatDoMhund.Models.Infra;
 using HelperMhundCore31;
-using HelperSaeCore31.Models.Infra.Cookie.Interface;
 using HelperSaeCore31.Models.Infra.Criptography;
 using HelperSaeStandard11.Handlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using ChatDoMhund.Models.Enum;
 
 namespace ChatDoMhund.Controllers
 {
@@ -19,19 +17,16 @@ namespace ChatDoMhund.Controllers
 		private readonly UsuarioLogado _usuarioLogado;
 		private readonly ConnectionManager _connectionManager;
 		private readonly AppCfgRepository _appCfgRepository;
-		private readonly ISaeHelperCookie _helperCookie;
 
 		public LoginController(SaeCriptography saeCriptography,
 			UsuarioLogado usuarioLogado,
 			ConnectionManager connectionManager,
-			AppCfgRepository appCfgRepository,
-			ISaeHelperCookie helperCookie)
+			AppCfgRepository appCfgRepository)
 		{
 			this._saeCriptography = saeCriptography;
 			this._usuarioLogado = usuarioLogado;
 			this._connectionManager = connectionManager;
 			this._appCfgRepository = appCfgRepository;
-			this._helperCookie = helperCookie;
 		}
 
 		//Aluno Gabriel (750) => https://chat.mhund.com.br/Login/Auth?e=99123&c=750&t=AL&o=MH&h=1C8AB2EB4AC2285F8028824878FD2884

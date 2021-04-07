@@ -6,10 +6,13 @@ const conversas = new Conversas();
 const chatToast = new ChatToast();
 var estouDigitando = false;
 var timeOutReconexao = 1000;
+var debugUsers = ["99123-AL-750", "99123-RE-1182", "99123-PR-1143"];
 
 $(() => {
 	CarregarConversas();
 	InicializarChat();
+	EsconderElementosIncompativeis();
+	SetDebugMessages();
 });
 
 const enterKey = 13;
@@ -462,7 +465,7 @@ function EstaDigitando(groupName) {
 			.find("[status]")
 			.html(estaDigitando);
 
-		
+
 		if (conversa.EstaSelecionada()) {
 			const $statusNoChat = $(".chat-header [status-da-conversa]");
 			$statusNoChat.html(`${$statusNoChat.attr("status-da-conversa")}: ${estaDigitando}`);
@@ -610,9 +613,9 @@ $(".chat-area").on("scroll", async e => {
 	//}
 
 	if (!div.scrollTop) {
-		console.log(`offsetHeight: ${div.offsetHeight}`);
-		console.log(`offsetHeight + ScrollTop: ${div.offsetHeight + div.scrollTop}`);
-		console.log(`scrollHeight: ${div.scrollHeight}`);
+		//console.log(`offsetHeight: ${div.offsetHeight}`);
+		//console.log(`offsetHeight + ScrollTop: ${div.offsetHeight + div.scrollTop}`);
+		//console.log(`scrollHeight: ${div.scrollHeight}`);
 		//debugger;
 		const $conversaSelecionada = $GetConversaSelecionada();
 		const conversa = new Conversa().Build({ $conversa: $conversaSelecionada });
@@ -709,3 +712,30 @@ $(".chat-area").on("scroll", async e => {
 		}
 	}
 });
+
+
+function SetDebugMessages() {
+	try {
+		if (debugUsers.includes(groupNameUsuarioLogado)) {
+			window.onerror = function (message, source, lineno, colno, error) {
+				const mensagem = `Message: "${message}", source: "${source}", line: "${lineno}", column: "${colno}", error: "${error}"`;
+				try {
+					new SaeMaterialSwal().Alert({
+						mensagem: mensagem
+					});
+				} catch (e) {
+					alert(mensagem);
+				}
+			};
+		}
+	} catch (e) {
+		console.log(e);
+	}
+}
+
+function EsconderElementosIncompativeis() {
+	if (isMobile.iOS()) {
+		$("div[div-titulo]").removeClass("s8").addClass("s12");
+		$("div[div-fullscreen]").hide();
+	}
+}

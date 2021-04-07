@@ -13,7 +13,7 @@ namespace ChatDoMhundStandard.Tratamento
 		public const string Responsavel = "RE";
 		public const string ResponsavelExtenso = "Responsável";
 
-		public static string TipoExtenso(string tipo)
+		public static string TipoExtenso(string tipo, string tipoDeProfessor = "")
 		{
 			if (!string.IsNullOrEmpty(tipo))
 			{
@@ -23,11 +23,12 @@ namespace ChatDoMhundStandard.Tratamento
 				}
 				if (tipo == Professor)
 				{
+					if (tipoDeProfessor == Coordenador)
+					{
+						return CoordenadorExtenso;
+					}
+
 					return ProfessorExtenso;
-				}
-				if (tipo == Coordenador)
-				{
-					return CoordenadorExtenso;
 				}
 				if (tipo == Responsavel)
 				{
